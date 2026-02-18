@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LC #5 — Longest Palindromic Substring | Center Expansion</title>
+    <meta name="description"
+        content="Interactive dry-run visualization of LeetCode #5 Longest Palindromic Substring using the Center Expansion technique.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #ffffff;
+            --bg2: #f8f9fc;
+            --bg3: #f1f3f8;
+            --card-bg: #ffffff;
+            --code-bg: #fafbfe;
+            --border: #e2e5ef;
+            --border-hover: #c5c9d8;
+            --text: #1a1d2e;
+            --text-secondary: #4a5068;
+            --text-dim: #8891a8;
+            --accent: #4f46e5;
+            --accent-light: #ede9fe;
+            --accent2: #7c3aed;
+            --emerald: #059669;
+            --emerald-bg: #ecfdf5;
+            --orange: #ea580c;
+            --orange-bg: #fff7ed;
+            --pink: #db2777;
+            --pink-bg: #fce7f3;
+            --yellow: #d97706;
+            --yellow-bg: #fffbeb;
+            --cyan: #0891b2;
+            --cyan-bg: #ecfeff;
+            --purple: #7c3aed;
+            --purple-bg: #f5f3ff;
+            --red: #dc2626;
+            --red-bg: #fef2f2;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+            --highlight-line: rgba(79, 70, 229, 0.06);
+            --radius: 14px;
+            --radius-sm: 10px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg2);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .header .badge {
+            background: var(--accent);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .header h1 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .header .tag {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--accent);
+            background: var(--accent-light);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* ===== CONTROLS BAR ===== */
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 24px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+        }
+
+        .input-group input[type="text"] {
+            background: var(--bg2);
+            border: 1.5px solid var(--border);
+            color: var(--accent);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            width: 220px;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .btn-run {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-run:hover {
+            background: var(--accent2);
+            box-shadow: var(--shadow-md);
+        }
+
+        .playback {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-left: 8px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .playback button {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all .15s;
+        }
+
+        .playback button:hover {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .playback button.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .speed-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 6px;
+        }
+
+        .speed-group label {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .speed-slider {
+            -webkit-appearance: none;
+            width: 72px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(79, 70, 229, 0.3);
+        }
+
+        .step-info {
+            margin-left: auto;
+            font-size: 13px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .step-info span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            height: calc(100vh - 106px);
+        }
+
+        /* ===== CODE PANEL ===== */
+        .code-panel {
+            background: var(--code-bg);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+        }
+
+        .code-panel::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .code-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .code-panel::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .code-title {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(250, 251, 254, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .code-title .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .dot-red {
+            background: #ff5f56;
+        }
+
+        .dot-yellow {
+            background: #ffbd2e;
+        }
+
+        .dot-green {
+            background: #27c93f;
+        }
+
+        .code-lines {
+            padding: 12px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            line-height: 1.85;
+        }
+
+        .code-line {
+            display: flex;
+            padding: 0 16px 0 0;
+            transition: background .2s;
+            position: relative;
+        }
+
+        .code-line.active {
+            background: var(--highlight-line);
+            border-left: 3px solid var(--accent);
+        }
+
+        .code-line.active .line-num {
+            color: var(--accent);
+        }
+
+        .line-num {
+            display: inline-block;
+            width: 42px;
+            text-align: right;
+            padding-right: 16px;
+            color: #c8cdd8;
+            user-select: none;
+            flex-shrink: 0;
+            font-size: 11px;
+        }
+
+        .line-content {
+            white-space: pre;
+            color: var(--text);
+        }
+
+        /* Syntax tokens */
+        .kw {
+            color: #8b5cf6;
+            font-weight: 500;
+        }
+
+        .tp {
+            color: #0891b2;
+        }
+
+        .fn {
+            color: #2563eb;
+        }
+
+        .str {
+            color: #059669;
+        }
+
+        .num {
+            color: #ea580c;
+        }
+
+        .cm {
+            color: #a0a8c0;
+            font-style: italic;
+        }
+
+        .op {
+            color: #64748b;
+        }
+
+        .br {
+            color: #94a3b8;
+        }
+
+        .ret {
+            color: #dc2626;
+            font-weight: 500;
+        }
+
+        /* ===== VIZ PANEL ===== */
+        .viz-panel {
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .viz-panel::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .viz-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .viz-panel::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        /* Cards */
+        .viz-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Char display */
+        .index-row,
+        .char-row {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .index-row {
+            margin-bottom: 4px;
+        }
+
+        .char-row {
+            margin-bottom: 24px;
+        }
+
+        .index-cell {
+            width: 44px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .char-cell {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg2);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            transition: all .3s ease;
+            position: relative;
+        }
+
+        .char-cell.pointer-i {
+            border-color: var(--yellow);
+            background: var(--yellow-bg);
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+        }
+
+        .char-cell.pointer-i::after {
+            content: 'i';
+            position: absolute;
+            bottom: -20px;
+            font-size: 10px;
+            color: var(--yellow);
+            font-weight: 700;
+        }
+
+        .char-cell.pointer-left {
+            border-color: var(--emerald);
+            background: var(--emerald-bg);
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+
+        .char-cell.pointer-left::after {
+            content: 'L';
+            position: absolute;
+            top: -18px;
+            font-size: 10px;
+            color: var(--emerald);
+            font-weight: 700;
+        }
+
+        .char-cell.pointer-right {
+            border-color: var(--pink);
+            background: var(--pink-bg);
+            box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.1);
+        }
+
+        .char-cell.pointer-right::after {
+            content: 'R';
+            position: absolute;
+            top: -18px;
+            font-size: 10px;
+            color: var(--pink);
+            font-weight: 700;
+        }
+
+        .char-cell.matched {
+            background: var(--cyan-bg);
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+
+        .char-cell.best-palindrome {
+            background: var(--purple-bg);
+            border-color: var(--purple);
+            color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .char-cell.mismatch {
+            border-color: var(--red);
+            background: var(--red-bg);
+        }
+
+        /* Variables grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .info-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+        }
+
+        .info-card .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: var(--text-dim);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .info-card .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .info-card.cyan .value {
+            color: var(--cyan);
+        }
+
+        .info-card.purple .value {
+            color: var(--purple);
+        }
+
+        .info-card.emerald .value {
+            color: var(--emerald);
+        }
+
+        .info-card.orange .value {
+            color: var(--orange);
+        }
+
+        .info-card.pink .value {
+            color: var(--pink);
+        }
+
+        .info-card.yellow .value {
+            color: var(--yellow);
+        }
+
+        /* Step description */
+        .step-text {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .step-text .highlight-cyan {
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        .step-text .highlight-purple {
+            color: var(--purple);
+            font-weight: 600;
+        }
+
+        .step-text .highlight-emerald {
+            color: var(--emerald);
+            font-weight: 600;
+        }
+
+        /* Palindrome result display */
+        .result-palindrome {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 26px;
+            font-weight: 700;
+            text-align: center;
+            padding: 16px;
+            background: var(--purple-bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            letter-spacing: 4px;
+            color: var(--purple);
+        }
+
+        .result-palindrome .pal-char.glow {
+            color: var(--accent);
+        }
+
+        /* Welcome state */
+        .welcome {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            gap: 14px;
+            padding: 40px;
+        }
+
+        .welcome-icon {
+            font-size: 56px;
+            margin-bottom: 4px;
+        }
+
+        .welcome h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .welcome p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            max-width: 380px;
+            line-height: 1.6;
+        }
+
+        .welcome .shortcut {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--accent-light);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeSlideIn .3s ease forwards;
+        }
+
+        @media (max-width: 900px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+
+            .code-panel {
+                max-height: 280px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <a href="../../index.html" class="back-btn">← Home</a>
+        <span class="badge">LC #5</span>
+        <h1>Longest Palindromic Substring</h1>
+        <span class="tag">Center Expansion</span>
+    </div>
+
+    <div class="controls-bar">
+        <div class="input-group">
+            <label>Input</label>
+            <input type="text" id="inputStr" value="babad" placeholder="Enter string…">
+        </div>
+        <button class="btn btn-run" id="runBtn" onclick="runVisualization()">▶ Run</button>
+        <div class="playback">
+            <button onclick="goToStart()" title="First step">⏮</button>
+            <button onclick="prevStep()" title="Previous">◀</button>
+            <button id="playPauseBtn" onclick="togglePlay()" title="Play / Pause">▶</button>
+            <button onclick="nextStep()" title="Next">▶</button>
+            <button onclick="goToEnd()" title="Last step">⏭</button>
+        </div>
+        <div class="speed-group">
+            <label>Speed</label>
+            <input type="range" class="speed-slider" id="speedSlider" min="100" max="2000" value="800" step="100">
+        </div>
+        <div class="step-info">Step <span id="stepCurrent">0</span> / <span id="stepTotal">0</span></div>
+    </div>
+
+    <div class="main">
+        <div class="code-panel">
+            <div class="code-title">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+                Solution.java
+            </div>
+            <div class="code-lines" id="codeLines"></div>
+        </div>
+        <div class="viz-panel" id="vizPanel">
+            <div class="welcome" id="welcomeState">
+                <div class="welcome-icon">🔍</div>
+                <h2>Center Expansion Visualizer</h2>
+                <p>Enter a string and click <strong>Run</strong> to see the algorithm expand from each center to find
+                    the longest palindromic substring.</p>
+                <p>Default: <span class="shortcut">"babad"</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CODE_LINES = [
+            { tokens: [{ t: 'kw', v: 'class' }, { t: 'tp', v: ' Solution' }, { t: 'br', v: ' {' }] },
+            { tokens: [{ t: 'kw', v: '    public' }, { t: 'tp', v: ' String' }, { t: 'fn', v: ' longestPalindrome' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String' }, { t: '', v: ' s' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '        if' }, { t: 'br', v: ' (' }, { t: '', v: 's' }, { t: 'op', v: ' == ' }, { t: 'kw', v: 'null' }, { t: 'op', v: ' || ' }, { t: '', v: 's.length()' }, { t: 'op', v: ' < ' }, { t: 'num', v: '1' }, { t: 'br', v: ')' }, { t: 'ret', v: ' return' }, { t: 'str', v: ' ""' }, { t: 'op', v: ';' }] },
+            { tokens: [] },
+            { tokens: [{ t: 'tp', v: '        int' }, { t: '', v: ' start' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        int' }, { t: '', v: ' end' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [] },
+            { tokens: [{ t: 'kw', v: '        for' }, { t: 'br', v: ' (' }, { t: 'tp', v: 'int' }, { t: '', v: ' i' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: '', v: 'i' }, { t: 'op', v: ' < ' }, { t: '', v: 's.length()' }, { t: 'op', v: '; ' }, { t: '', v: 'i++' }, { t: 'br', v: ') {' }] },
+            { tokens: [] },
+            { tokens: [{ t: 'tp', v: '            int' }, { t: '', v: ' len1' }, { t: 'op', v: ' = ' }, { t: 'fn', v: 'expandFromCenter' }, { t: 'br', v: '(' }, { t: '', v: 's, i, i' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '            int' }, { t: '', v: ' len2' }, { t: 'op', v: ' = ' }, { t: 'fn', v: 'expandFromCenter' }, { t: 'br', v: '(' }, { t: '', v: 's, i, i + 1' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [] },
+            { tokens: [{ t: 'tp', v: '            int' }, { t: '', v: ' len' }, { t: 'op', v: ' = ' }, { t: 'fn', v: 'Math.max' }, { t: 'br', v: '(' }, { t: '', v: 'len1, len2' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [] },
+            { tokens: [{ t: 'kw', v: '            if' }, { t: 'br', v: ' (' }, { t: '', v: 'len' }, { t: 'op', v: ' > ' }, { t: '', v: 'end - start' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: '', v: '                start' }, { t: 'op', v: ' = ' }, { t: '', v: 'i - (len - 1) / 2' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: '', v: '                end' }, { t: 'op', v: ' = ' }, { t: '', v: 'i + len / 2' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [] },
+            { tokens: [{ t: 'ret', v: '        return' }, { t: '', v: ' s.substring' }, { t: 'br', v: '(' }, { t: '', v: 'start, end + 1' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [] },
+            { tokens: [{ t: 'kw', v: '    private' }, { t: 'tp', v: ' int' }, { t: 'fn', v: ' expandFromCenter' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String' }, { t: '', v: ' s, ' }, { t: 'tp', v: 'int' }, { t: '', v: ' left, ' }, { t: 'tp', v: 'int' }, { t: '', v: ' right' }, { t: 'br', v: ') {' }] },
+            { tokens: [] },
+            { tokens: [{ t: 'kw', v: '        while' }, { t: 'br', v: ' (' }, { t: '', v: 'left' }, { t: 'op', v: ' >= ' }, { t: 'num', v: '0' }, { t: 'op', v: ' &&' }] },
+            { tokens: [{ t: '', v: '               right' }, { t: 'op', v: ' < ' }, { t: '', v: 's.length()' }, { t: 'op', v: ' &&' }] },
+            { tokens: [{ t: '', v: '               s.charAt(left)' }, { t: 'op', v: ' == ' }, { t: '', v: 's.charAt(right)' }, { t: 'br', v: ') {' }] },
+            { tokens: [] },
+            { tokens: [{ t: '', v: '            left' }, { t: 'op', v: '--' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: '', v: '            right' }, { t: 'op', v: '++' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [] },
+            { tokens: [{ t: 'ret', v: '        return' }, { t: '', v: ' right - left - 1' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ];
+
+        function renderCode() {
+            const c = document.getElementById('codeLines');
+            c.innerHTML = '';
+            CODE_LINES.forEach((line, i) => {
+                const div = document.createElement('div');
+                div.className = 'code-line';
+                div.id = `cl-${i}`;
+                const num = document.createElement('span');
+                num.className = 'line-num';
+                num.textContent = i + 1;
+                div.appendChild(num);
+                const content = document.createElement('span');
+                content.className = 'line-content';
+                if (!line.tokens.length) { content.innerHTML = '&nbsp;'; }
+                else { content.innerHTML = line.tokens.map(t => t.t ? `<span class="${t.t}">${esc(t.v)}</span>` : esc(t.v)).join(''); }
+                div.appendChild(content);
+                c.appendChild(div);
+            });
+        }
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function highlightLine(idx) {
+            document.querySelectorAll('.code-line.active').forEach(e => e.classList.remove('active'));
+            if (idx !== null && idx >= 0) {
+                const el = document.getElementById(`cl-${idx}`);
+                if (el) { el.classList.add('active'); el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+            }
+        }
+
+        // ===== TRACE =====
+        function generateTrace(s) {
+            const steps = [];
+            if (!s || s.length < 1) { steps.push({ type: 'init', codeLine: 2, desc: 'Empty input — return ""', vars: {}, charStates: [] }); return steps; }
+            let start = 0, end = 0;
+            steps.push({ type: 'init', codeLine: 4, desc: 'Initialize <span class="highlight-cyan">start = 0</span>, <span class="highlight-cyan">end = 0</span>', vars: { start: 0, end: 0, i: '-', left: '-', right: '-', len1: '-', len2: '-', len: '-' }, charStates: new Array(s.length).fill('default'), bestStart: 0, bestEnd: 0 });
+
+            for (let i = 0; i < s.length; i++) {
+                const cs = new Array(s.length).fill('default'); cs[i] = 'pointer-i';
+                steps.push({ type: 'for-i', codeLine: 7, desc: `Outer loop: <span class="highlight-cyan">i = ${i}</span>, center at '<span class="highlight-purple">${s[i]}</span>'`, vars: { start, end, i, left: '-', right: '-', len1: '-', len2: '-', len: '-' }, charStates: cs, pointerI: i, bestStart: start, bestEnd: end });
+
+                const odd = traceExpand(s, i, i);
+                odd.steps.forEach(st => { st.vars.start = start; st.vars.end = end; st.vars.i = i; st.bestStart = start; st.bestEnd = end; steps.push(st); });
+                const len1 = odd.result;
+                steps.push({ type: 'len1', codeLine: 9, desc: `Odd expansion: <span class="highlight-emerald">len1 = ${len1}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2: '-', len: '-' }, charStates: odd.matched, pointerI: i, bestStart: start, bestEnd: end });
+
+                const even = traceExpand(s, i, i + 1);
+                even.steps.forEach(st => { st.vars.start = start; st.vars.end = end; st.vars.i = i; st.bestStart = start; st.bestEnd = end; steps.push(st); });
+                const len2 = even.result;
+                steps.push({ type: 'len2', codeLine: 10, desc: `Even expansion: <span class="highlight-emerald">len2 = ${len2}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2, len: '-' }, charStates: even.matched, pointerI: i, bestStart: start, bestEnd: end });
+
+                const len = Math.max(len1, len2);
+                steps.push({ type: 'max', codeLine: 12, desc: `<span class="highlight-cyan">len = max(${len1}, ${len2}) = ${len}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2, len }, charStates: new Array(s.length).fill('default'), pointerI: i, bestStart: start, bestEnd: end });
+
+                if (len > end - start) {
+                    const os = start, oe = end;
+                    start = i - Math.floor((len - 1) / 2);
+                    end = i + Math.floor(len / 2);
+                    const bs = new Array(s.length).fill('default');
+                    for (let k = start; k <= end; k++) bs[k] = 'best-palindrome';
+                    steps.push({ type: 'update', codeLine: 15, desc: `New best! <span class="highlight-purple">len ${len} > ${oe - os}</span> → <span class="highlight-cyan">start=${start}, end=${end}</span> → "<span class="highlight-purple">${s.substring(start, end + 1)}</span>"`, vars: { start, end, i, left: '-', right: '-', len1, len2, len }, charStates: bs, pointerI: i, bestStart: start, bestEnd: end });
+                } else {
+                    steps.push({ type: 'skip', codeLine: 14, desc: `No update: <span class="highlight-cyan">len ${len} ≤ ${end - start}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2, len }, charStates: new Array(s.length).fill('default'), pointerI: i, bestStart: start, bestEnd: end });
+                }
+            }
+            const fs = new Array(s.length).fill('default');
+            for (let k = start; k <= end; k++) fs[k] = 'best-palindrome';
+            steps.push({ type: 'result', codeLine: 20, desc: `Return "<span class="highlight-purple">${s.substring(start, end + 1)}</span>"`, vars: { start, end }, charStates: fs, bestStart: start, bestEnd: end, finalResult: s.substring(start, end + 1) });
+            return steps;
+        }
+
+        function traceExpand(s, iL, iR) {
+            const steps = []; let left = iL, right = iR;
+            const label = iL === iR ? 'Odd' : 'Even';
+            const es = new Array(s.length).fill('default');
+            if (left >= 0 && left < s.length) es[left] = 'pointer-left';
+            if (right >= 0 && right < s.length) es[right] = right === left ? 'pointer-left' : 'pointer-right';
+            steps.push({ type: 'exp-entry', codeLine: 23, desc: `${label}: <span class="highlight-emerald">expandFromCenter(s, ${iL}, ${iR})</span>`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: es });
+            let matched = new Array(s.length).fill('default');
+            while (left >= 0 && right < s.length && s[left] === s[right]) {
+                const st = new Array(s.length).fill('default');
+                st[left] = 'pointer-left'; if (right !== left) st[right] = 'pointer-right';
+                for (let k = left; k <= right; k++) if (k !== left && k !== right) st[k] = 'matched';
+                matched = [...st];
+                steps.push({ type: 'exp-match', codeLine: 27, desc: `Match! s[${left}]='<span class="highlight-emerald">${s[left]}</span>' == s[${right}]='<span class="highlight-emerald">${s[right]}</span>'`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: st });
+                left--; right++;
+            }
+            if (left >= 0 && right < s.length) {
+                const st = [...matched]; if (left >= 0 && left < s.length) st[left] = 'mismatch'; if (right < s.length) st[right] = 'mismatch';
+                steps.push({ type: 'exp-mis', codeLine: 27, desc: `Mismatch: s[${left}]='${s[left]}' ≠ s[${right}]='${s[right]}'`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: st });
+            } else {
+                steps.push({ type: 'exp-oob', codeLine: 31, desc: `Out of bounds (left=${left}, right=${right})`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: matched });
+            }
+            const res = right - left - 1;
+            steps.push({ type: 'exp-ret', codeLine: 33, desc: `Return <span class="highlight-cyan">${right} - ${left} - 1 = ${res}</span>`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: matched });
+            return { steps, result: res, matched };
+        }
+
+        // ===== STATE =====
+        let steps = [], currentStep = 0, isPlaying = false, playInterval = null, currentInput = 'babad';
+
+        function runVisualization() {
+            const v = document.getElementById('inputStr').value.trim();
+            if (!v) return;
+            currentInput = v;
+            steps = generateTrace(v);
+            currentStep = 0;
+            stopPlay();
+            document.getElementById('welcomeState').style.display = 'none';
+            renderStep();
+        }
+
+        function renderStep() {
+            if (!steps.length) return;
+            const step = steps[currentStep];
+            document.getElementById('stepCurrent').textContent = currentStep + 1;
+            document.getElementById('stepTotal').textContent = steps.length;
+            highlightLine(step.codeLine);
+            renderViz(step);
+        }
+
+        function renderViz(step) {
+            const panel = document.getElementById('vizPanel');
+            const w = document.getElementById('welcomeState');
+            if (w) w.style.display = 'none';
+            panel.querySelectorAll('.viz-content').forEach(e => e.remove());
+
+            const wrap = document.createElement('div');
+            wrap.className = 'viz-content animate-in';
+
+            // String
+            const sv = document.createElement('div');
+            sv.className = 'viz-card';
+            sv.innerHTML = '<div class="section-label">📝 String</div>';
+            const ir = document.createElement('div'); ir.className = 'index-row';
+            const cr = document.createElement('div'); cr.className = 'char-row';
+            const cs = step.charStates || [];
+            for (let i = 0; i < currentInput.length; i++) {
+                const ic = document.createElement('div'); ic.className = 'index-cell'; ic.textContent = i; ir.appendChild(ic);
+                const cc = document.createElement('div'); cc.className = 'char-cell';
+                if (cs[i] && cs[i] !== 'default') cc.classList.add(cs[i]);
+                if (step.pointerI === i && !cc.classList.contains('pointer-left') && !cc.classList.contains('pointer-right') && !cc.classList.contains('best-palindrome')) cc.classList.add('pointer-i');
+                cc.textContent = currentInput[i]; cr.appendChild(cc);
+            }
+            sv.appendChild(ir); sv.appendChild(cr); wrap.appendChild(sv);
+
+            // Variables
+            const vars = step.vars || {};
+            const ev = document.createElement('div');
+            ev.className = 'viz-card';
+            ev.innerHTML = '<div class="section-label">📊 Variables</div>';
+            const grid = document.createElement('div'); grid.className = 'info-grid';
+            [{ k: 'i', l: 'i (center)', c: 'yellow' }, { k: 'left', l: 'left', c: 'emerald' }, { k: 'right', l: 'right', c: 'pink' }, { k: 'len1', l: 'len1 (odd)', c: 'cyan' }, { k: 'len2', l: 'len2 (even)', c: 'cyan' }, { k: 'len', l: 'len (max)', c: 'purple' }, { k: 'start', l: 'start', c: 'orange' }, { k: 'end', l: 'end', c: 'orange' }].forEach(v => {
+                const card = document.createElement('div'); card.className = `info-card ${v.c}`;
+                card.innerHTML = `<div class="label">${v.l}</div><div class="value">${vars[v.k] !== undefined ? vars[v.k] : '-'}</div>`;
+                grid.appendChild(card);
+            });
+            ev.appendChild(grid); wrap.appendChild(ev);
+
+            // Step detail
+            const sd = document.createElement('div'); sd.className = 'viz-card';
+            sd.innerHTML = `<div class="section-label">💡 Step Detail</div><div class="step-text">${step.desc}</div>`;
+            wrap.appendChild(sd);
+
+            // Best palindrome
+            const bs = step.bestStart !== undefined ? step.bestStart : 0;
+            const be = step.bestEnd !== undefined ? step.bestEnd : 0;
+            const bp = step.finalResult || currentInput.substring(bs, be + 1);
+            const rc = document.createElement('div'); rc.className = 'viz-card';
+            rc.innerHTML = `<div class="section-label">🏆 ${step.finalResult ? 'Final Result' : 'Best Palindrome So Far'}</div>`;
+            const pd = document.createElement('div'); pd.className = 'result-palindrome';
+            pd.innerHTML = bp.split('').map(c => `<span class="pal-char ${step.finalResult ? 'glow' : ''}">${esc(c)}</span>`).join('');
+            rc.appendChild(pd); wrap.appendChild(rc);
+            panel.appendChild(wrap);
+        }
+
+        // Playback
+        function nextStep() { if (currentStep < steps.length - 1) { currentStep++; renderStep(); } else stopPlay(); }
+        function prevStep() { if (currentStep > 0) { currentStep--; renderStep(); } }
+        function goToStart() { currentStep = 0; renderStep(); }
+        function goToEnd() { currentStep = steps.length - 1; renderStep(); }
+        function togglePlay() { isPlaying ? stopPlay() : startPlay(); }
+        function startPlay() { if (!steps.length) return; isPlaying = true; document.getElementById('playPauseBtn').textContent = '⏸'; document.getElementById('playPauseBtn').classList.add('active'); const spd = parseInt(document.getElementById('speedSlider').value); playInterval = setInterval(() => { if (currentStep < steps.length - 1) { currentStep++; renderStep(); } else stopPlay(); }, spd); }
+        function stopPlay() { isPlaying = false; document.getElementById('playPauseBtn').textContent = '▶'; document.getElementById('playPauseBtn').classList.remove('active'); if (playInterval) { clearInterval(playInterval); playInterval = null; } }
+        document.getElementById('speedSlider').addEventListener('input', () => { if (isPlaying) { stopPlay(); startPlay(); } });
+        document.getElementById('inputStr').addEventListener('keydown', e => { if (e.key === 'Enter') runVisualization(); });
+        renderCode();
+    </script>
+</body>
+
+</html>
