@@ -551,10 +551,141 @@
         .problem-card:hover .card-title {
             color: var(--accent);
         }
+
+        /* ===== MODAL & FLOATING DASHBOARD BTN ===== */
+        .dash-toggle-btn {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px 20px;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            transition: all .2s;
+        }
+
+        .dash-toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
+        }
+
+        .dashboard-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        .dashboard-modal.active {
+            display: flex;
+        }
+
+        .dashboard-modal-content {
+            background: transparent;
+            width: 100%;
+            max-width: 1100px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: fadeUp .3s ease forwards;
+        }
+
+        .dashboard-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 20px;
+            line-height: 1;
+            color: var(--text-dim);
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .dashboard-close:hover {
+            color: var(--text);
+            border-color: var(--accent);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 
 <body>
+
+    <button class="dash-toggle-btn" onclick="toggleDashboard()">
+        📅 Revision Dashboard
+    </button>
+
+    <div class="dashboard-modal" id="dashboardModal">
+        <div class="dashboard-modal-content">
+            <button class="dashboard-close" onclick="toggleDashboard()">&times;</button>
+            <div class="srs-dashboard" style="margin-bottom: 0;">
+                <div class="srs-header">
+                    <div class="srs-header-left">
+                        <div class="srs-icon">📅</div>
+                        <div>
+                            <h2>Revision Dashboard</h2>
+                            <p>Spaced repetition tracking for your solved problems</p>
+                        </div>
+                    </div>
+                    <div class="srs-controls">
+                        <button class="srs-btn srs-btn-secondary" onclick="exportSrsData()"
+                            title="Backup data to a file">Export</button>
+                        <button class="srs-btn srs-btn-secondary"
+                            onclick="document.getElementById('importFile').click()"
+                            title="Restore data from a file">Import</button>
+                        <input type="file" id="importFile" style="display:none" accept=".json"
+                            onchange="importSrsData(event)">
+
+                        <button class="srs-btn srs-btn-secondary" onclick="addManualProblem()"
+                            title="Add a problem manually">+ Add Manual</button>
+
+                        <input type="text" id="scriptUrl" class="srs-input" title="Apps Script Web App URL"
+                            placeholder="Paste Web App URL here" style="min-width: 250px;">
+                        <input type="text" id="lcUsername" class="srs-input" title="LeetCode Username"
+                            placeholder="Enter LeetCode Username">
+                        <button class="srs-btn srs-btn-primary" id="syncBtn" onclick="syncSubmissions()">
+                            <div class="spinner" id="syncSpinner"></div>
+                            <span id="syncText">Sync Submissions</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="srs-list" id="srsList">
+                    <!-- Revision items will be generated here -->
+                    <div class="srs-empty">Loading your revision schedule...</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="hero">
         <div class="hero-badge">⚡ Interactive Algorithm Visualizer</div>
@@ -569,43 +700,6 @@
     </div>
 
     <div class="content" id="content">
-        <!-- ===== SRS DASHBOARD ===== -->
-        <div class="srs-dashboard">
-            <div class="srs-header">
-                <div class="srs-header-left">
-                    <div class="srs-icon">📅</div>
-                    <div>
-                        <h2>Revision Dashboard</h2>
-                        <p>Spaced repetition tracking for your solved problems</p>
-                    </div>
-                </div>
-                <div class="srs-controls">
-                    <button class="srs-btn srs-btn-secondary" onclick="exportSrsData()"
-                        title="Backup data to a file">Export</button>
-                    <button class="srs-btn srs-btn-secondary" onclick="document.getElementById('importFile').click()"
-                        title="Restore data from a file">Import</button>
-                    <input type="file" id="importFile" style="display:none" accept=".json"
-                        onchange="importSrsData(event)">
-
-                    <button class="srs-btn srs-btn-secondary" onclick="addManualProblem()"
-                        title="Add a problem manually">+ Add Manual</button>
-
-                    <input type="text" id="scriptUrl" class="srs-input" title="Apps Script Web App URL"
-                        placeholder="Paste Web App URL here" style="min-width: 250px;">
-                    <input type="text" id="lcUsername" class="srs-input" title="LeetCode Username"
-                        placeholder="Enter LeetCode Username">
-                    <button class="srs-btn srs-btn-primary" id="syncBtn" onclick="syncSubmissions()">
-                        <div class="spinner" id="syncSpinner"></div>
-                        <span id="syncText">Sync Submissions</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="srs-list" id="srsList">
-                <!-- Revision items will be generated here -->
-                <div class="srs-empty">Loading your revision schedule...</div>
-            </div>
-        </div>
 
         <!-- ===== CENTER EXPANSION (Pattern top-level) ===== -->
         <div class="pattern-section" data-pattern="center-expansion">
@@ -1061,8 +1155,19 @@
                 alert("Could not append manual problem to Sheets.");
             }
         }
+        // ===== DASHBOARD MODAL LOGIC =====
+        function toggleDashboard() {
+            const modal = document.getElementById('dashboardModal');
+            modal.classList.toggle('active');
 
-        // Initialize dashboard on load
+            // Re-render when opening to ensure fresh data and adjust UI
+            if (modal.classList.contains('active')) {
+                // Ensure data is loaded or load if none exists
+                renderDashboard();
+            }
+        }
+
+        // Initialize dashboard silently on load so problems are ready when toggle is clicked
         document.addEventListener('DOMContentLoaded', () => {
             renderDashboard();
         });
