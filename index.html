@@ -779,46 +779,78 @@
 
             const now = new Date();
             const dueProblems = [];
+            const upcomingProblems = [];
 
             for (const [slug, prob] of Object.entries(data.problems)) {
                 const dueDate = new Date(prob.nextDueDate);
+                const probData = { ...prob, slug };
                 if (dueDate.setHours(0, 0, 0, 0) <= now.setHours(0, 0, 0, 0)) {
-                    dueProblems.push({ ...prob, slug });
+                    dueProblems.push(probData);
+                } else {
+                    upcomingProblems.push(probData);
                 }
-            }
-
-            if (dueProblems.length === 0) {
-                listEl.innerHTML = `<div class="srs-empty">🎉 All caught up! Nothing due for revision today.</div>`;
-                return;
             }
 
             // Sort by earliest due date
             dueProblems.sort((a, b) => new Date(a.nextDueDate) - new Date(b.nextDueDate));
+            upcomingProblems.sort((a, b) => new Date(a.nextDueDate) - new Date(b.nextDueDate));
 
             let html = '';
-            dueProblems.forEach(p => {
-                const targetPath = findPathForSlug(p.slug) || '#';
-                const linkTag = targetPath !== '#' ? `<a href="${targetPath}" target="_blank" style="color: inherit; text-decoration: none;">${p.title} ↗</a>` : p.title;
 
-                html += `
-                <div class="srs-item">
-                    <div class="srs-item-left">
-                        <div class="srs-item-title">${linkTag}</div>
-                        <div class="srs-item-meta">
-                            <span class="srs-item-level">
-                                <span class="srs-item-level-indicator" style="opacity: ${0.4 + (p.level * 0.2)}"></span>
-                                Level ${p.level} (+${getIntervalDays(p.level) / 7} wks)
-                            </span>
-                            <span>Due: ${new Date(p.nextDueDate).toLocaleDateString()}</span>
+            // 1. Due Problems Section
+            html += `<h4 style="margin-top: 8px; margin-bottom: 12px; font-size: 16px; color: var(--text);">Due for Revision (${dueProblems.length})</h4>`;
+            if (dueProblems.length === 0) {
+                html += `<div class="srs-empty">🎉 All caught up! Nothing due for revision today.</div>`;
+            } else {
+                dueProblems.forEach(p => {
+                    const targetPath = findPathForSlug(p.slug) || '#';
+                    const linkTag = targetPath !== '#' ? `<a href="${targetPath}" target="_blank" style="color: inherit; text-decoration: none;">${p.title} ↗</a>` : p.title;
+
+                    html += `
+                    <div class="srs-item" id="srs-item-${p.slug}">
+                        <div class="srs-item-left">
+                            <div class="srs-item-title">${linkTag}</div>
+                            <div class="srs-item-meta">
+                                <span class="srs-item-level">
+                                    <span class="srs-item-level-indicator" style="opacity: ${0.4 + (p.level * 0.2)}"></span>
+                                    Level ${p.level} (+${getIntervalDays(p.level) / 7} wks)
+                                </span>
+                                <span style="color: var(--pink); font-weight: 600;">Due: ${new Date(p.nextDueDate).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                        <div class="srs-actions">
+                            <button class="srs-btn srs-btn-success" onclick="markRevision('${p.slug}', true)" title="Remembered easily">+ Level Up</button>
+                            <button class="srs-btn srs-btn-fail" onclick="markRevision('${p.slug}', false)" title="Needed help/Forgot">Reset</button>
                         </div>
                     </div>
-                    <div class="srs-actions">
-                        <button class="srs-btn srs-btn-success" onclick="markRevision('${p.slug}', true)" title="Remembered easily">+ Level Up</button>
-                        <button class="srs-btn srs-btn-fail" onclick="markRevision('${p.slug}', false)" title="Needed help/Forgot">Reset</button>
+                    `;
+                });
+            }
+
+            // 2. Upcoming Problems Section
+            if (upcomingProblems.length > 0) {
+                html += `<h4 style="margin-top: 32px; margin-bottom: 12px; font-size: 16px; color: var(--text);">Upcoming Revisions (${upcomingProblems.length})</h4>`;
+                upcomingProblems.forEach(p => {
+                    const targetPath = findPathForSlug(p.slug) || '#';
+                    const linkTag = targetPath !== '#' ? `<a href="${targetPath}" target="_blank" style="color: inherit; text-decoration: none;">${p.title} ↗</a>` : p.title;
+
+                    html += `
+                    <div class="srs-item" style="opacity: 0.8;">
+                        <div class="srs-item-left">
+                            <div class="srs-item-title">${linkTag}</div>
+                            <div class="srs-item-meta">
+                                <span class="srs-item-level">
+                                    <span class="srs-item-level-indicator" style="opacity: ${0.4 + (p.level * 0.2)}"></span>
+                                    Level ${p.level} (+${getIntervalDays(p.level) / 7} wks)
+                                </span>
+                                <span style="color: var(--emerald);">Scheduled: ${new Date(p.nextDueDate).toLocaleDateString()}</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                `;
-            });
+                    `;
+                });
+            }
+
             listEl.innerHTML = html;
         }
 
