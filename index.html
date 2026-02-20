@@ -819,6 +819,20 @@
             }
         }
 
+        // Helper to snap next due dates to the upcoming Saturday (or keep as Sunday if already Sunday)
+        function calculateNextWeekend(baseDate, daysToAdd) {
+            const nextDue = new Date(baseDate);
+            nextDue.setDate(nextDue.getDate() + daysToAdd);
+
+            const dayOfWeek = nextDue.getDay();
+            if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                // Snap forward to the next Saturday
+                const daysUntilSaturday = 6 - dayOfWeek;
+                nextDue.setDate(nextDue.getDate() + daysUntilSaturday);
+            }
+            return nextDue;
+        }
+
         async function fetchSrsData(url, username) {
             if (!url || !username) return null;
 
@@ -1006,8 +1020,7 @@
                 if (sub.statusDisplay === "Accepted") {
                     if (!existingProblems[sub.titleSlug]) {
                         // New problem solved!
-                        const nextDue = new Date(now);
-                        nextDue.setDate(nextDue.getDate() + 7);
+                        const nextDue = calculateNextWeekend(now, 7);
 
                         toPush.push({
                             slug: sub.titleSlug,
@@ -1068,8 +1081,7 @@
             }
 
             const daysToAdd = getIntervalDays(newLevel);
-            const nextDue = new Date(now);
-            nextDue.setDate(now.getDate() + daysToAdd);
+            const nextDue = calculateNextWeekend(now, daysToAdd);
 
             const nextDueIso = nextDue.toISOString();
 
@@ -1124,8 +1136,7 @@
             }
 
             const now = new Date();
-            const nextDue = new Date(now);
-            nextDue.setDate(nextDue.getDate() + 7);
+            const nextDue = calculateNextWeekend(now, 7);
 
             try {
                 const response = await fetch(urlInput, {
