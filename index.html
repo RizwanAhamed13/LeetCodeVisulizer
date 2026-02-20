@@ -155,6 +155,216 @@
             padding: 40px 24px 80px;
         }
 
+        /* ===== SRS DASHBOARD ===== */
+        .srs-dashboard {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-sm);
+            animation: fadeUp .4s ease forwards;
+        }
+
+        .srs-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .srs-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .srs-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: var(--accent-light);
+        }
+
+        .srs-header h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .srs-header p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .srs-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .srs-input {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: var(--bg2);
+            color: var(--text);
+            outline: none;
+            transition: all .2s;
+            min-width: 200px;
+        }
+
+        .srs-input:focus {
+            border-color: var(--accent);
+            background: var(--bg);
+        }
+
+        .srs-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .srs-btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .srs-btn-primary:hover:not(:disabled) {
+            background: var(--accent2);
+            transform: translateY(-1px);
+        }
+
+        .srs-btn-secondary {
+            background: var(--bg3);
+            color: var(--text-secondary);
+        }
+
+        .srs-btn-secondary:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .srs-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .srs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .srs-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .srs-item-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .srs-item-title {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        .srs-item-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 12px;
+        }
+
+        .srs-item-level {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .srs-item-level-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .srs-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .srs-btn-success {
+            background: var(--emerald-light);
+            color: var(--emerald);
+        }
+
+        .srs-btn-success:hover {
+            background: #bbf7d0;
+        }
+
+        .srs-btn-fail {
+            background: var(--pink-light);
+            color: var(--pink);
+        }
+
+        .srs-btn-fail:hover {
+            background: #fbcfe8;
+        }
+
+        .srs-empty {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--text-dim);
+            font-size: 14px;
+            background: var(--bg2);
+            border-radius: 12px;
+            border: 1px dashed var(--border);
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         /* Pattern section (top-level) */
         .pattern-section {
             margin-bottom: 40px;
@@ -359,6 +569,44 @@
     </div>
 
     <div class="content" id="content">
+        <!-- ===== SRS DASHBOARD ===== -->
+        <div class="srs-dashboard">
+            <div class="srs-header">
+                <div class="srs-header-left">
+                    <div class="srs-icon">📅</div>
+                    <div>
+                        <h2>Revision Dashboard</h2>
+                        <p>Spaced repetition tracking for your solved problems</p>
+                    </div>
+                </div>
+                <div class="srs-controls">
+                    <button class="srs-btn srs-btn-secondary" onclick="exportSrsData()"
+                        title="Backup data to a file">Export</button>
+                    <button class="srs-btn srs-btn-secondary" onclick="document.getElementById('importFile').click()"
+                        title="Restore data from a file">Import</button>
+                    <input type="file" id="importFile" style="display:none" accept=".json"
+                        onchange="importSrsData(event)">
+
+                    <button class="srs-btn srs-btn-secondary" onclick="addManualProblem()"
+                        title="Add a problem manually">+ Add Manual</button>
+
+                    <input type="text" id="scriptUrl" class="srs-input" title="Apps Script Web App URL"
+                        placeholder="Paste Web App URL here" style="min-width: 250px;">
+                    <input type="text" id="lcUsername" class="srs-input" title="LeetCode Username"
+                        placeholder="Enter LeetCode Username">
+                    <button class="srs-btn srs-btn-primary" id="syncBtn" onclick="syncSubmissions()">
+                        <div class="spinner" id="syncSpinner"></div>
+                        <span id="syncText">Sync Submissions</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="srs-list" id="srsList">
+                <!-- Revision items will be generated here -->
+                <div class="srs-empty">Loading your revision schedule...</div>
+            </div>
+        </div>
+
         <!-- ===== CENTER EXPANSION (Pattern top-level) ===== -->
         <div class="pattern-section" data-pattern="center-expansion">
             <div class="pattern-header">
@@ -451,6 +699,341 @@
 
             document.getElementById('noResults').style.display = anyVisible ? 'none' : 'block';
         }
+
+        // ===== SPACED REPETITION LOGIC (GOOGLE SHEETS BACKEND) =====
+
+        // Use localStorage just to remember the Web App URL and Username between refreshes to avoid typing it every time
+        const PREFS_KEY = 'leetcode_srs_prefs';
+        function getPrefs() {
+            const prefs = localStorage.getItem(PREFS_KEY);
+            return prefs ? JSON.parse(prefs) : { url: '', username: '' };
+        }
+        function savePrefs(url, username) {
+            localStorage.setItem(PREFS_KEY, JSON.stringify({ url, username }));
+        }
+
+        // Global State
+        let currentSrsData = { username: '', problems: {} };
+
+        function getIntervalDays(level) {
+            switch (Math.max(0, Number.parseInt(level, 10) || 0)) {
+                case 0: return 7;
+                case 1: return 14;
+                case 2: return 42;
+                case 3: return 84;
+                default: return 84;
+            }
+        }
+
+        async function fetchSrsData(url, username) {
+            if (!url || !username) return null;
+
+            try {
+                const response = await fetch(`${url}?username=${encodeURIComponent(username)}`);
+                if (!response.ok) throw new Error("Network response was not ok");
+                const data = await response.json();
+
+                if (data.error) {
+                    console.error("API Error:", data.error);
+                    return null;
+                }
+
+                return data; // { username: "...", problems: { "slug": { title, level, nextDueDate, lastSolved } } }
+            } catch (error) {
+                console.error("Failed to fetch data from Google Sheets:", error);
+                return null;
+            }
+        }
+
+        async function renderDashboard() {
+            const listEl = document.getElementById('srsList');
+            const urlEl = document.getElementById('scriptUrl');
+            const userEl = document.getElementById('lcUsername');
+
+            const prefs = getPrefs();
+            if (prefs.url && !urlEl.value) urlEl.value = prefs.url;
+            if (prefs.username && !userEl.value) userEl.value = prefs.username;
+
+            const currentUrl = urlEl.value.trim();
+            const currentUsername = userEl.value.trim();
+
+            if (!currentUrl || !currentUsername) {
+                listEl.innerHTML = `<div class="srs-empty">Please enter your Web App URL and Username, then click Sync!</div>`;
+                return;
+            }
+
+            // Save prefs temporarily so we remember them
+            savePrefs(currentUrl, currentUsername);
+
+            listEl.innerHTML = `<div class="srs-empty"><div class="spinner" style="display:inline-block; border-top-color:var(--accent);"></div> Loading your schedule from Google Sheets...</div>`;
+
+            const data = await fetchSrsData(currentUrl, currentUsername);
+
+            if (!data || Object.keys(data.problems).length === 0) {
+                listEl.innerHTML = `<div class="srs-empty">No tracked problems found in Sheets. Click Sync to fetch your submissions!</div>`;
+                return;
+            }
+
+            // Update global state for quick reference
+            currentSrsData = data;
+
+            const now = new Date();
+            const dueProblems = [];
+
+            for (const [slug, prob] of Object.entries(data.problems)) {
+                const dueDate = new Date(prob.nextDueDate);
+                if (dueDate.setHours(0, 0, 0, 0) <= now.setHours(0, 0, 0, 0)) {
+                    dueProblems.push({ ...prob, slug });
+                }
+            }
+
+            if (dueProblems.length === 0) {
+                listEl.innerHTML = `<div class="srs-empty">🎉 All caught up! Nothing due for revision today.</div>`;
+                return;
+            }
+
+            // Sort by earliest due date
+            dueProblems.sort((a, b) => new Date(a.nextDueDate) - new Date(b.nextDueDate));
+
+            let html = '';
+            dueProblems.forEach(p => {
+                const targetPath = findPathForSlug(p.slug) || '#';
+                const linkTag = targetPath !== '#' ? `<a href="${targetPath}" target="_blank" style="color: inherit; text-decoration: none;">${p.title} ↗</a>` : p.title;
+
+                html += `
+                <div class="srs-item">
+                    <div class="srs-item-left">
+                        <div class="srs-item-title">${linkTag}</div>
+                        <div class="srs-item-meta">
+                            <span class="srs-item-level">
+                                <span class="srs-item-level-indicator" style="opacity: ${0.4 + (p.level * 0.2)}"></span>
+                                Level ${p.level} (+${getIntervalDays(p.level) / 7} wks)
+                            </span>
+                            <span>Due: ${new Date(p.nextDueDate).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                    <div class="srs-actions">
+                        <button class="srs-btn srs-btn-success" onclick="markRevision('${p.slug}', true)" title="Remembered easily">+ Level Up</button>
+                        <button class="srs-btn srs-btn-fail" onclick="markRevision('${p.slug}', false)" title="Needed help/Forgot">Reset</button>
+                    </div>
+                </div>
+                `;
+            });
+            listEl.innerHTML = html;
+        }
+
+        // Helper to find local file path if we have it visualized
+        function findPathForSlug(slug) {
+            const card = document.querySelector(`.problem-card[data-title*="${slug.replaceAll('-', ' ')}"]`);
+            if (card) return card.getAttribute('href');
+            return null; // Don't redirect to leetcode by default, stay local or do nothing
+        }
+
+        async function syncSubmissions() {
+            const urlInput = document.getElementById('scriptUrl').value.trim();
+            const usernameInput = document.getElementById('lcUsername').value.trim();
+
+            if (!urlInput || !usernameInput) {
+                alert("Please enter both the Web App URL and LeetCode username.");
+                return;
+            }
+
+            savePrefs(urlInput, usernameInput);
+
+            const btn = document.getElementById('syncBtn');
+            const spinner = document.getElementById('syncSpinner');
+            const btnText = document.getElementById('syncText');
+
+            btn.disabled = true;
+            spinner.style.display = 'block';
+            btnText.style.display = 'none';
+
+            try {
+                // 1. Fetch from Alfa API
+                const res = await fetch(`https://alfa-leetcode-api.onrender.com/${usernameInput}/submission`);
+                if (!res.ok) throw new Error("Alfa API request failed");
+                const result = await res.json();
+
+                if (result.submission) {
+                    await processAndPushSubmissions(urlInput, usernameInput, result.submission);
+                } else if (result.errors) {
+                    alert("Error fetching submissions: " + (result.errors[0]?.message || "Unknown error"));
+                }
+            } catch (err) {
+                alert("Failed to sync submissions. " + err.message);
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                btnText.style.display = 'inline';
+            }
+        }
+
+        async function processAndPushSubmissions(url, username, submissions) {
+            // Get current sheets data to avoid duplicates
+            const currentDataResponse = await fetchSrsData(url, username);
+            const existingProblems = currentDataResponse ? currentDataResponse.problems : {};
+
+            const toPush = [];
+            const now = new Date();
+
+            submissions.forEach(sub => {
+                if (sub.statusDisplay === "Accepted") {
+                    if (!existingProblems[sub.titleSlug]) {
+                        // New problem solved!
+                        const nextDue = new Date(now);
+                        nextDue.setDate(nextDue.getDate() + 7);
+
+                        toPush.push({
+                            slug: sub.titleSlug,
+                            title: sub.title,
+                            level: 0,
+                            nextDueDate: nextDue.toISOString(),
+                            lastSolved: sub.timestamp ? new Date(sub.timestamp * 1000).toISOString() : now.toISOString()
+                        });
+
+                        // Optimistically update memory so we don't push it again if clicking sync rapidly
+                        existingProblems[sub.titleSlug] = true;
+                    }
+                }
+            });
+
+            if (toPush.length > 0) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            username: username,
+                            action: 'sync_multiple',
+                            payloadData: toPush
+                        })
+                    });
+
+                    if (response.ok) {
+                        alert(`Successfully synced! Pushed ${toPush.length} new accepted problems to Google Sheets.`);
+                        renderDashboard(); // Re-render to fetch fresh data
+                    } else {
+                        throw new Error("Failed to post to Google Sheets");
+                    }
+                } catch (err) {
+                    alert("Error pushing data to Google Sheets: " + err.message);
+                }
+            } else {
+                alert("Synced successfully. No new accepted problems found since last sync.");
+                renderDashboard(); // Render normally just in case
+            }
+        }
+
+        async function markRevision(slug, isSuccess) {
+            const urlInput = document.getElementById('scriptUrl').value.trim();
+            const usernameInput = document.getElementById('lcUsername').value.trim();
+            if (!urlInput || !usernameInput) return;
+
+            // Use the globally cached data instead of making a GET request first to save time
+            const prob = currentSrsData.problems[slug];
+            if (!prob) return;
+
+            const now = new Date();
+            let newLevel = prob.level;
+
+            if (isSuccess) {
+                newLevel = Math.min(3, newLevel + 1);
+            } else {
+                newLevel = 0;
+            }
+
+            const daysToAdd = getIntervalDays(newLevel);
+            const nextDue = new Date(now);
+            nextDue.setDate(now.getDate() + daysToAdd);
+
+            const nextDueIso = nextDue.toISOString();
+
+            // Optimistic UI Update - temporarily remove it from DOM immediately
+            const itemElement = document.getElementById(`srs-item-${slug}`);
+            if (itemElement) itemElement.style.opacity = '0.5';
+
+            try {
+                const response = await fetch(urlInput, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        username: usernameInput,
+                        action: 'update_revision',
+                        payloadData: {
+                            slug: slug,
+                            level: newLevel,
+                            nextDueDate: nextDueIso
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    renderDashboard(); // Re-render completely logic
+                } else {
+                    throw new Error("Failed to update in sheets");
+                }
+            } catch (err) {
+                alert("Failed to update revision status in Google Sheets: " + err.message);
+                if (itemElement) itemElement.style.opacity = '1'; // Revert visual
+            }
+        }
+
+        // --- MANUAL CONTROLS ---
+
+        async function addManualProblem() {
+            const urlInput = document.getElementById('scriptUrl').value.trim();
+            const usernameInput = document.getElementById('lcUsername').value.trim();
+
+            if (!urlInput || !usernameInput) {
+                alert("Please enter Web App URL and Username first.");
+                return;
+            }
+
+            const title = prompt("Enter the exact LeetCode problem name (e.g., 'Two Sum'):");
+            if (!title) return;
+
+            const slug = title.trim().toLowerCase().replaceAll(' ', '-');
+
+            if (currentSrsData.problems && currentSrsData.problems[slug]) {
+                alert("This problem is already in your revision tracker!");
+                return;
+            }
+
+            const now = new Date();
+            const nextDue = new Date(now);
+            nextDue.setDate(nextDue.getDate() + 7);
+
+            try {
+                const response = await fetch(urlInput, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        username: usernameInput,
+                        action: 'add_manual',
+                        payloadData: {
+                            slug: slug,
+                            title: title.trim(),
+                            nextDueDate: nextDue.toISOString(),
+                            lastSolved: now.toISOString()
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    const resJson = await response.json();
+                    if (resJson.error) {
+                        alert("Error: " + resJson.error);
+                    } else {
+                        alert(`Added "${title}" to Google Sheets correctly!`);
+                        renderDashboard();
+                    }
+                }
+            } catch (err) {
+                alert("Could not append manual problem to Sheets.");
+            }
+        }
+
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDashboard();
+        });
     </script>
 
 </body>
