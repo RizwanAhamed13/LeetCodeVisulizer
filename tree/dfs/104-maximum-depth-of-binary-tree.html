@@ -552,6 +552,48 @@
             transform: translateX(5px);
         }
 
+        .stack-frame.returning {
+            background: var(--pink-light, #fce7f3);
+            border: 1px solid var(--pink);
+            transform: translateX(-5px);
+        }
+
+        /* SVG for arrows linking frames */
+        .stack-arrows {
+            position: absolute;
+            top: 0;
+            left: -30px;
+            width: 30px;
+            height: 100%;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        .stack-arrow-path {
+            fill: none;
+            stroke-width: 2px;
+            stroke-dasharray: 4;
+            animation: dashDraw 0.4s linear forwards;
+        }
+
+        .stack-arrow-path.call {
+            stroke: var(--accent);
+        }
+
+        .stack-arrow-path.return {
+            stroke: var(--pink);
+        }
+
+        @keyframes dashDraw {
+            from {
+                stroke-dashoffset: 20;
+            }
+
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
         .frame-node {
             font-weight: 700;
             display: flex;
@@ -730,15 +772,16 @@
                 const frameId = nextFrameId++;
                 const nval = node ? node.val : 'null';
                 const nid = node ? node.id : -1;
-                callStack.push({ id: frameId, nodeVal: nval, nodeId: nid, h1: '?', h2: '?', ret: '?' });
+                callStack.push({ id: frameId, nodeVal: nval, nodeId: nid, h1: '?', h2: '?', ret: '?', isReturning: false });
 
-                steps.push({ codeLine: 1, desc: `Call maxDepth(Node ${nval})`, activeNode: nid, stack: clone(callStack), visited: Array.from(visitedIds) });
+                steps.push({ codeLine: 1, desc: `Call maxDepth(Node ${nval})`, activeNode: nid, stack: clone(callStack), visited: Array.from(visitedIds), arrowType: 'call' });
                 if (node) visitedIds.add(nid);
 
                 if (!node) {
                     steps.push({ codeLine: 2, desc: `root is null! Return 0.`, activeNode: nid, stack: clone(callStack), visited: Array.from(visitedIds) });
                     callStack[callStack.length - 1].ret = 0;
-                    steps.push({ codeLine: 2, desc: `<span class="hl-accent">Return 0</span> to caller.`, activeNode: nid, stack: clone(callStack), visited: Array.from(visitedIds) });
+                    callStack[callStack.length - 1].isReturning = true;
+                    steps.push({ codeLine: 2, desc: `<span class="hl-accent">Return 0</span> to caller.`, activeNode: nid, stack: clone(callStack), visited: Array.from(visitedIds), arrowType: 'return' });
                     callStack.pop();
                     return 0;
                 }
@@ -749,17 +792,20 @@
                 const h1 = dfs(node.left);
 
                 callStack[callStack.length - 1].h1 = h1;
+                callStack[callStack.length - 1].isReturning = false; // Reset if we returned to it
                 steps.push({ codeLine: 3, desc: `Left child returned <span class="hl-accent">${h1}</span>. Therefore, <span class="hl-emerald">height1 = ${h1}</span> for Node ${nval}.`, activeNode: nid, stack: clone(callStack), visited: Array.from(visitedIds) });
 
                 steps.push({ codeLine: 4, desc: `Call maxDepth on the right child.`, activeNode: nid, stack: clone(callStack), visited: Array.from(visitedIds) });
                 const h2 = dfs(node.right);
 
                 callStack[callStack.length - 1].h2 = h2;
+                callStack[callStack.length - 1].isReturning = false;
                 steps.push({ codeLine: 4, desc: `Right child returned <span class="hl-accent">${h2}</span>. Therefore, <span class="hl-emerald">height2 = ${h2}</span> for Node ${nval}.`, activeNode: nid, stack: clone(callStack), visited: Array.from(visitedIds) });
 
                 const ret = Math.max(h1, h2) + 1;
                 callStack[callStack.length - 1].ret = ret;
-                steps.push({ codeLine: 5, desc: `Math.max(${h1}, ${h2}) + 1 = <strong>${ret}</strong>.<br><span class="hl-accent">Return ${ret}</span> up the chain.`, activeNode: nid, stack: clone(callStack), visited: Array.from(visitedIds) });
+                callStack[callStack.length - 1].isReturning = true;
+                steps.push({ codeLine: 5, desc: `Math.max(${h1}, ${h2}) + 1 = <strong>${ret}</strong>.<br><span class="hl-accent">Return ${ret}</span> up the chain.`, activeNode: nid, stack: clone(callStack), visited: Array.from(visitedIds), arrowType: 'return' });
 
                 callStack.pop();
                 return ret;
@@ -826,14 +872,20 @@
             // STACK VISUALIZATION
             const sc = document.createElement('div'); sc.className = 'viz-card';
             sc.innerHTML = '<div class="section-label">📚 Call Stack (DFS Frames)</div>';
-            const sv = document.createElement('div'); sv.className = 'stack-container';
+            const sv = document.createElement('div');
+            sv.className = 'stack-container';
+            sv.style.position = 'relative'; // important for absolute arrows
+
             if (!step.stack.length) {
                 sv.innerHTML = '<div style="font-size: 13px; color: var(--text-dim); text-align: center; padding: 10px;">Stack is empty</div>';
             } else {
-                // reverse simply to show latest frame at top
-                [...step.stack].reverse().forEach((f, idx) => {
+                // reverse simply to show latest frame at top, but we keep track of indices to draw arrows
+                const reversedStack = [...step.stack].reverse();
+
+                reversedStack.forEach((f, idx) => {
                     const fd = document.createElement('div');
-                    fd.className = `stack-frame ${idx === 0 ? 'active' : ''}`;
+                    fd.className = `stack-frame ${idx === 0 && !f.isReturning ? 'active' : ''} ${f.isReturning ? 'returning' : ''}`;
+                    fd.id = `frame-${f.id}`;
                     fd.innerHTML = `
                         <div class="frame-node">${f.nodeVal}</div>
                         <div class="frame-var"><span class="lbl">height1</span><span class="val">${f.h1}</span></div>
@@ -842,6 +894,47 @@
                     `;
                     sv.appendChild(fd);
                 });
+
+                // Draw arrows if there's a recent push / pop
+                if (step.arrowType && step.stack.length > 1) {
+                    // Frame ids: step.stack[step.stack.length - 1].id (top), step.stack[step.stack.length - 2].id (caller)
+                    const svgArrows = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svgArrows.setAttribute('class', 'stack-arrows');
+                    // Top frame in array is at the bottom visually since we reversed it
+                    // The caller visually is below it. Wait, the array is reversed.
+                    // reversedStack[0] is the top of the stack. Wait, reversed stack index 0 is the current frame
+                    // reversedStack[1] is the caller frame.
+
+                    // We can just add a simple svg that floats on the left side indicating the transfer
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+                    if (step.arrowType === 'call') {
+                        // Arrow pointing UP from caller to callee. Caller is below visually.
+                        // Say each frame is roughly 50px tall (including gap)
+                        path.setAttribute('d', 'M 20 60 Q 5 40 20 20');
+                        path.setAttribute('class', 'stack-arrow-path call');
+                        path.setAttribute('marker-end', 'url(#arrowhead-call)');
+                    } else if (step.arrowType === 'return') {
+                        // Arrow pointing DOWN from callee (top) to caller (below)
+                        path.setAttribute('d', 'M 20 20 Q 5 40 20 60');
+                        path.setAttribute('class', 'stack-arrow-path return');
+                        path.setAttribute('marker-end', 'url(#arrowhead-return)');
+                    }
+
+                    // Add defs for markers
+                    svgArrows.innerHTML = `
+                        <defs>
+                            <marker id="arrowhead-call" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                                <polygon points="0 0, 6 3, 0 6" fill="var(--accent)" />
+                            </marker>
+                            <marker id="arrowhead-return" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                                <polygon points="0 0, 6 3, 0 6" fill="var(--pink)" />
+                            </marker>
+                        </defs>
+                    `;
+                    svgArrows.appendChild(path);
+                    sv.appendChild(svgArrows);
+                }
             }
             sc.appendChild(sv); wrap.appendChild(sc);
 
