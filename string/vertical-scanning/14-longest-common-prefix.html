@@ -10,450 +10,12 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="../../core/engine.css">
     <style>
-        *,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg: #ffffff;
-            --bg2: #f8f9fc;
-            --bg3: #f1f3f8;
-            --card-bg: #ffffff;
-            --code-bg: #fafbfe;
-            --border: #e2e5ef;
-            --border-hover: #c5c9d8;
-            --text: #1a1d2e;
-            --text-secondary: #4a5068;
-            --text-dim: #8891a8;
-            --accent: #4f46e5;
-            --accent-light: #ede9fe;
-            --accent2: #7c3aed;
-            --emerald: #059669;
-            --emerald-bg: #ecfdf5;
-            --orange: #ea580c;
-            --orange-bg: #fff7ed;
-            --pink: #db2777;
-            --pink-bg: #fce7f3;
-            --yellow: #d97706;
-            --yellow-bg: #fffbeb;
-            --cyan: #0891b2;
-            --cyan-bg: #ecfeff;
-            --purple: #7c3aed;
-            --purple-bg: #f5f3ff;
-            --red: #dc2626;
-            --red-bg: #fef2f2;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
-            --highlight-line: rgba(79, 70, 229, 0.06);
-            --radius: 14px;
-            --radius-sm: 10px;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg2);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* ===== HEADER ===== */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .back-btn {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 7px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all .2s;
-            text-decoration: none;
-        }
-
-        .back-btn:hover {
-            color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .header .badge {
-            background: var(--accent);
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-
-        .header h1 {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .header .tag {
-            margin-left: auto;
-            font-size: 12px;
-            color: var(--accent);
-            background: var(--accent-light);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        /* ===== CONTROLS BAR ===== */
-        .controls-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 24px;
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .input-group label {
-            font-size: 12px;
-            color: var(--text-dim);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .6px;
-        }
-
-        .input-group input[type="text"] {
-            background: var(--bg2);
-            border: 1.5px solid var(--border);
-            color: var(--accent);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            width: 320px;
-            outline: none;
-            transition: border-color .2s;
-        }
-
-        .input-group input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 18px;
-            border-radius: 8px;
-            border: none;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .2s;
-        }
-
-        .btn-run {
-            background: var(--accent);
-            color: #fff;
-        }
-
-        .btn-run:hover {
-            background: var(--accent2);
-            box-shadow: var(--shadow-md);
-        }
-
-        .playback {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            margin-left: 8px;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 3px;
-        }
-
-        .playback button {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: none;
-            color: var(--text-dim);
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all .15s;
-        }
-
-        .playback button:hover {
-            background: var(--accent-light);
-            color: var(--accent);
-        }
-
-        .playback button.active {
-            background: var(--accent-light);
-            color: var(--accent);
-        }
-
-        .speed-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: 6px;
-        }
-
-        .speed-group label {
-            font-size: 11px;
-            color: var(--text-dim);
-            font-weight: 500;
-        }
-
-        .speed-slider {
-            -webkit-appearance: none;
-            width: 72px;
-            height: 4px;
-            background: var(--border);
-            border-radius: 2px;
-            outline: none;
-        }
-
-        .speed-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: var(--accent);
-            cursor: pointer;
-            box-shadow: 0 1px 4px rgba(79, 70, 229, 0.3);
-        }
-
-        .step-info {
-            margin-left: auto;
-            font-size: 13px;
-            color: var(--text-dim);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .step-info span {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        /* ===== MAIN LAYOUT ===== */
-        .main {
-            display: grid;
-            grid-template-columns: 400px 1fr;
-            height: calc(100vh - 106px);
-        }
-
-        /* ===== CODE PANEL ===== */
-        .code-panel {
-            background: var(--code-bg);
-            border-right: 1px solid var(--border);
-            overflow-y: auto;
-        }
-
-        .code-panel::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .code-panel::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .code-panel::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        .code-title {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: rgba(250, 251, 254, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border);
-            font-size: 12px;
-            color: var(--text-dim);
-            font-weight: 600;
-        }
-
-        .code-title .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        .dot-red {
-            background: #ff5f56;
-        }
-
-        .dot-yellow {
-            background: #ffbd2e;
-        }
-
-        .dot-green {
-            background: #27c93f;
-        }
-
-        .code-lines {
-            padding: 12px 0;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12.5px;
-            line-height: 1.85;
-        }
-
-        .code-line {
-            display: flex;
-            padding: 0 16px 0 0;
-            transition: background .2s;
-            position: relative;
-        }
-
-        .code-line.active {
-            background: var(--highlight-line);
-            border-left: 3px solid var(--accent);
-        }
-
-        .code-line.active .line-num {
-            color: var(--accent);
-        }
-
-        .line-num {
-            display: inline-block;
-            width: 42px;
-            text-align: right;
-            padding-right: 16px;
-            color: #c8cdd8;
-            user-select: none;
-            flex-shrink: 0;
-            font-size: 11px;
-        }
-
-        .line-content {
-            white-space: pre;
-            color: var(--text);
-        }
-
-        /* Syntax tokens */
-        .kw {
-            color: #8b5cf6;
-            font-weight: 500;
-        }
-
-        .tp {
-            color: #0891b2;
-        }
-
-        .fn {
-            color: #2563eb;
-        }
-
-        .str {
-            color: #059669;
-        }
-
-        .num {
-            color: #ea580c;
-        }
-
-        .cm {
-            color: #a0a8c0;
-            font-style: italic;
-        }
-
-        .op {
-            color: #64748b;
-        }
-
-        .br {
-            color: #94a3b8;
-        }
-
-        .ret {
-            color: #dc2626;
-            font-weight: 500;
-        }
-
-        /* ===== VIZ PANEL ===== */
-        .viz-panel {
-            overflow-y: auto;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .viz-panel::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .viz-panel::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .viz-panel::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        /* Cards */
-        .viz-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 22px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .section-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-dim);
-            font-weight: 700;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
         /* ===== STRING GRID (Vertical Scanning) ===== */
         .grid-wrapper {
+            display: flex;
+            justify-content: center;
             overflow-x: auto;
             padding-bottom: 8px;
         }
@@ -574,23 +136,11 @@
             opacity: 0.35;
         }
 
-        /* Column highlight bar */
-        .col-highlight {
-            position: absolute;
-            top: -4px;
-            width: 44px;
-            height: calc(100% + 8px);
-            background: rgba(79, 70, 229, 0.04);
-            border-radius: 4px;
-            pointer-events: none;
-            z-index: -1;
-        }
-
         /* ===== SCANNING ARROW ===== */
         .scan-direction {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 10px;
             padding: 10px 0;
         }
@@ -610,6 +160,7 @@
             background: var(--cyan-bg);
             color: var(--cyan);
             border: 1px solid rgba(8, 145, 178, 0.2);
+            transition: margin-left 0.3s ease;
         }
 
         .scan-arrow .arrow-icon {
@@ -653,65 +204,12 @@
             color: var(--purple);
         }
 
-        .info-card.emerald .value {
-            color: var(--emerald);
-        }
-
         .info-card.orange .value {
             color: var(--orange);
         }
 
-        .info-card.pink .value {
-            color: var(--pink);
-        }
-
-        .info-card.yellow .value {
-            color: var(--yellow);
-        }
-
         .info-card.accent .value {
             color: var(--accent);
-        }
-
-        .info-card.red .value {
-            color: var(--red);
-        }
-
-        /* Step description */
-        .step-text {
-            font-size: 14px;
-            line-height: 1.7;
-            color: var(--text-secondary);
-        }
-
-        .step-text .highlight-cyan {
-            color: var(--cyan);
-            font-weight: 600;
-        }
-
-        .step-text .highlight-purple {
-            color: var(--purple);
-            font-weight: 600;
-        }
-
-        .step-text .highlight-emerald {
-            color: var(--emerald);
-            font-weight: 600;
-        }
-
-        .step-text .highlight-accent {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .step-text .highlight-red {
-            color: var(--red);
-            font-weight: 600;
-        }
-
-        .step-text .highlight-orange {
-            color: var(--orange);
-            font-weight: 600;
         }
 
         /* Result display */
@@ -736,65 +234,6 @@
 
         .result-prefix .prefix-char.glow {
             text-shadow: 0 0 12px rgba(79, 70, 229, 0.4);
-        }
-
-        /* Welcome state */
-        .welcome {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-            gap: 14px;
-            padding: 40px;
-        }
-
-        .welcome-icon {
-            font-size: 56px;
-            margin-bottom: 4px;
-        }
-
-        .welcome h2 {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .welcome p {
-            color: var(--text-secondary);
-            font-size: 14px;
-            max-width: 380px;
-            line-height: 1.6;
-        }
-
-        .welcome .shortcut {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: var(--accent-light);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        @keyframes fadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(6px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-in {
-            animation: fadeSlideIn .3s ease forwards;
         }
 
         /* StringBuilder card */
@@ -823,7 +262,7 @@
             font-size: 16px;
             font-weight: 700;
             color: var(--accent);
-            animation: fadeSlideIn .3s ease forwards;
+            animation: popIn .3s ease forwards;
         }
 
         .sb-char.new {
@@ -838,77 +277,25 @@
             font-style: italic;
         }
 
-        .input-hint {
-            font-size: 11px;
-            color: var(--text-dim);
-            margin-left: 4px;
-        }
-
-        @media (max-width: 900px) {
-            .main {
-                grid-template-columns: 1fr;
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
             }
 
-            .code-panel {
-                max-height: 280px;
+            100% {
+                transform: scale(1);
+                opacity: 1;
             }
         }
     </style>
 </head>
 
 <body>
-
-    <div class="header">
-        <a href="../../index.html" class="back-btn">← Home</a>
-        <span class="badge">LC #14</span>
-        <h1>Longest Common Prefix</h1>
-        <span class="tag">Vertical Scanning</span>
-    </div>
-
-    <div class="controls-bar">
-        <div class="input-group">
-            <label>Input</label>
-            <input type="text" id="inputStr" value="flower,flow,flight" placeholder="Comma-separated strings…">
-            <span class="input-hint">comma separated</span>
-        </div>
-        <button class="btn btn-run" id="runBtn" onclick="runVisualization()">▶ Run</button>
-        <div class="playback">
-            <button onclick="goToStart()" title="First step">⏮</button>
-            <button onclick="prevStep()" title="Previous">◀</button>
-            <button id="playPauseBtn" onclick="togglePlay()" title="Play / Pause">▶</button>
-            <button onclick="nextStep()" title="Next">▶</button>
-            <button onclick="goToEnd()" title="Last step">⏭</button>
-        </div>
-        <div class="speed-group">
-            <label>Speed</label>
-            <input type="range" class="speed-slider" id="speedSlider" min="100" max="2000" value="800" step="100">
-        </div>
-        <div class="step-info">Step <span id="stepCurrent">0</span> / <span id="stepTotal">0</span></div>
-    </div>
-
-    <div class="main">
-        <div class="code-panel">
-            <div class="code-title">
-                <span class="dot dot-red"></span>
-                <span class="dot dot-yellow"></span>
-                <span class="dot dot-green"></span>
-                Solution.java
-            </div>
-            <div class="code-lines" id="codeLines"></div>
-        </div>
-        <div class="viz-panel" id="vizPanel">
-            <div class="welcome" id="welcomeState">
-                <div class="welcome-icon">📐</div>
-                <h2>Vertical Scanning Visualizer</h2>
-                <p>Enter comma-separated strings and click <strong>Run</strong> to watch the algorithm scan each column
-                    vertically to find the longest common prefix.</p>
-                <p>Default: <span class="shortcut">"flower, flow, flight"</span></p>
-            </div>
-        </div>
-    </div>
-
+    <script src="../../core/engine.js"></script>
     <script>
-        // ===== CODE LINES (matching the user's provided solution) =====
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
         const CODE_LINES = [
             { tokens: [{ t: 'kw', v: 'class' }, { t: 'tp', v: ' Solution' }, { t: 'br', v: ' {' }] },
             { tokens: [{ t: 'kw', v: '    public' }, { t: 'tp', v: ' String' }, { t: 'fn', v: ' longestCommonPrefix' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String[]' }, { t: '', v: ' strs' }, { t: 'br', v: ') {' }] },
@@ -926,37 +313,116 @@
             { tokens: [{ t: 'ret', v: '        return' }, { t: '', v: ' ans' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
-        ];
+        ].map(line => {
+            if (line.tokens.length) line.tokens.forEach(t => t.v = esc(t.v));
+            return line;
+        });
 
-        function renderCode() {
-            const c = document.getElementById('codeLines');
-            c.innerHTML = '';
-            CODE_LINES.forEach((line, i) => {
-                const div = document.createElement('div');
-                div.className = 'code-line';
-                div.id = `cl-${i}`;
-                const num = document.createElement('span');
-                num.className = 'line-num';
-                num.textContent = i + 1;
-                div.appendChild(num);
-                const content = document.createElement('span');
-                content.className = 'line-content';
-                if (!line.tokens.length) { content.innerHTML = '&nbsp;'; }
-                else { content.innerHTML = line.tokens.map(t => t.t ? `<span class="${t.t}">${esc(t.v)}</span>` : esc(t.v)).join(''); }
-                div.appendChild(content);
-                c.appendChild(div);
-            });
-        }
+        const engine = new VizEngine({
+            title: "Longest Common Prefix",
+            badge: "LC #14",
+            tag: "Vertical Scanning",
+            codeLines: CODE_LINES,
+            inputs: [
+                { id: "inputStr", label: "Input", default: "flower,flow,flight", width: "320px" }
+            ],
+            onRun: () => {
+                const v = document.getElementById('inputStr').value.trim();
+                const strs = v.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                if (!strs || strs.length === 0) { alert("Invalid inputs"); return []; }
+                window.engineCache = { strs };
+                return generateTrace(strs);
+            },
+            onRenderStep: (step, container, eng) => {
+                const { strs } = window.engineCache;
 
-        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+                // 1. GRID 
+                let gridHtml = `<div class="grid-wrapper"><div class="string-grid">`;
+                const gridData = step.grid;
 
-        function highlightLine(idx) {
-            document.querySelectorAll('.code-line.active').forEach(e => e.classList.remove('active'));
-            if (idx !== null && idx >= 0) {
-                const el = document.getElementById(`cl-${idx}`);
-                if (el) { el.classList.add('active'); el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+                // Header
+                gridHtml += `<div class="grid-header">`;
+                for (let c = 0; c < gridData.maxLen; c++) {
+                    const activeCls = (c === gridData.activeCol) ? ' active-col' : '';
+                    gridHtml += `<div class="col-idx${activeCls}">${c}</div>`;
+                }
+                gridHtml += `</div>`;
+
+                // Arrow
+                if (gridData.activeCol >= 0) {
+                    gridHtml += `
+                    <div class="scan-direction" style="padding-left: 80px;">
+                        <div class="scan-arrow vertical" style="margin-left: ${gridData.activeCol * 48}px">
+                            <span class="arrow-icon">↓</span> Column ${gridData.activeCol}
+                        </div>
+                    </div>`;
+                }
+
+                // Rows
+                for (let r = 0; r < gridData.grid.length; r++) {
+                    gridHtml += `<div class="grid-row">`;
+                    const activeCls = (r === gridData.activeRow) ? ' active-row' : '';
+                    gridHtml += `<div class="row-label${activeCls}" title="${strs[r]}">strs[${r}]</div>`;
+
+                    for (let c = 0; c < gridData.maxLen; c++) {
+                        const cellData = gridData.grid[r][c];
+                        const cls = cellData.state !== 'default' ? ` ${cellData.state}` : '';
+                        const chStr = cellData.ch || '·';
+                        const stl = !cellData.ch ? ' style="color:var(--text-dim); font-size:12px;"' : '';
+                        gridHtml += `<div class="char-cell${cls}"${stl}>${chStr}</div>`;
+                    }
+                    gridHtml += `</div>`;
+                }
+                gridHtml += `</div></div>`;
+
+                container.innerHTML += eng.createZoomableCard('grid_container', '📐 Vertical Scanning Grid', gridHtml, '200px');
+
+                // 2. STRINGBUILDER
+                let sbHtml = '<div class="sb-display">';
+                if (step.sbContent && step.sbContent.length > 0) {
+                    step.sbContent.forEach((ch, idx) => {
+                        const isNew = (step.newChar && idx === step.sbContent.length - 1) ? ' new' : '';
+                        sbHtml += `<div class="sb-char${isNew}">${ch}</div>`;
+                    });
+                } else {
+                    sbHtml += `<span class="sb-empty">empty</span>`;
+                }
+                sbHtml += '</div>';
+                container.innerHTML += eng.createSimpleCard('🔤 StringBuilder (sb)', sbHtml);
+
+                // 3. VARIABLES
+                const v = step.vars || {};
+                let varsHtml = `<div class="info-grid">`;
+                const varConfigs = [
+                    { k: 'i', l: 'i (column)', c: 'cyan' },
+                    { k: 'ch', l: 'ch (ref char)', c: 'purple' },
+                    { k: 'currentStr', l: 'Current String', c: 'orange' },
+                    { k: 'sb', l: 'sb (prefix)', c: 'accent' },
+                ];
+                varConfigs.forEach(vc => {
+                    const val = v[vc.k] !== undefined ? v[vc.k] : '-';
+                    const displayVal = val === '' ? '""' : val;
+                    const fsz = String(displayVal).length > 12 ? '13px' : '18px';
+                    varsHtml += `<div class="info-card ${vc.c}"><div class="label">${vc.l}</div><div class="value" style="font-size:${fsz};">${esc(String(displayVal))}</div></div>`;
+                });
+                varsHtml += `</div>`;
+                container.innerHTML += eng.createSimpleCard('📊 Variables', varsHtml);
+
+                // 4. STEP DETAIL
+                container.innerHTML += eng.createSimpleCard('💡 Step Detail', `<div class="step-text">${step.desc}</div>`);
+
+                // 5. RESULT
+                const prefixSoFar = step.finalResult !== undefined ? step.finalResult : (step.sbContent ? step.sbContent.join('') : '');
+                let resHtml = '';
+                if (prefixSoFar.length > 0) {
+                    resHtml = `<div class="result-prefix">${prefixSoFar.split('').map(c => `<span class="prefix-char ${step.finalResult !== undefined ? 'glow' : ''}">${esc(c)}</span>`).join('')}</div>`;
+                } else {
+                    resHtml = `<div class="result-prefix empty">${step.finalResult !== undefined ? '(empty string — no common prefix)' : '(building…)'}</div>`;
+                }
+                const title = step.finalResult !== undefined ? '🏆 Final Result' : '🏆 Common Prefix So Far';
+                container.innerHTML += eng.createSimpleCard(title, resHtml);
             }
-        }
+        });
 
         // ===== TRACE GENERATION (Vertical Scanning) =====
         function generateTrace(strs) {
@@ -964,169 +430,49 @@
             const index = strs[0];
             const sb = [];
 
-            // Step 1: Initialize index = strs[0]
-            steps.push({
-                codeLine: 2,
-                desc: `Set <span class="highlight-purple">index = strs[0] = "${esc(index)}"</span> — this is our reference string.`,
-                vars: { i: '-', ch: '-', currentStr: '-', sb: '' },
-                grid: buildGrid(strs, -1, -1, [], null),
-                sbContent: [],
-                type: 'init'
-            });
+            steps.push({ codeLine: 2, desc: `Set <span class="hl-purple">index = strs[0] = "${esc(index)}"</span> — this is our reference string.`, vars: { i: '-', ch: '-', currentStr: '-', sb: '' }, grid: buildGrid(strs, -1, -1, [], null), sbContent: [] });
+            steps.push({ codeLine: 3, desc: `Create an empty <span class="hl-cyan">StringBuilder sb</span> to build the common prefix.`, vars: { i: '-', ch: '-', currentStr: '-', sb: '' }, grid: buildGrid(strs, -1, -1, [], null), sbContent: [] });
 
-            // Step 2: Initialize StringBuilder
-            steps.push({
-                codeLine: 3,
-                desc: `Create an empty <span class="highlight-cyan">StringBuilder sb</span> to build the common prefix.`,
-                vars: { i: '-', ch: '-', currentStr: '-', sb: '' },
-                grid: buildGrid(strs, -1, -1, [], null),
-                sbContent: [],
-                type: 'init'
-            });
-
-            // Outer loop: for each column i
             for (let i = 0; i < index.length; i++) {
                 const ch = index.charAt(i);
+                steps.push({ codeLine: 4, desc: `Outer loop: <span class="hl-cyan">i = ${i}</span>, scanning column ${i} vertically across all strings.`, vars: { i, ch: '-', currentStr: '-', sb: sb.join('') }, grid: buildGrid(strs, i, -1, sb, null), sbContent: [...sb] });
+                steps.push({ codeLine: 5, desc: `Get reference character: <span class="hl-purple">ch = index.charAt(${i}) = '${esc(ch)}'</span>`, vars: { i, ch: ch, currentStr: `strs[0]="${esc(index)}"`, sb: sb.join('') }, grid: buildGrid(strs, i, 0, sb, { row: 0, col: i, state: 'reference' }), sbContent: [...sb] });
 
-                // Step: Enter outer loop, set i and ch
-                steps.push({
-                    codeLine: 4,
-                    desc: `Outer loop: <span class="highlight-cyan">i = ${i}</span>, scanning column ${i} vertically across all strings.`,
-                    vars: { i, ch: '-', currentStr: '-', sb: sb.join('') },
-                    grid: buildGrid(strs, i, -1, sb, null),
-                    sbContent: [...sb],
-                    type: 'outer-loop'
-                });
-
-                // Step: char ch = index.charAt(i)
-                steps.push({
-                    codeLine: 5,
-                    desc: `Get reference character: <span class="highlight-purple">ch = index.charAt(${i}) = '${esc(ch)}'</span>`,
-                    vars: { i, ch: ch, currentStr: `strs[0]="${esc(index)}"`, sb: sb.join('') },
-                    grid: buildGrid(strs, i, 0, sb, { row: 0, col: i, state: 'reference' }),
-                    sbContent: [...sb],
-                    type: 'get-char'
-                });
-
-                // Inner loop: for each string
                 let earlyReturn = false;
                 for (let j = 0; j < strs.length; j++) {
                     const str = strs[j];
+                    steps.push({ codeLine: 6, desc: `Inner loop: checking <span class="hl-cyan">str = strs[${j}] = "${esc(str)}"</span>`, vars: { i, ch: ch, currentStr: `strs[${j}]="${esc(str)}"`, sb: sb.join('') }, grid: buildGrid(strs, i, j, sb, { row: j, col: i, state: 'scanning' }), sbContent: [...sb] });
 
-                    // Step: Enter inner loop for this string
-                    steps.push({
-                        codeLine: 6,
-                        desc: `Inner loop: checking <span class="highlight-cyan">str = strs[${j}] = "${esc(str)}"</span>`,
-                        vars: { i, ch: ch, currentStr: `strs[${j}]="${esc(str)}"`, sb: sb.join('') },
-                        grid: buildGrid(strs, i, j, sb, { row: j, col: i, state: 'scanning' }),
-                        sbContent: [...sb],
-                        type: 'inner-loop'
-                    });
-
-                    // Check condition: i >= str.length() || str.charAt(i) != ch
                     if (i >= str.length) {
-                        // Length exceeded — early return
-                        steps.push({
-                            codeLine: 7,
-                            desc: `<span class="highlight-red">i = ${i} >= str.length() = ${str.length}</span> — string "${esc(str)}" is too short! Condition is true.`,
-                            vars: { i, ch: ch, currentStr: `strs[${j}]="${esc(str)}"`, sb: sb.join('') },
-                            grid: buildGrid(strs, i, j, sb, { row: j, col: i, state: 'length-exceeded' }),
-                            sbContent: [...sb],
-                            type: 'length-exceeded'
-                        });
-
-                        steps.push({
-                            codeLine: 8,
-                            desc: `<span class="highlight-red">Return</span> sb.toString() = "<span class="highlight-accent">${esc(sb.join(''))}</span>"`,
-                            vars: { i, ch: ch, currentStr: `strs[${j}]="${esc(str)}"`, sb: sb.join('') },
-                            grid: buildGridFinal(strs, sb),
-                            sbContent: [...sb],
-                            finalResult: sb.join(''),
-                            type: 'return'
-                        });
+                        steps.push({ codeLine: 7, desc: `<span class="hl-red">i = ${i} >= str.length() = ${str.length}</span> — string "${esc(str)}" is too short! Condition is true.`, vars: { i, ch: ch, currentStr: `strs[${j}]="${esc(str)}"`, sb: sb.join('') }, grid: buildGrid(strs, i, j, sb, { row: j, col: i, state: 'length-exceeded' }), sbContent: [...sb] });
+                        steps.push({ codeLine: 8, desc: `<span class="hl-red">Return</span> sb.toString() = "<span class="hl-accent">${esc(sb.join(''))}</span>"`, vars: { i, ch: ch, currentStr: `strs[${j}]="${esc(str)}"`, sb: sb.join('') }, grid: buildGridFinal(strs, sb), sbContent: [...sb], finalResult: sb.join('') });
                         earlyReturn = true;
                         break;
                     } else if (str.charAt(i) !== ch) {
-                        // Mismatch — early return
-                        steps.push({
-                            codeLine: 7,
-                            desc: `<span class="highlight-red">str.charAt(${i}) = '${esc(str.charAt(i))}' != ch = '${esc(ch)}'</span> — mismatch! Condition is true.`,
-                            vars: { i, ch: ch, currentStr: `strs[${j}]="${esc(str)}"`, sb: sb.join('') },
-                            grid: buildGrid(strs, i, j, sb, { row: j, col: i, state: 'mismatch' }),
-                            sbContent: [...sb],
-                            type: 'mismatch'
-                        });
-
-                        steps.push({
-                            codeLine: 8,
-                            desc: `<span class="highlight-red">Return</span> sb.toString() = "<span class="highlight-accent">${esc(sb.join(''))}</span>"`,
-                            vars: { i, ch: ch, currentStr: `strs[${j}]="${esc(str)}"`, sb: sb.join('') },
-                            grid: buildGridFinal(strs, sb),
-                            sbContent: [...sb],
-                            finalResult: sb.join(''),
-                            type: 'return'
-                        });
+                        steps.push({ codeLine: 7, desc: `<span class="hl-red">str.charAt(${i}) = '${esc(str.charAt(i))}' != ch = '${esc(ch)}'</span> — mismatch! Condition is true.`, vars: { i, ch: ch, currentStr: `strs[${j}]="${esc(str)}"`, sb: sb.join('') }, grid: buildGrid(strs, i, j, sb, { row: j, col: i, state: 'mismatch' }), sbContent: [...sb] });
+                        steps.push({ codeLine: 8, desc: `<span class="hl-red">Return</span> sb.toString() = "<span class="hl-accent">${esc(sb.join(''))}</span>"`, vars: { i, ch: ch, currentStr: `strs[${j}]="${esc(str)}"`, sb: sb.join('') }, grid: buildGridFinal(strs, sb), sbContent: [...sb], finalResult: sb.join('') });
                         earlyReturn = true;
                         break;
                     } else {
-                        // Match
-                        steps.push({
-                            codeLine: 7,
-                            desc: `<span class="highlight-emerald">str.charAt(${i}) = '${esc(str.charAt(i))}' == ch = '${esc(ch)}'</span> — match! ✓ Continue.`,
-                            vars: { i, ch: ch, currentStr: `strs[${j}]="${esc(str)}"`, sb: sb.join('') },
-                            grid: buildGrid(strs, i, j, sb, { row: j, col: i, state: 'matched' }),
-                            sbContent: [...sb],
-                            type: 'match'
-                        });
+                        steps.push({ codeLine: 7, desc: `<span class="hl-emerald">str.charAt(${i}) = '${esc(str.charAt(i))}' == ch = '${esc(ch)}'</span> — match! ✓ Continue.`, vars: { i, ch: ch, currentStr: `strs[${j}]="${esc(str)}"`, sb: sb.join('') }, grid: buildGrid(strs, i, j, sb, { row: j, col: i, state: 'matched' }), sbContent: [...sb] });
                     }
                 }
 
                 if (earlyReturn) break;
 
-                // All strings matched at column i — append ch to sb
                 sb.push(ch);
-                steps.push({
-                    codeLine: 10,
-                    desc: `All strings match at column ${i}! <span class="highlight-emerald">sb.append('${esc(ch)}')</span> → sb = "<span class="highlight-accent">${esc(sb.join(''))}</span>"`,
-                    vars: { i, ch: ch, currentStr: '-', sb: sb.join('') },
-                    grid: buildGrid(strs, i, -1, sb, null, true),
-                    sbContent: [...sb],
-                    newChar: ch,
-                    type: 'append'
-                });
+                steps.push({ codeLine: 10, desc: `All strings match at column ${i}! <span class="hl-emerald">sb.append('${esc(ch)}')</span> → sb = "<span class="hl-accent">${esc(sb.join(''))}</span>"`, vars: { i, ch: ch, currentStr: '-', sb: sb.join('') }, grid: buildGrid(strs, i, -1, sb, null, true), sbContent: [...sb], newChar: ch });
             }
 
-            // If we finished the entire outer loop without early return
-            if (!steps.length || steps[steps.length - 1].type !== 'return') {
+            if (!steps.length || steps[steps.length - 1].finalResult === undefined) {
                 const ans = sb.join('');
-                steps.push({
-                    codeLine: 12,
-                    desc: `Loop complete. <span class="highlight-cyan">ans = sb.toString() = "${esc(ans)}"</span>`,
-                    vars: { i: '-', ch: '-', currentStr: '-', sb: ans },
-                    grid: buildGridFinal(strs, sb),
-                    sbContent: [...sb],
-                    type: 'assign-ans'
-                });
-                steps.push({
-                    codeLine: 13,
-                    desc: `<span class="highlight-accent">Return ans = "${esc(ans)}"</span>`,
-                    vars: { i: '-', ch: '-', currentStr: '-', sb: ans },
-                    grid: buildGridFinal(strs, sb),
-                    sbContent: [...sb],
-                    finalResult: ans,
-                    type: 'return'
-                });
+                steps.push({ codeLine: 12, desc: `Loop complete. <span class="hl-cyan">ans = sb.toString() = "${esc(ans)}"</span>`, vars: { i: '-', ch: '-', currentStr: '-', sb: ans }, grid: buildGridFinal(strs, sb), sbContent: [...sb] });
+                steps.push({ codeLine: 13, desc: `<span class="hl-accent">Return ans = "${esc(ans)}"</span>`, vars: { i: '-', ch: '-', currentStr: '-', sb: ans }, grid: buildGridFinal(strs, sb), sbContent: [...sb], finalResult: ans });
             }
 
             return steps;
         }
 
-        // Build the grid data for a given step
-        // activeCol: current column i being scanned (-1 = none)
-        // activeRow: current string j being checked (-1 = none)
-        // prefix: characters in sb so far
-        // highlight: { row, col, state } for special highlight
-        // allMatched: if all strings matched at this col
         function buildGrid(strs, activeCol, activeRow, prefix, highlight, allMatched = false) {
             const maxLen = Math.max(...strs.map(s => s.length));
             const grid = [];
@@ -1135,26 +481,9 @@
                 for (let c = 0; c < maxLen; c++) {
                     let state = 'default';
                     const ch = c < strs[r].length ? strs[r].charAt(c) : '';
-
-                    // Mark prefix columns
-                    if (c < prefix.length) {
-                        state = 'prefix';
-                    }
-
-                    // Mark current column being scanned
-                    if (c === activeCol && state !== 'prefix') {
-                        if (allMatched) {
-                            state = 'matched';
-                        } else {
-                            state = 'scanning';
-                        }
-                    }
-
-                    // Apply specific highlight
-                    if (highlight && highlight.row === r && highlight.col === c) {
-                        state = highlight.state;
-                    }
-
+                    if (c < prefix.length) state = 'prefix';
+                    if (c === activeCol && state !== 'prefix') state = allMatched ? 'matched' : 'scanning';
+                    if (highlight && highlight.row === r && highlight.col === c) state = highlight.state;
                     row.push({ ch, state });
                 }
                 grid.push(row);
@@ -1177,188 +506,7 @@
             return { grid, maxLen, activeCol: -1, activeRow: -1 };
         }
 
-        // ===== STATE =====
-        let steps = [], currentStep = 0, isPlaying = false, playInterval = null, currentStrs = [];
-
-        function runVisualization() {
-            const v = document.getElementById('inputStr').value.trim();
-            if (!v) return;
-            currentStrs = v.split(',').map(s => s.trim()).filter(s => s.length > 0);
-            if (currentStrs.length === 0) return;
-            steps = generateTrace(currentStrs);
-            currentStep = 0;
-            stopPlay();
-            document.getElementById('welcomeState').style.display = 'none';
-            renderStep();
-        }
-
-        function renderStep() {
-            if (!steps.length) return;
-            const step = steps[currentStep];
-            document.getElementById('stepCurrent').textContent = currentStep + 1;
-            document.getElementById('stepTotal').textContent = steps.length;
-            highlightLine(step.codeLine);
-            renderViz(step);
-        }
-
-        function renderViz(step) {
-            const panel = document.getElementById('vizPanel');
-            const w = document.getElementById('welcomeState');
-            if (w) w.style.display = 'none';
-            panel.querySelectorAll('.viz-content').forEach(e => e.remove());
-
-            const wrap = document.createElement('div');
-            wrap.className = 'viz-content animate-in';
-
-            // ===== 1. STRING GRID =====
-            const gridCard = document.createElement('div');
-            gridCard.className = 'viz-card';
-            gridCard.innerHTML = '<div class="section-label">📐 Vertical Scanning Grid</div>';
-
-            const gridData = step.grid;
-            const gwrap = document.createElement('div');
-            gwrap.className = 'grid-wrapper';
-            const sgrid = document.createElement('div');
-            sgrid.className = 'string-grid';
-
-            // Column indices header
-            const headerRow = document.createElement('div');
-            headerRow.className = 'grid-header';
-            for (let c = 0; c < gridData.maxLen; c++) {
-                const ci = document.createElement('div');
-                ci.className = 'col-idx';
-                if (c === gridData.activeCol) ci.classList.add('active-col');
-                ci.textContent = c;
-                headerRow.appendChild(ci);
-            }
-            sgrid.appendChild(headerRow);
-
-            // Scanning direction indicator
-            if (gridData.activeCol >= 0) {
-                const scanDir = document.createElement('div');
-                scanDir.className = 'scan-direction';
-                scanDir.style.paddingLeft = '80px';
-                // Position indicator at current column
-                const indicator = document.createElement('div');
-                indicator.className = 'scan-arrow vertical';
-                indicator.innerHTML = `<span class="arrow-icon">↓</span> Column ${gridData.activeCol}`;
-                indicator.style.marginLeft = `${gridData.activeCol * 48}px`;
-                scanDir.appendChild(indicator);
-                sgrid.appendChild(scanDir);
-            }
-
-            // String rows
-            for (let r = 0; r < gridData.grid.length; r++) {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'grid-row';
-                const label = document.createElement('div');
-                label.className = 'row-label';
-                if (r === gridData.activeRow) label.classList.add('active-row');
-                label.textContent = `strs[${r}]`;
-                label.title = currentStrs[r];
-                rowDiv.appendChild(label);
-
-                for (let c = 0; c < gridData.maxLen; c++) {
-                    const cellData = gridData.grid[r][c];
-                    const cell = document.createElement('div');
-                    cell.className = 'char-cell';
-                    if (cellData.state !== 'default') cell.classList.add(cellData.state);
-                    cell.textContent = cellData.ch || '·';
-                    if (!cellData.ch) {
-                        cell.style.color = 'var(--text-dim)';
-                        cell.style.fontSize = '12px';
-                    }
-                    rowDiv.appendChild(cell);
-                }
-                sgrid.appendChild(rowDiv);
-            }
-
-            gwrap.appendChild(sgrid);
-            gridCard.appendChild(gwrap);
-            wrap.appendChild(gridCard);
-
-            // ===== 2. STRINGBUILDER =====
-            const sbCard = document.createElement('div');
-            sbCard.className = 'viz-card';
-            sbCard.innerHTML = '<div class="section-label">🔤 StringBuilder (sb)</div>';
-            const sbDisp = document.createElement('div');
-            sbDisp.className = 'sb-display';
-            if (step.sbContent && step.sbContent.length > 0) {
-                step.sbContent.forEach((ch, idx) => {
-                    const sc = document.createElement('div');
-                    sc.className = 'sb-char';
-                    if (step.newChar && idx === step.sbContent.length - 1) sc.classList.add('new');
-                    sc.textContent = ch;
-                    sbDisp.appendChild(sc);
-                });
-            } else {
-                const em = document.createElement('span');
-                em.className = 'sb-empty';
-                em.textContent = 'empty';
-                sbDisp.appendChild(em);
-            }
-            sbCard.appendChild(sbDisp);
-            wrap.appendChild(sbCard);
-
-            // ===== 3. VARIABLES =====
-            const vars = step.vars || {};
-            const ev = document.createElement('div');
-            ev.className = 'viz-card';
-            ev.innerHTML = '<div class="section-label">📊 Variables</div>';
-            const grid = document.createElement('div');
-            grid.className = 'info-grid';
-            [
-                { k: 'i', l: 'i (column)', c: 'cyan' },
-                { k: 'ch', l: 'ch (ref char)', c: 'purple' },
-                { k: 'currentStr', l: 'Current String', c: 'orange' },
-                { k: 'sb', l: 'sb (prefix)', c: 'accent' },
-            ].forEach(v => {
-                const card = document.createElement('div');
-                card.className = `info-card ${v.c}`;
-                const val = vars[v.k] !== undefined ? vars[v.k] : '-';
-                const displayVal = val === '' ? '""' : val;
-                card.innerHTML = `<div class="label">${v.l}</div><div class="value" style="font-size:${String(displayVal).length > 12 ? '13' : '18'}px">${esc(String(displayVal))}</div>`;
-                grid.appendChild(card);
-            });
-            ev.appendChild(grid);
-            wrap.appendChild(ev);
-
-            // ===== 4. STEP DETAIL =====
-            const sd = document.createElement('div');
-            sd.className = 'viz-card';
-            sd.innerHTML = `<div class="section-label">💡 Step Detail</div><div class="step-text">${step.desc}</div>`;
-            wrap.appendChild(sd);
-
-            // ===== 5. RESULT =====
-            const rc = document.createElement('div');
-            rc.className = 'viz-card';
-            rc.innerHTML = `<div class="section-label">🏆 ${step.finalResult !== undefined ? 'Final Result' : 'Common Prefix So Far'}</div>`;
-            const pd = document.createElement('div');
-            const prefixSoFar = step.finalResult !== undefined ? step.finalResult : (step.sbContent ? step.sbContent.join('') : '');
-            if (prefixSoFar.length > 0) {
-                pd.className = 'result-prefix';
-                pd.innerHTML = prefixSoFar.split('').map(c => `<span class="prefix-char ${step.finalResult !== undefined ? 'glow' : ''}">${esc(c)}</span>`).join('');
-            } else {
-                pd.className = 'result-prefix empty';
-                pd.textContent = step.finalResult !== undefined ? '(empty string — no common prefix)' : '(building…)';
-            }
-            rc.appendChild(pd);
-            wrap.appendChild(rc);
-
-            panel.appendChild(wrap);
-        }
-
-        // ===== PLAYBACK =====
-        function nextStep() { if (currentStep < steps.length - 1) { currentStep++; renderStep(); } else stopPlay(); }
-        function prevStep() { if (currentStep > 0) { currentStep--; renderStep(); } }
-        function goToStart() { currentStep = 0; renderStep(); }
-        function goToEnd() { currentStep = steps.length - 1; renderStep(); }
-        function togglePlay() { isPlaying ? stopPlay() : startPlay(); }
-        function startPlay() { if (!steps.length) return; isPlaying = true; document.getElementById('playPauseBtn').textContent = '⏸'; document.getElementById('playPauseBtn').classList.add('active'); const spd = parseInt(document.getElementById('speedSlider').value); playInterval = setInterval(() => { if (currentStep < steps.length - 1) { currentStep++; renderStep(); } else stopPlay(); }, spd); }
-        function stopPlay() { isPlaying = false; document.getElementById('playPauseBtn').textContent = '▶'; document.getElementById('playPauseBtn').classList.remove('active'); if (playInterval) { clearInterval(playInterval); playInterval = null; } }
-        document.getElementById('speedSlider').addEventListener('input', () => { if (isPlaying) { stopPlay(); startPlay(); } });
-        document.getElementById('inputStr').addEventListener('keydown', e => { if (e.key === 'Enter') runVisualization(); });
-        renderCode();
+        engine.init();
     </script>
 </body>
 

@@ -324,7 +324,7 @@ class VizEngine {
             const state = this.zoomStates.get(cid);
 
             // Apply transforms immediately
-            canvas.style.transform = \`translate(\${state.translateX}px, \${state.translateY}px) scale(\${state.scale})\`;
+            canvas.style.transform = `translate(${state.translateX}px, ${state.translateY}px) scale(${state.scale})`;
 
             // Prevent attaching multiple listeners if step re-renders (we use DOM replacement so usually fine, but safe to detach or bind once)
             container.onwheel = (e) => {
@@ -332,10 +332,10 @@ class VizEngine {
                 const zoomIntensity = 0.05;
                 const wheel = e.deltaY < 0 ? 1 : -1;
                 let newScale = state.scale * Math.exp(wheel * zoomIntensity);
-                
+
                 // Limits
-                if(newScale < 0.2) newScale = 0.2;
-                if(newScale > 5) newScale = 5;
+                if (newScale < 0.2) newScale = 0.2;
+                if (newScale > 5) newScale = 5;
 
                 // Zoom relative to pointer
                 const rect = container.getBoundingClientRect();
@@ -347,7 +347,7 @@ class VizEngine {
                 state.translateY = mouseY - (mouseY - state.translateY) * (newScale / state.scale);
                 state.scale = newScale;
 
-                canvas.style.transform = \`translate(\${state.translateX}px, \${state.translateY}px) scale(\${state.scale})\`;
+                canvas.style.transform = `translate(${state.translateX}px, ${state.translateY}px) scale(${state.scale})`;
             };
 
             container.onmousedown = (e) => {
@@ -358,7 +358,7 @@ class VizEngine {
             };
 
             window.addEventListener('mouseup', () => {
-                if(state.isDragging) {
+                if (state.isDragging) {
                     state.isDragging = false;
                     container.style.cursor = 'grab';
                 }
@@ -368,15 +368,15 @@ class VizEngine {
                 if (!state.isDragging) return;
                 state.translateX = e.clientX - state.startX;
                 state.translateY = e.clientY - state.startY;
-                canvas.style.transform = \`translate(\${state.translateX}px, \${state.translateY}px) scale(\${state.scale})\`;
+                canvas.style.transform = `translate(${state.translateX}px, ${state.translateY}px) scale(${state.scale})`;
             });
-            
+
             // Reattach generic mousemove to document but tied to this container's drag state
             container.onmousemove = (e) => {
-                if(!state.isDragging) return;
+                if (!state.isDragging) return;
                 state.translateX = e.clientX - state.startX;
                 state.translateY = e.clientY - state.startY;
-                canvas.style.transform = \`translate(\${state.translateX}px, \${state.translateY}px) scale(\${state.scale})\`;
+                canvas.style.transform = `translate(${state.translateX}px, ${state.translateY}px) scale(${state.scale})`;
             }
             container.onmouseup = () => {
                 state.isDragging = false;
@@ -390,28 +390,28 @@ class VizEngine {
     }
 
     // --- HELPER WRAPPER CREATOR ---
-    createZoomableCard(id, labelHtml, innerHtml, defaultHeight='300px') {
-        return \`
+    createZoomableCard(id, labelHtml, innerHtml, defaultHeight = '300px') {
+        return `
             <div class="viz-card">
-                <div class="section-label">\${labelHtml}</div>
-                <div class="zoomable-container" id="\${id}" style="height: \${defaultHeight}">
+                <div class="section-label">${labelHtml}</div>
+                <div class="zoomable-container" id="${id}" style="height: ${defaultHeight}">
                     <div class="zoomable-canvas">
-                        \${innerHtml}
+                        ${innerHtml}
                     </div>
                 </div>
                 <div style="font-size:10px; color:var(--text-dim); margin-top:8px; text-align:right;">
                     <em>Scroll to zoom, drag to pan. Drag bottom right to resize box.</em>
                 </div>
             </div>
-        \`;
+        `;
     }
 
     createSimpleCard(labelHtml, innerHtml) {
-        return \`
+        return `
             <div class="viz-card">
-                <div class="section-label">\${labelHtml}</div>
-                \${innerHtml}
+                <div class="section-label">${labelHtml}</div>
+                ${innerHtml}
             </div>
-        \`;
+        `;
     }
 }

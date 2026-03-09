@@ -10,224 +10,14 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="../core/engine.css">
     <style>
-        *,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg: #ffffff;
-            --bg2: #f8f9fc;
-            --bg3: #f1f3f8;
-            --card-bg: #ffffff;
-            --code-bg: #fafbfe;
-            --border: #e2e5ef;
-            --text: #1a1d2e;
-            --text-secondary: #4a5068;
-            --text-dim: #8891a8;
-            --accent: #4f46e5;
-            --accent-light: #ede9fe;
-            --emerald: #059669;
-            --emerald-bg: #ecfdf5;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
-            --radius: 14px;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg2);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* ===== HEADER ===== */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .back-btn {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 7px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all .2s;
-            text-decoration: none;
-        }
-
-        .back-btn:hover {
-            color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .header h1 {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .header .tag {
-            margin-left: auto;
-            font-size: 12px;
-            color: var(--accent);
-            background: var(--accent-light);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        /* ===== CONTROLS BAR ===== */
-        .controls-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 24px;
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-
-        .mode-toggle {
-            display: flex;
-            background: var(--bg2);
-            padding: 3px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            margin-right: 12px;
-        }
-
-        .mode-btn {
-            padding: 6px 14px;
-            border: none;
-            background: transparent;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-dim);
-            cursor: pointer;
-            border-radius: 7px;
-            transition: all 0.2s;
-        }
-
-        .mode-btn.active {
-            background: var(--bg);
-            color: var(--accent);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 18px;
-            border-radius: 8px;
-            border: none;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .2s;
-        }
-
-        .btn-restart {
-            background: var(--accent);
-            color: #fff;
-        }
-
-        .btn-restart:hover {
-            background: #4338ca;
-        }
-
-        .playback {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 3px;
-        }
-
-        .playback button {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: none;
-            color: var(--text-dim);
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 6px;
-        }
-
-        .playback button:hover:not(:disabled) {
-            background: var(--accent-light);
-            color: var(--accent);
-        }
-
-        .playback button:disabled {
-            opacity: 0.3;
-        }
-
-        .speed-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: 6px;
-        }
-
-        .speed-group label {
-            font-size: 11px;
-            color: var(--text-dim);
-            font-weight: 500;
-        }
-
-        .step-info {
-            margin-left: auto;
-            font-size: 13px;
-            color: var(--text-dim);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .step-info span {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        /* ===== MAIN LAYOUT ===== */
-        .main {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            height: calc(100vh - 106px);
-        }
-
-        /* ===== STEP PANEL ===== */
+        /* ===== STEP PANEL (Will Replace Code Panel) ===== */
         .step-panel {
-            background: var(--code-bg);
-            border-right: 1px solid var(--border);
             overflow-y: auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .panel-title {
@@ -283,20 +73,37 @@
             color: var(--text);
         }
 
-        /* ===== VIZ PANEL ===== */
-        .viz-panel {
-            overflow-y: auto;
-            padding: 40px;
+        /* ===== TOGGLE BUTTONS ===== */
+        .mode-toggle {
             display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-items: center;
+            background: var(--bg2);
+            padding: 3px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-right: 12px;
+        }
+
+        .mode-btn {
+            padding: 6px 14px;
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dim);
+            cursor: pointer;
+            border-radius: 7px;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: var(--bg);
+            color: var(--accent);
+            box-shadow: var(--shadow-sm);
         }
 
         /* Arrays */
         .array-container {
             width: 100%;
-            max-width: 800px;
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius);
@@ -451,7 +258,6 @@
         /* Network */
         .medium {
             width: 100%;
-            max-width: 800px;
             height: 100px;
             position: relative;
             border-radius: var(--radius);
@@ -489,7 +295,6 @@
         /* Explanation */
         .info-card {
             width: 100%;
-            max-width: 800px;
             background: #fffbe6;
             padding: 24px;
             border-radius: var(--radius);
@@ -508,73 +313,11 @@
             line-height: 1.6;
             color: #856404;
         }
-
-        @media (max-width: 900px) {
-            .main {
-                grid-template-columns: 1fr;
-            }
-
-            .step-panel {
-                max-height: 200px;
-            }
-        }
     </style>
 </head>
 
 <body>
-
-    <div class="header">
-        <a href="../index.html" class="back-btn">← Home</a>
-        <h1>Sliding Window Protocol</h1>
-        <span class="tag" id="currentModeLabel">Go-Back-N</span>
-    </div>
-
-    <div class="controls-bar">
-        <div class="mode-toggle">
-            <button class="mode-btn active" id="btn-gbn" onclick="setMode('gbn')">Go-Back-N</button>
-            <button class="mode-btn" id="btn-sr" onclick="setMode('sr')">Selective Repeat</button>
-        </div>
-        <button class="btn btn-restart" onclick="restart()">↺ Restart</button>
-        <div class="playback">
-            <button onclick="goToStep(0)">⏮</button>
-            <button onclick="prevStep()" id="prevBtn">◀</button>
-            <button id="playPauseBtn" onclick="togglePlay()">▶</button>
-            <button onclick="nextStep()" id="nextBtn">▶</button>
-            <button onclick="goToStep(currentSteps.length - 1)">⏭</button>
-        </div>
-        <div class="step-info">Step <span id="stepCurrent">0</span> / <span id="stepTotal">0</span></div>
-    </div>
-
-    <div class="main">
-        <div class="step-panel" id="stepList"></div>
-        <div class="viz-panel">
-
-            <div class="array-container">
-                <div class="array-label">Sender Buffer</div>
-                <div class="window" id="senderWindow"></div>
-                <div class="pointer top" id="ptr-s-base" data-label="S_base"></div>
-                <div class="pointer bottom" id="ptr-s-next" data-label="S_next"></div>
-                <div class="array-row" id="senderRow"></div>
-            </div>
-
-            <div class="medium" id="networkMedium"></div>
-
-            <div class="array-container">
-                <div class="array-label">Receiver Buffer</div>
-                <div class="window receiver" id="receiverWindow"></div>
-                <div class="pointer top emerald" id="ptr-r-base" data-label="R_base"></div>
-                <div class="pointer bottom emerald" id="ptr-r-next" data-label="R_next"></div>
-                <div class="array-row" id="receiverRow"></div>
-            </div>
-
-            <div class="info-card">
-                <div class="info-title" id="infoTitle">Mode: Go-Back-N</div>
-                <div class="info-text" id="infoText"></div>
-            </div>
-
-        </div>
-    </div>
-
+    <script src="../core/engine.js"></script>
     <script>
         const GBN_STEPS = [
             { title: "Setup Parameters", desc: "Window Size = 4. S_base tracks the oldest unacknowledged frame. S_next is where new transmissions happen. R_expected is the strict sequence number the receiver demands.", sBase: 0, sNext: 0, rBase: 0, rNext: 0, sState: [], rState: [], packets: [] },
@@ -597,104 +340,192 @@
             { title: "Sender State", desc: "Sender receives ACKs for 3 and 4 and marks them done. But S_base CANNOT slide because frame 2 is still unacknowledged entirely.", sBase: 2, sNext: 5, rBase: 2, rNext: 5, sState: [2, 3, 4], rState: [0, 1, 3, 4], packets: [] },
             { title: "Selective Timeout", desc: "The independent timer for frame 2 expires. SR behaves surgically: it ONLY resends the missing frame 2, saving network bandwidth.", sBase: 2, sNext: 5, rBase: 2, rNext: 5, sState: [2, 3, 4], rState: [0, 1, 3, 4], packets: [{ v: 2, p: 0.1, t: 'data' }] },
             { title: "Receiver Cascade", desc: "Frame 2 arrives! R_base moves to 3, but wait—3 & 4 are already buffered! The receiver delivers 2, 3, and 4 instantly, cascading R_base all the way forward to 5.", sBase: 2, sNext: 5, rBase: 5, rNext: 5, sState: [2, 3, 4], rState: [0, 1, 2, 3, 4], packets: [{ v: 2, p: 0.5, t: 'ack' }] },
-            { title: "Full Synchronization", desc: "The sender receives ACK 2. Since 3 and 4 were marked done, S_base jumps directly to 5. Both sender and receiver arrays are now perfectly synced.", sBase: 5, sNext: 5, rBase: 5, rNext: 5, sState: [], rState: [0, 1, 2, 3, 4], packets: [] }
+            { title: "Full Synchronization", desc: "The sender receives ACK 2. Since 3 and 4 were marked done, S_base jumps directly to 5. Both sender and receiver arrays are perfectly synced.", sBase: 5, sNext: 5, rBase: 5, rNext: 5, sState: [], rState: [0, 1, 2, 3, 4], packets: [] }
         ];
 
         let mode = 'gbn';
-        let currentSteps = GBN_STEPS;
-        let currentStep = 0;
-        let isPlaying = false;
-        let playInterval = null;
 
-        function setMode(m) {
-            stop();
-            mode = m;
-            currentSteps = (m === 'gbn') ? GBN_STEPS : SR_STEPS;
-            document.getElementById('btn-gbn').classList.toggle('active', m === 'gbn');
-            document.getElementById('btn-sr').classList.toggle('active', m === 'sr');
-            document.getElementById('currentModeLabel').innerText = (m === 'gbn') ? 'Go-Back-N' : 'Selective Repeat';
-            document.getElementById('infoTitle').innerText = 'Mode: ' + (m === 'gbn' ? 'Go-Back-N' : 'Selective Repeat');
+        const engine = new VizEngine({
+            title: "Sliding Window Protocol",
+            badge: "Network",
+            tag: "Protocol",
+            codeLines: [],
+            onRun: () => {
+                return mode === 'gbn' ? GBN_STEPS : SR_STEPS;
+            },
+            onRenderStep: (step, container, eng) => {
+                // Determine pointer offset
+                const getPtrLeft = (idx, baseId) => {
+                    const el = document.getElementById(baseId + Math.min(idx, 7));
+                    if (!el) return 0;
+                    let l = el.offsetLeft + 24;
+                    if (idx > 7) l += 30; // offset if pointers go beyond array limit
+                    return l;
+                };
 
-            // Re-label 4th pointer
-            document.getElementById('ptr-r-next').setAttribute('data-label', m === 'gbn' ? 'R_expected' : 'R_buffered_end');
+                const getWindowParams = (idx, baseId) => {
+                    const el = document.getElementById(baseId + idx);
+                    if (!el) return { w: 0, l: 0 };
+                    return {
+                        l: el.offsetLeft - 6,
+                        w: 48 * 4 + 8 * 3 + 12
+                    };
+                };
 
-            restart();
-        }
+                let arraysHtml = `<div style="display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%;">`;
 
-        function init() {
-            const create = (id, p) => {
-                const r = document.getElementById(id); r.innerHTML = '';
-                for (let i = 0; i < 8; i++) { const c = document.createElement('div'); c.className = 'cell'; c.id = p + '-c-' + i; c.innerText = i; r.appendChild(c); }
-            };
-            create('senderRow', 's'); create('receiverRow', 'r');
-            setMode('gbn');
-        }
+                // Sender Buffer
+                let sRow = `<div class="array-row" style="position: relative;">`;
+                for (let i = 0; i < 8; i++) {
+                    const sentClass = step.sState.includes(i) ? ' sent' : '';
+                    sRow += `<div class="cell${sentClass}" id="s-c-${i}">${i}</div>`;
+                }
+                sRow += `</div>`;
+                arraysHtml += `<div class="array-container">
+                                  <div class="array-label">Sender Buffer</div>
+                                  <div class="window" id="senderWindow"></div>
+                                  <div class="pointer top" id="ptr-s-base" data-label="S_base"></div>
+                                  <div class="pointer bottom" id="ptr-s-next" data-label="S_next"></div>
+                                  ${sRow}
+                               </div>`;
 
-        function updateUI() {
-            const s = currentSteps[currentStep];
-            document.getElementById('stepCurrent').innerText = currentStep;
-            document.getElementById('stepTotal').innerText = currentSteps.length - 1;
-            document.getElementById('infoText').innerText = s.desc;
+                // Network Medium
+                let netHtml = `<div class="medium" id="networkMedium">`;
+                step.packets.forEach(p => {
+                    // Start absolute positioning
+                    const typeClass = p.t + (p.lost ? ' lost' : '');
+                    const label = (p.t === 'data' ? 'F' : 'A') + p.v + (p.rej ? ' ❌' : '');
+                    // For the visualizer, we can't easily rely on left/right pixels if we don't know the exact container size at string generation time, but we can use percentage!
+                    const startP = p.t === 'data' ? 5 : 95;
+                    const endP = p.t === 'data' ? 95 : 5;
+                    const posP = startP + (endP - startP) * p.p;
+                    netHtml += `<div class="packet ${typeClass}" style="left: calc(${posP}% - 15px);">${label}</div>`;
+                });
+                netHtml += `</div>`;
+                arraysHtml += netHtml;
 
-            for (let i = 0; i < 8; i++) {
-                const sc = document.getElementById('s-c-' + i); sc.className = 'cell' + (s.sState.includes(i) ? ' sent' : '');
-                const rc = document.getElementById('r-c-' + i);
-                rc.className = 'cell';
-                if (s.rState.includes(i)) {
-                    // In SR, if it's accepted but not at base, it's buffered
-                    if (mode === 'sr' && i >= s.rBase) rc.classList.add('buffered');
-                    else rc.classList.add('received');
+                // Receiver Buffer
+                let rRow = `<div class="array-row" style="position: relative;">`;
+                for (let i = 0; i < 8; i++) {
+                    let rClass = '';
+                    if (step.rState.includes(i)) {
+                        if (mode === 'sr' && i >= step.rBase) rClass = ' buffered';
+                        else rClass = ' received';
+                    }
+                    rRow += `<div class="cell${rClass}" id="r-c-${i}">${i}</div>`;
+                }
+                rRow += `</div>`;
+
+                const rNextLabel = mode === 'gbn' ? 'R_expected' : 'R_buffered_end';
+                arraysHtml += `<div class="array-container">
+                                  <div class="array-label">Receiver Buffer</div>
+                                  <div class="window receiver" id="receiverWindow"></div>
+                                  <div class="pointer top emerald" id="ptr-r-base" data-label="R_base"></div>
+                                  <div class="pointer bottom emerald" id="ptr-r-next" data-label="${rNextLabel}"></div>
+                                  ${rRow}
+                               </div>`;
+
+                arraysHtml += `</div>`;
+
+                // Add the arrays visually
+                container.innerHTML += eng.createZoomableCard('net_canvas', '🌐 Network Transfer Simulation', arraysHtml, '450px');
+
+                container.innerHTML += `<div class="info-card">
+                                            <div class="info-title">Mode: ${mode === 'gbn' ? 'Go-Back-N' : 'Selective Repeat'}</div>
+                                            <div class="info-text">${step.desc}</div>
+                                        </div>`;
+
+                // Position pointers after appending to DOM so offsetLeft computes. We use setTimeout of 0 to ensure DOM is flushed.
+                setTimeout(() => {
+                    const ptrBase = document.getElementById('ptr-s-base');
+                    if (ptrBase) ptrBase.style.left = getPtrLeft(step.sBase, 's-c-') + 'px';
+
+                    const ptrNext = document.getElementById('ptr-s-next');
+                    if (ptrNext) ptrNext.style.left = getPtrLeft(step.sNext, 's-c-') + 'px';
+
+                    const rPtrBase = document.getElementById('ptr-r-base');
+                    if (rPtrBase) rPtrBase.style.left = getPtrLeft(step.rBase, 'r-c-') + 'px';
+
+                    const rPtrNext = document.getElementById('ptr-r-next');
+                    if (rPtrNext) rPtrNext.style.left = getPtrLeft(step.rNext, 'r-c-') + 'px';
+
+                    const sw = document.getElementById('senderWindow');
+                    if (sw) {
+                        const wp = getWindowParams(step.sBase, 's-c-');
+                        sw.style.left = wp.l + 'px';
+                        sw.style.width = wp.w + 'px';
+                    }
+
+                    const rw = document.getElementById('receiverWindow');
+                    if (rw) {
+                        const wp = getWindowParams(step.rBase, 'r-c-');
+                        rw.style.left = wp.l + 'px';
+                        rw.style.width = wp.w + 'px';
+                    }
+                }, 0);
+
+                // Update Step List active class
+                document.querySelectorAll('.step-item.active').forEach(el => el.classList.remove('active'));
+                const stepEl = document.getElementById('step-el-' + eng.currentStep);
+                if (stepEl) {
+                    stepEl.classList.add('active');
+                    stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             }
+        });
 
-            const win = (id, base, p) => {
-                const w = document.getElementById(id); const c = document.getElementById(p + '-c-' + base);
-                if (!c) return;
-                w.style.left = (c.offsetLeft - 6) + 'px'; w.style.width = (48 * 4 + 8 * 3 + 12) + 'px';
-            };
-            win('senderWindow', s.sBase, 's'); win('receiverWindow', s.rBase, 'r');
+        // Initialize engine
+        engine.init();
 
-            const ptr = (id, idx, p) => {
-                const el = document.getElementById(id); const c = document.getElementById(p + '-c-' + Math.min(idx, 7));
-                if (!c) return;
-                let l = c.offsetLeft + 24; if (idx > 7) l += 30;
-                el.style.left = l + 'px';
-            };
-            ptr('ptr-s-base', s.sBase, 's'); ptr('ptr-s-next', s.sNext, 's');
-            ptr('ptr-r-base', s.rBase, 'r'); ptr('ptr-r-next', s.rNext, 'r');
+        // Dynamically override Code Pane to be a Step Panel, and inject the Mode toggles.
+        document.addEventListener('DOMContentLoaded', () => {
+            const controlsBar = document.querySelector('.controls-bar');
 
-            const med = document.getElementById('networkMedium'); med.innerHTML = '';
-            s.packets.forEach(p => {
-                const d = document.createElement('div'); d.className = 'packet ' + p.t + (p.lost ? ' lost' : '');
-                d.innerText = (p.t === 'data' ? 'F' : 'A') + p.v + (p.rej ? ' ❌' : '');
-                const start = p.t === 'data' ? 40 : med.clientWidth - 40, end = p.t === 'data' ? med.clientWidth - 40 : 40;
-                d.style.left = (start + (end - start) * p.p) + 'px';
-                med.appendChild(d);
-                if (p.lost) setTimeout(() => d.classList.add('lost'), 50);
+            // Insert Mode Toggle at start
+            const modeToggleHTML = `
+                <div class="mode-toggle">
+                    <button class="mode-btn active" id="btn-gbn" onclick="setMode('gbn')">Go-Back-N</button>
+                    <button class="mode-btn" id="btn-sr" onclick="setMode('sr')">Selective Repeat</button>
+                </div>
+            `;
+            controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
+
+            // Hide the default "Run" button because we will just trigger run() automatically when mode changes
+            const runBtn = document.getElementById('engineRunBtn');
+            if (runBtn) runBtn.style.display = 'none';
+
+            buildStepPanel();
+            engine.run(); // Initial run
+        });
+
+        function buildStepPanel() {
+            const codePane = document.getElementById('engineCodePane');
+            const stepsToRender = mode === 'gbn' ? GBN_STEPS : SR_STEPS;
+            let listHtml = `<div class="panel-title">${mode === 'gbn' ? 'Go-Back-N' : 'Selective Repeat'} Steps</div><div id="stepList">`;
+
+            stepsToRender.forEach((st, i) => {
+                listHtml += `<div class="step-item" id="step-el-${i}" onclick="engine.goTo(${i})">
+                                <span class="step-num">STEP ${i}</span>
+                                <div class="step-title">${st.title}</div>
+                             </div>`;
             });
-
-            const list = document.getElementById('stepList'); list.innerHTML = '';
-            currentSteps.forEach((st, i) => {
-                const div = document.createElement('div'); div.className = 'step-item ' + (i === currentStep ? 'active' : '');
-                div.onclick = () => goToStep(i);
-                div.innerHTML = `<span class="step-num">STEP ${i}</span><div class="step-title">${st.title}</div>`;
-                list.appendChild(div);
-                if (i === currentStep) div.scrollIntoView({ block: 'nearest' });
-            });
-
-            document.getElementById('prevBtn').disabled = currentStep === 0;
-            document.getElementById('nextBtn').disabled = currentStep === currentSteps.length - 1;
+            listHtml += `</div>`;
+            codePane.className = 'pane step-panel';
+            codePane.innerHTML = listHtml;
         }
 
-        function nextStep() { if (currentStep < currentSteps.length - 1) { currentStep++; updateUI(); } else stop(); }
-        function prevStep() { if (currentStep > 0) { currentStep--; updateUI(); } }
-        function goToStep(i) { currentStep = i; updateUI(); }
-        function restart() { currentStep = 0; updateUI(); }
-        function togglePlay() { isPlaying ? stop() : play(); }
-        function play() { isPlaying = true; document.getElementById('playPauseBtn').innerText = '⏸'; playInterval = setInterval(nextStep, 1500); }
-        function stop() { isPlaying = false; document.getElementById('playPauseBtn').innerText = '▶'; clearInterval(playInterval); }
+        window.setMode = function (m) {
+            engine.stopPlay();
+            mode = m;
+            document.getElementById('btn-gbn').classList.toggle('active', m === 'gbn');
+            document.getElementById('btn-sr').classList.toggle('active', m === 'sr');
+            const badge = document.querySelector('.header .badge');
+            if (badge) badge.textContent = m === 'gbn' ? 'Go-Back-N' : 'Selective Repeat';
 
-        window.onload = init;
+            buildStepPanel();
+            engine.run();
+        };
+
     </script>
 </body>
 

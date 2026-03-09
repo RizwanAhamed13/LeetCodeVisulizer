@@ -263,12 +263,12 @@
                     let cls = "array-box";
                     if (i === step.pointerI) cls += " pointer-i";
                     if (step.result && (i === step.result[0] || i === step.result[1])) cls += " found";
-                    arrHtml += \`
+                    arrHtml += `
                         <div class="array-element">
-                            <div class="array-index">\${i}</div>
-                            <div class="\${cls}">\${nums[i]}</div>
+                            <div class="array-index">${i}</div>
+                            <div class="${cls}">${nums[i]}</div>
                         </div>
-                    \`;
+                    `;
                 }
                 arrHtml += '</div>';
 
@@ -277,22 +277,22 @@
 
                 // HashMap UI (Uses zoomable canvas as a feature test!)
                 let mapHtml = '';
-                if(Object.keys(step.mapState).length === 0) {
+                if (Object.keys(step.mapState).length === 0) {
                     mapHtml = '<div style="font-size: 13px; color: var(--text-dim); padding: 10px;">(Empty)</div>';
                 } else {
                     mapHtml += '<div class="hashmap-container">';
                     step.keysAddedState.forEach(key => {
                         let innercls = 'hashmap-entry';
                         let boxStyle = '';
-                        if(step.newEntry === key) innercls += " new-entry";
-                        if(step.checkComp === key) boxStyle = 'box-shadow: 0 0 0 2px var(--cyan);';
-                        if(step.foundComp === key) innercls += " found-entry";
-                        mapHtml += \`
-                            <div class="\${innercls}" style="\${boxStyle}">
-                                <div class="hm-key">Key: \${key}</div>
-                                <div class="hm-val">Idx: \${step.mapState[key]}</div>
+                        if (step.newEntry === key) innercls += " new-entry";
+                        if (step.checkComp === key) boxStyle = 'box-shadow: 0 0 0 2px var(--cyan);';
+                        if (step.foundComp === key) innercls += " found-entry";
+                        mapHtml += `
+                            <div class="${innercls}" style="${boxStyle}">
+                                <div class="hm-key">Key: ${key}</div>
+                                <div class="hm-val">Idx: ${step.mapState[key]}</div>
                             </div>
-                        \`;
+                        `;
                     });
                     mapHtml += '</div>';
                 }
@@ -302,22 +302,22 @@
 
                 // Variables Grid
                 const v = step.vars || {};
-                let varsHtml = \`
+                let varsHtml = `
                     <div class="info-grid">
-                        <div class="info-card pink"><div class="label">target</div><div class="value">\${target}</div></div>
-                        <div class="info-card yellow"><div class="label">i</div><div class="value">\${v.i}</div></div>
-                        <div class="info-card emerald"><div class="label">nums[i]</div><div class="value">\${v.nums_i}</div></div>
-                        <div class="info-card cyan"><div class="label">complement</div><div class="value">\${v.comp}</div></div>
+                        <div class="info-card pink"><div class="label">target</div><div class="value">${target}</div></div>
+                        <div class="info-card yellow"><div class="label">i</div><div class="value">${v.i}</div></div>
+                        <div class="info-card emerald"><div class="label">nums[i]</div><div class="value">${v.nums_i}</div></div>
+                        <div class="info-card cyan"><div class="label">complement</div><div class="value">${v.comp}</div></div>
                     </div>
-                \`;
+                `;
                 container.innerHTML += eng.createSimpleCard('📊 Variables', varsHtml);
 
                 // Desc
-                container.innerHTML += eng.createSimpleCard('💡 Step Detail', \`<div class="step-text">\${step.desc}</div>\`);
+                container.innerHTML += eng.createSimpleCard('💡 Step Detail', `<div class="step-text">${step.desc}</div>`);
 
                 // Result
-                if(step.result) {
-                    container.innerHTML += eng.createSimpleCard('🏆 Result Output', \`<div class="state-tracker" style="color:var(--emerald); background:var(--emerald-bg); border-color:var(--emerald);"><span>Output</span><span>[\${step.result.join(', ')}]</span></div>\`);
+                if (step.result) {
+                    container.innerHTML += eng.createSimpleCard('🏆 Result Output', `<div class="state-tracker" style="color:var(--emerald); background:var(--emerald-bg); border-color:var(--emerald);"><span>Output</span><span>[${step.result.join(', ')}]</span></div>`);
                 }
             }
         });
@@ -346,13 +346,13 @@
                 });
 
                 steps.push({
-                    codeLine: 7, desc: `Check if map contains<span class= "hl-cyan" > ${ comp }</span >.`,
+                    codeLine: 7, desc: `Check if map contains <span class="hl-cyan">${comp}</span>.`,
                     vars: { i: i, nums_i: nums[i], comp: comp }, mapState: { ...map }, keysAddedState: [...keysAdded], pointerI: i, checkComp: comp
                 });
 
                 if (comp in map) {
                     steps.push({
-                        codeLine: 8, desc: `Found complement < span class= "hl-cyan" > ${ comp }</span > !Return[<span class="hl-emerald">${map[comp]}</span>, <span class="hl-yellow">${i}</span>].`,
+                        codeLine: 8, desc: `Found complement <span class="hl-cyan">${comp}</span>! Return [<span class="hl-emerald">${map[comp]}</span>, <span class="hl-yellow">${i}</span>].`,
                         vars: { i: i, nums_i: nums[i], comp: comp }, mapState: { ...map }, keysAddedState: [...keysAdded], pointerI: i, foundComp: comp, result: [map[comp], i]
                     });
                     return steps;
@@ -362,7 +362,7 @@
                 if (!keysAdded.includes(nums[i])) keysAdded.push(nums[i]);
 
                 steps.push({
-                    codeLine: 11, desc: `Put < span class= "hl-emerald" > Key: ${ nums[i]}</span >, <span class="hl-purple">Value: ${i}</span> into map.`,
+                    codeLine: 11, desc: `Put <span class="hl-emerald">Key: ${nums[i]}</span>, <span class="hl-purple">Value: ${i}</span> into map.`,
                     vars: { i: i, nums_i: nums[i], comp: comp }, mapState: { ...map }, keysAddedState: [...keysAdded], pointerI: i, newEntry: nums[i]
                 });
             }

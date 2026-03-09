@@ -10,457 +10,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="../../core/engine.css">
     <style>
-        *,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg: #ffffff;
-            --bg2: #f8f9fc;
-            --bg3: #f1f3f8;
-            --card-bg: #ffffff;
-            --code-bg: #fafbfe;
-            --border: #e2e5ef;
-            --text: #1a1d2e;
-            --text-secondary: #4a5068;
-            --text-dim: #8891a8;
-            --accent: #4f46e5;
-            --accent-light: #ede9fe;
-            --accent2: #7c3aed;
-            --emerald: #059669;
-            --emerald-bg: #ecfdf5;
-            --orange: #ea580c;
-            --orange-bg: #fff7ed;
-            --pink: #db2777;
-            --cyan: #0891b2;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
-            --highlight-line: rgba(79, 70, 229, 0.06);
-            --radius: 14px;
-            --radius-sm: 10px;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg2);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* HEADER & CONTROLS */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .back-btn {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 7px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all .2s;
-        }
-
-        .back-btn:hover {
-            color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .header .badge {
-            background: var(--accent);
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-
-        .header h1 {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .header .tag {
-            margin-left: auto;
-            font-size: 12px;
-            color: var(--accent);
-            background: var(--accent-light);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .controls-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 24px;
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .input-group label {
-            font-size: 12px;
-            color: var(--text-dim);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .6px;
-        }
-
-        .input-group input[type="text"] {
-            background: var(--bg2);
-            border: 1.5px solid var(--border);
-            color: var(--accent);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            width: 140px;
-            outline: none;
-            transition: border-color .2s;
-        }
-
-        .input-group input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 18px;
-            border-radius: 8px;
-            border: none;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .2s;
-            margin-left: 8px;
-        }
-
-        .btn-run {
-            background: var(--accent);
-            color: #fff;
-        }
-
-        .btn-run:hover {
-            background: var(--accent2);
-            box-shadow: var(--shadow-md);
-        }
-
-        .playback {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            margin-left: 8px;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 3px;
-        }
-
-        .playback button {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: none;
-            color: var(--text-dim);
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all .15s;
-        }
-
-        .playback button:hover,
-        .playback button.active {
-            background: var(--accent-light);
-            color: var(--accent);
-        }
-
-        .speed-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: 6px;
-        }
-
-        .speed-group label {
-            font-size: 11px;
-            color: var(--text-dim);
-            font-weight: 500;
-        }
-
-        .speed-slider {
-            -webkit-appearance: none;
-            width: 72px;
-            height: 4px;
-            background: var(--border);
-            border-radius: 2px;
-            outline: none;
-        }
-
-        .speed-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: var(--accent);
-            cursor: pointer;
-            box-shadow: 0 1px 4px rgba(79, 70, 229, 0.3);
-        }
-
-        .step-info {
-            margin-left: auto;
-            font-size: 13px;
-            color: var(--text-dim);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .step-info span {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        /* MAIN LAYOUT */
-        .main {
-            display: grid;
-            grid-template-columns: 460px 1fr;
-            height: calc(100vh - 106px);
-        }
-
-        /* CODE PANEL */
-        .code-panel {
-            background: var(--code-bg);
-            border-right: 1px solid var(--border);
-            overflow-y: auto;
-        }
-
-        .code-panel::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .code-panel::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        .code-title {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: rgba(250, 251, 254, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border);
-            font-size: 12px;
-            color: var(--text-dim);
-            font-weight: 600;
-        }
-
-        .code-title .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        .dot-red {
-            background: #ff5f56;
-        }
-
-        .dot-yellow {
-            background: #ffbd2e;
-        }
-
-        .dot-green {
-            background: #27c93f;
-        }
-
-        .code-lines {
-            padding: 12px 0;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12.5px;
-            line-height: 1.85;
-        }
-
-        .code-line {
-            display: flex;
-            padding: 0 16px 0 0;
-            transition: background .2s;
-            position: relative;
-        }
-
-        .code-line.active {
-            background: var(--highlight-line);
-            border-left: 3px solid var(--accent);
-        }
-
-        .code-line.active .line-num {
-            color: var(--accent);
-        }
-
-        .line-num {
-            display: inline-block;
-            width: 42px;
-            text-align: right;
-            padding-right: 16px;
-            color: #c8cdd8;
-            user-select: none;
-            flex-shrink: 0;
-            font-size: 11px;
-        }
-
-        .line-content {
-            white-space: pre;
-            color: var(--text);
-        }
-
-        .kw {
-            color: #8b5cf6;
-            font-weight: 500;
-        }
-
-        .tp {
-            color: #0891b2;
-        }
-
-        .fn {
-            color: #2563eb;
-        }
-
-        .str {
-            color: #059669;
-        }
-
-        .num {
-            color: #ea580c;
-        }
-
-        .op {
-            color: #64748b;
-        }
-
-        .br {
-            color: #94a3b8;
-        }
-
-        .ret {
-            color: #dc2626;
-            font-weight: 500;
-        }
-
-        /* VIZ PANEL */
-        .viz-panel {
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            padding: 24px;
-            gap: 20px;
-            background: var(--bg2);
-        }
-
-        .viz-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 22px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .section-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-dim);
-            font-weight: 700;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .welcome {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-            gap: 14px;
-            padding: 40px;
-        }
-
-        .welcome-icon {
-            font-size: 56px;
-            margin-bottom: 4px;
-        }
-
-        .welcome h2 {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .welcome p {
-            color: var(--text-secondary);
-            font-size: 14px;
-            max-width: 380px;
-            line-height: 1.6;
-        }
-
-        @keyframes fadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(6px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-in {
-            animation: fadeSlideIn .3s ease forwards;
-        }
-
         /* RESULTS DP STATE */
         .dp-state {
             background: var(--emerald-bg);
@@ -496,23 +47,13 @@
             display: flex;
             justify-content: center;
             padding-top: 20px;
-            overflow-x: auto;
-            overflow-y: hidden;
-        }
-
-        .tree-container::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .tree-container::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
+            overflow: visible;
         }
 
         .tree-wrapper {
             position: relative;
             min-width: 600px;
-            /* will be dynamically adjusted */
+            min-height: 300px;
         }
 
         .tree-node {
@@ -556,7 +97,7 @@
             background: var(--emerald-bg);
         }
 
-        svg {
+        .tree-svg {
             position: absolute;
             top: 0;
             left: 0;
@@ -582,6 +123,8 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            position: relative;
+            padding-left: 10px;
         }
 
         .stack-frame {
@@ -606,7 +149,7 @@
         }
 
         .stack-frame.returning {
-            background: var(--pink-light, #fce7f3);
+            background: var(--pink-bg);
             border: 1px solid var(--pink);
             transform: translateX(-5px);
         }
@@ -614,7 +157,7 @@
         .stack-arrows {
             position: absolute;
             top: 0;
-            left: -30px;
+            left: -20px;
             width: 30px;
             height: 100%;
             pointer-events: none;
@@ -727,54 +270,7 @@
 </head>
 
 <body>
-
-    <div class="header">
-        <a href="../index.html" class="back-btn">← Home</a>
-        <span class="badge">Backtracking</span>
-        <h1>Combination Sum</h1>
-        <span class="tag">Array / Backtracking</span>
-    </div>
-
-    <div class="controls-bar">
-        <div class="input-group">
-            <label for="inputArr">Candidates</label>
-            <input type="text" id="inputArr" value="2,3,6,7" placeholder="e.g. 2,3,6,7">
-        </div>
-        <div class="input-group">
-            <label for="inputTarget">Target</label>
-            <input type="text" id="inputTarget" value="7" style="width: 60px;" placeholder="7">
-        </div>
-        <button class="btn btn-run" onclick="runVisualization()">▶ Run</button>
-        <div class="playback">
-            <button onclick="goToStart()" title="First step">⏮</button>
-            <button onclick="prevStep()" title="Previous">◀</button>
-            <button id="playPauseBtn" onclick="togglePlay()" title="Play / Pause">▶</button>
-            <button onclick="nextStep()" title="Next">▶</button>
-            <button onclick="goToEnd()" title="Last step">⏭</button>
-        </div>
-        <div class="speed-group">
-            <label for="speedSlider">Speed</label>
-            <input type="range" class="speed-slider" id="speedSlider" min="200" max="2500" value="1000" step="100">
-        </div>
-        <div class="step-info">Step <span id="stepCurrent">0</span> / <span id="stepTotal">0</span></div>
-    </div>
-
-    <div class="main">
-        <div class="code-panel">
-            <div class="code-title"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span
-                    class="dot dot-green"></span>Solution.java</div>
-            <div class="code-lines" id="codeLines"></div>
-        </div>
-        <div class="viz-panel" id="vizPanel">
-            <div class="welcome" id="welcomeState">
-                <div class="welcome-icon">🌲</div>
-                <h2>Combination Sum Visualizer</h2>
-                <p>Enter an array of distinct candidate integers and a target sum, then click <strong>Run</strong> to
-                    watch the DFS backtracking building valid combinations using a decision tree.</p>
-            </div>
-        </div>
-    </div>
-
+    <script src="../../core/engine.js"></script>
     <script>
         const CODE_LINES = [
             { tokens: [{ t: 'kw', v: 'class' }, { t: 'tp', v: ' Solution' }, { t: 'br', v: ' {' }] },
@@ -797,21 +293,6 @@
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] }
         ];
-
-        function renderCode() {
-            const c = document.getElementById('codeLines'); c.innerHTML = '';
-            CODE_LINES.forEach((line, i) => {
-                const div = document.createElement('div'); div.className = 'code-line'; div.id = `cl-${i}`;
-                const num = document.createElement('span'); num.className = 'line-num'; num.textContent = i + 1; div.appendChild(num);
-                const content = document.createElement('span'); content.className = 'line-content';
-                content.innerHTML = line.tokens.length ? line.tokens.map(t => t.t ? `<span class="${t.t}">${t.v}</span>` : t.v).join('') : '&nbsp;';
-                div.appendChild(content); c.appendChild(div);
-            });
-        }
-        function highlightLine(idx) {
-            document.querySelectorAll('.code-line.active').forEach(e => e.classList.remove('active'));
-            if (idx !== null && idx >= 0) { const el = document.getElementById(`cl-${idx}`); if (el) { el.classList.add('active'); el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } }
-        }
 
         function clone(obj) { return typeof structuredClone === 'function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)); }
 
@@ -902,328 +383,177 @@
                 callStack.push(frameState);
 
                 // Add call visual
-                steps.push({
-                    codeLine: 7,
-                    desc: `Call <span class="hl-accent">backtrack(..., temp=${tListStr}, remain=${treeNode.remain}, start=${treeNode.start})</span>`,
-                    activeNode: treeNode.id,
-                    stack: clone(callStack),
-                    visited: Array.from(visitedIds),
-                    arrowType: 'call',
-                    treeVisualState,
-                    resultList: clone(resultList)
-                });
+                steps.push({ codeLine: 7, desc: `Call <span class="hl-accent">backtrack(..., temp=${tListStr}, remain=${treeNode.remain}, start=${treeNode.start})</span>`, activeNode: treeNode.id, stack: clone(callStack), visited: Array.from(visitedIds), arrowType: 'call', treeVisualState, resultList: clone(resultList) });
 
                 if (treeNode.remain < 0) {
-                    steps.push({
-                        codeLine: 8,
-                        desc: `remain (${treeNode.remain}) &lt; 0. Invalid path, <span class="hl-pink">Return</span> (Backtrack).`,
-                        activeNode: treeNode.id,
-                        stack: clone(callStack),
-                        visited: Array.from(visitedIds),
-                        treeVisualState,
-                        resultList: clone(resultList)
-                    });
+                    steps.push({ codeLine: 8, desc: `remain (${treeNode.remain}) &lt; 0. Invalid path, <span class="hl-pink">Return</span> (Backtrack).`, activeNode: treeNode.id, stack: clone(callStack), visited: Array.from(visitedIds), treeVisualState, resultList: clone(resultList) });
 
                     frameState.isReturning = true;
                     frameState.isComplete = true;
-                    steps.push({
-                        codeLine: 8,
-                        desc: `<span class="hl-pink">Return</span> from backtrack.`,
-                        activeNode: treeNode.id,
-                        stack: clone(callStack),
-                        visited: Array.from(visitedIds),
-                        treeVisualState,
-                        arrowType: 'return',
-                        resultList: clone(resultList)
-                    });
+                    steps.push({ codeLine: 8, desc: `<span class="hl-pink">Return</span> from backtrack.`, activeNode: treeNode.id, stack: clone(callStack), visited: Array.from(visitedIds), treeVisualState, arrowType: 'return', resultList: clone(resultList) });
                     callStack.pop();
                     return;
                 }
 
                 if (treeNode.remain === 0) {
                     resultList.push([...treeNode.tempList]);
-                    steps.push({
-                        codeLine: 9,
-                        desc: `remain == 0! Valid combination found. Add <span class="hl-emerald">${tListStr}</span> to result list.`,
-                        activeNode: treeNode.id,
-                        stack: clone(callStack),
-                        visited: Array.from(visitedIds),
-                        treeVisualState,
-                        resultList: clone(resultList)
-                    });
+                    steps.push({ codeLine: 9, desc: `remain == 0! Valid combination found. Add <span class="hl-emerald">${tListStr}</span> to result list.`, activeNode: treeNode.id, stack: clone(callStack), visited: Array.from(visitedIds), treeVisualState, resultList: clone(resultList) });
 
                     frameState.isReturning = true;
                     frameState.isComplete = true;
-                    steps.push({
-                        codeLine: 9,
-                        desc: `<span class="hl-pink">Return</span> from backtrack.`,
-                        activeNode: treeNode.id,
-                        stack: clone(callStack),
-                        visited: Array.from(visitedIds),
-                        treeVisualState,
-                        arrowType: 'return',
-                        resultList: clone(resultList)
-                    });
+                    steps.push({ codeLine: 9, desc: `<span class="hl-pink">Return</span> from backtrack.`, activeNode: treeNode.id, stack: clone(callStack), visited: Array.from(visitedIds), treeVisualState, arrowType: 'return', resultList: clone(resultList) });
                     callStack.pop();
                     return;
                 }
 
                 // Loop branch
-                steps.push({
-                    codeLine: 11,
-                    desc: `For loop starting at i=${treeNode.start}. (Candidates: [${candidates}])`,
-                    activeNode: treeNode.id,
-                    stack: clone(callStack),
-                    visited: Array.from(visitedIds),
-                    treeVisualState,
-                    resultList: clone(resultList)
-                });
+                steps.push({ codeLine: 11, desc: `For loop starting at i=${treeNode.start}. (Candidates: [${candidates}])`, activeNode: treeNode.id, stack: clone(callStack), visited: Array.from(visitedIds), treeVisualState, resultList: clone(resultList) });
 
                 for (let idx = 0; idx < treeNode.children.length; idx++) {
                     const childNode = treeNode.children[idx];
                     const i = childNode.i_value_used;
 
-                    steps.push({
-                        codeLine: 12,
-                        desc: `i=${i}, candidates[i]=${candidates[i]}. temp.add(${candidates[i]})`,
-                        activeNode: treeNode.id,
-                        stack: clone(callStack),
-                        visited: Array.from(visitedIds),
-                        treeVisualState,
-                        resultList: clone(resultList)
-                    });
+                    steps.push({ codeLine: 12, desc: `i=${i}, candidates[i]=${candidates[i]}. temp.add(${candidates[i]})`, activeNode: treeNode.id, stack: clone(callStack), visited: Array.from(visitedIds), treeVisualState, resultList: clone(resultList) });
 
                     // Recursive call
                     dfs(childNode);
 
                     // Backtrack
-                    steps.push({
-                        codeLine: 14,
-                        desc: `Backtracking: temp.remove(${candidates[i]}) to restore state for next loop iteration.`,
-                        activeNode: treeNode.id,
-                        stack: clone(callStack),
-                        visited: Array.from(visitedIds),
-                        treeVisualState,
-                        resultList: clone(resultList)
-                    });
+                    steps.push({ codeLine: 14, desc: `Backtracking: temp.remove(${candidates[i]}) to restore state for next loop iteration.`, activeNode: treeNode.id, stack: clone(callStack), visited: Array.from(visitedIds), treeVisualState, resultList: clone(resultList) });
                 }
 
                 frameState.isReturning = true;
                 frameState.isComplete = true;
 
-                steps.push({
-                    codeLine: 17,
-                    desc: `End of loop. <span class="hl-pink">Return</span> to caller.`,
-                    activeNode: treeNode.id,
-                    stack: clone(callStack),
-                    visited: Array.from(visitedIds),
-                    arrowType: 'return',
-                    treeVisualState,
-                    resultList: clone(resultList)
-                });
+                steps.push({ codeLine: 17, desc: `End of loop. <span class="hl-pink">Return</span> to caller.`, activeNode: treeNode.id, stack: clone(callStack), visited: Array.from(visitedIds), arrowType: 'return', treeVisualState, resultList: clone(resultList) });
 
                 callStack.pop();
             }
 
             dfs(root);
 
-            steps.push({
-                codeLine: 4,
-                desc: `Execution complete. All combinations explored.`,
-                activeNode: -1,
-                stack: [],
-                visited: Array.from(visitedIds),
-                treeVisualState,
-                resultList: clone(resultList)
-            });
+            steps.push({ codeLine: 4, desc: `Execution complete. All combinations explored.`, activeNode: -1, stack: [], visited: Array.from(visitedIds), treeVisualState, resultList: clone(resultList) });
 
             return steps;
         }
 
-        let steps = [], currentStep = 0, isPlaying = false, playInterval = null;
+        const engine = new VizEngine({
+            title: "Combination Sum",
+            badge: "Backtracking",
+            tag: "Array / Backtracking",
+            codeLines: CODE_LINES,
+            inputs: [
+                { id: "inputArr", label: "Candidates", default: "2,3,6,7", width: "120px" },
+                { id: "inputTarget", label: "Target", default: "7", width: "60px" }
+            ],
+            onRun: () => {
+                const cdStr = document.getElementById('inputArr').value.trim();
+                const trStr = document.getElementById('inputTarget').value.trim();
 
-        function runVisualization() {
-            const cdStr = document.getElementById('inputArr').value.trim();
-            const trStr = document.getElementById('inputTarget').value.trim();
+                const cands = cdStr.split(',').map(s => Number.parseInt(s.trim())).filter(n => !isNaN(n));
+                const target = Number.parseInt(trStr);
 
-            const cands = cdStr.split(',').map(s => Number.parseInt(s.trim())).filter(n => !isNaN(n));
-            const target = Number.parseInt(trStr);
-
-            if (!cands.length || isNaN(target)) {
-                alert("Please enter valid comma-separated integers for candidates and a valid target.");
-                return;
-            }
-
-            steps = generateTrace(cands, target);
-            currentStep = 0; stopPlay();
-            document.getElementById('welcomeState').style.display = 'none';
-            renderStep();
-        }
-
-        function renderStep() {
-            if (!steps.length) return;
-            const step = steps[currentStep];
-            document.getElementById('stepCurrent').textContent = currentStep + 1;
-            document.getElementById('stepTotal').textContent = steps.length;
-            highlightLine(step.codeLine);
-
-            const panel = document.getElementById('vizPanel');
-            panel.querySelectorAll('.viz-content').forEach(e => e.remove());
-            const wrap = document.createElement('div'); wrap.className = 'viz-content animate-in';
-
-            // DP / RESULT STATE TRACKER
-            if (step.resultList !== undefined) {
-                const mc = document.createElement('div');
-                mc.className = 'dp-state';
-                const formattedRes = step.resultList.length === 0 ? "[]" : "[ " + step.resultList.map(a => `[${a.join(',')}]`).join(', ') + " ]";
-                mc.innerHTML = `<span class="label">Result Combinations List</span><span>${formattedRes}</span>`;
-                wrap.appendChild(mc);
-            }
-
-            // TREE VISUALIZATION
-            const tc = document.createElement('div'); tc.className = 'viz-card';
-            tc.innerHTML = '<div class="section-label">🌲 Decision/Recursion Space</div>';
-            const tv = document.createElement('div'); tv.className = 'tree-container';
-
-            const ts = step.treeVisualState;
-            const tw = document.createElement('div');
-            tw.className = 'tree-wrapper';
-            if (ts && ts.maxWidth) tw.style.minWidth = `${Math.max(600, ts.maxWidth + 100)}px`;
-            tw.style.minHeight = '300px';
-
-            let svgHtml = '<svg>';
-            if (ts && ts.edges) {
-                ts.edges.forEach(e => {
-                    const sourceNode = ts.nodes.find(n => n.id === e.source);
-                    const targetNode = ts.nodes.find(n => n.id === e.target);
-                    let extraClass = '';
-                    if (step.activeNode === sourceNode.id || step.activeNode === targetNode.id) extraClass = 'active';
-
-                    svgHtml += `<line x1="${sourceNode.x}" y1="${sourceNode.y}" x2="${targetNode.x}" y2="${targetNode.y}" class="tree-edge ${extraClass}" />`;
-                });
-            }
-            svgHtml += '</svg>';
-            tw.innerHTML += svgHtml;
-
-            if (ts && ts.nodes) {
-                ts.nodes.forEach(n => {
-                    const isAct = step.activeNode === n.id;
-                    const isVis = step.visited && step.visited.includes(n.id);
-                    const nd = document.createElement('div');
-
-                    let cls = `tree-node`;
-                    if (isAct) cls += ` active`;
-                    else if (isVis) cls += ` visited`;
-
-                    nd.className = cls;
-                    nd.style.left = `${n.x}px`; nd.style.top = `${n.y}px`;
-
-                    const labelSpan = document.createElement('span');
-                    labelSpan.textContent = `[${n.tempList.join(',')}]`;
-                    nd.appendChild(labelSpan);
-
-                    const remainSpan = document.createElement('span');
-                    remainSpan.className = 'node-remain';
-                    remainSpan.textContent = `rem: ${n.remain}`;
-                    nd.appendChild(remainSpan);
-
-                    tw.appendChild(nd);
-                });
-            }
-            tv.appendChild(tw);
-            tc.appendChild(tv); wrap.appendChild(tc);
-
-            // STACK VISUALIZATION
-            const sc = document.createElement('div'); sc.className = 'viz-card';
-            sc.innerHTML = '<div class="section-label">📚 DFS Call Stack</div>';
-            const sv = document.createElement('div');
-            sv.className = 'stack-container';
-            sv.style.position = 'relative';
-
-            if (!step.stack.length) {
-                sv.innerHTML = '<div style="font-size: 13px; color: var(--text-dim); text-align: center; padding: 10px;">Stack is empty</div>';
-            } else {
-                const reversedStack = [...step.stack].reverse();
-
-                reversedStack.forEach((f, idx) => {
-                    const fd = document.createElement('div');
-                    fd.className = `stack-frame ${idx === 0 && !f.isReturning ? 'active' : ''} ${f.isReturning ? 'returning' : ''}`;
-                    fd.id = `frame-${f.id}`;
-                    fd.innerHTML = `
-                        <div class="frame-node">#${f.id}</div>
-                        <div class="frame-var"><span class="lbl" style="color: var(--pink);">start</span><span class="val hl-pink">${f.start}</span></div>
-                        <div class="frame-var"><span class="lbl" style="color: var(--orange);">remain</span><span class="val hl-orange">${f.remain}</span></div>
-                        <div class="frame-var"><span class="lbl">tempList</span><span class="val hl-accent">${f.tempList}</span></div>
-                    `;
-                    sv.appendChild(fd);
-                });
-
-                if (step.arrowType && step.stack.length > 0) {
-                    const svgArrows = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                    svgArrows.setAttribute('class', 'stack-arrows');
-
-                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-
-                    if (step.arrowType === 'call') {
-                        path.setAttribute('d', 'M 20 60 Q 5 40 20 20');
-                        path.setAttribute('class', 'stack-arrow-path call');
-                        path.setAttribute('marker-end', 'url(#arrowhead-call)');
-                    } else if (step.arrowType === 'return' && step.stack.length > 0) {
-                        path.setAttribute('d', 'M 20 20 Q 5 40 20 60');
-                        path.setAttribute('class', 'stack-arrow-path return');
-                        path.setAttribute('marker-end', 'url(#arrowhead-return)');
-                    }
-
-                    svgArrows.innerHTML = `
-                        <defs>
-                            <marker id="arrowhead-call" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                                <polygon points="0 0, 6 3, 0 6" fill="var(--accent)" />
-                            </marker>
-                            <marker id="arrowhead-return" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                                <polygon points="0 0, 6 3, 0 6" fill="var(--pink)" />
-                            </marker>
-                        </defs>
-                    `;
-                    if (step.stack.length > 1 || step.arrowType === 'call') {
-                        svgArrows.appendChild(path);
-                    }
-                    sv.appendChild(svgArrows);
+                if (!cands.length || isNaN(target)) {
+                    alert("Please enter valid comma-separated integers for candidates and a valid target.");
+                    return [];
                 }
-            }
-            sc.appendChild(sv); wrap.appendChild(sc);
 
-            // STEP DESCRIPTION
-            const desc = document.createElement('div'); desc.className = 'viz-card';
-            desc.innerHTML = `<div class="section-label">💡 Current Operation</div><div class="step-text">${step.desc}</div>`;
-            wrap.appendChild(desc);
+                return generateTrace(cands, target);
+            },
+            onRenderStep: (step, container, eng) => {
+                // DP / RESULT STATE TRACKER
+                if (step.resultList !== undefined) {
+                    const formattedRes = step.resultList.length === 0 ? "[]" : "[ " + step.resultList.map(a => `[${a.join(',')}]`).join(', ') + " ]";
+                    container.innerHTML += `<div class="dp-state"><span class="label">Result Combinations List</span><span>${formattedRes}</span></div>`;
+                }
 
-            panel.appendChild(wrap);
+                // TREE VISUALIZATION
+                const ts = step.treeVisualState;
+                let treeHtml = `<div class="tree-container">`;
 
-            // Scroll tree to active node
-            setTimeout(() => {
-                if (ts && ts.nodes && step.activeNode !== -1) {
-                    const actN = ts.nodes.find(n => n.id === step.activeNode);
-                    if (actN) {
-                        // center tree
-                        tv.scrollLeft = actN.x - tv.clientWidth / 2;
+                let twWidth = ts && ts.maxWidth ? Math.max(600, ts.maxWidth + 100) : 600;
+                let twHtml = `<div class="tree-wrapper" style="min-width: ${twWidth}px;">`;
+
+                let svgHtml = '<svg class="tree-svg">';
+                if (ts && ts.edges) {
+                    ts.edges.forEach(e => {
+                        const sourceNode = ts.nodes.find(n => n.id === e.source);
+                        const targetNode = ts.nodes.find(n => n.id === e.target);
+                        let extraClass = '';
+                        if (step.activeNode === sourceNode.id || step.activeNode === targetNode.id) extraClass = 'active';
+
+                        svgHtml += `<line x1="${sourceNode.x}" y1="${sourceNode.y}" x2="${targetNode.x}" y2="${targetNode.y}" class="tree-edge ${extraClass}" />`;
+                    });
+                }
+                svgHtml += '</svg>';
+                twHtml += svgHtml;
+
+                if (ts && ts.nodes) {
+                    ts.nodes.forEach(n => {
+                        const isAct = step.activeNode === n.id;
+                        const isVis = step.visited && step.visited.includes(n.id);
+
+                        let cls = `tree-node`;
+                        if (isAct) cls += ` active`;
+                        else if (isVis) cls += ` visited`;
+
+                        twHtml += `<div class="${cls}" style="left:${n.x}px; top:${n.y}px;">
+                                      <span>[${n.tempList.join(',')}]</span>
+                                      <span class="node-remain">rem: ${n.remain}</span>
+                                   </div>`;
+                    });
+                }
+                twHtml += `</div>`;
+                treeHtml += twHtml + `</div>`;
+
+                container.innerHTML += eng.createZoomableCard('tree_zoom', '🌲 Decision/Recursion Space', treeHtml, '280px');
+
+                // STACK VISUALIZATION
+                let stackHtml = `<div class="stack-container">`;
+                if (!step.stack.length) {
+                    stackHtml += '<div style="font-size: 13px; color: var(--text-dim); text-align: center; padding: 10px;">Stack is empty</div>';
+                } else {
+                    const reversedStack = [...step.stack].reverse();
+                    reversedStack.forEach((f, idx) => {
+                        const actCls = (idx === 0 && !f.isReturning) ? ' active' : '';
+                        const retCls = f.isReturning ? ' returning' : '';
+                        stackHtml += `
+                            <div class="stack-frame${actCls}${retCls}" id="frame-${f.id}">
+                                <div class="frame-node">#${f.id}</div>
+                                <div class="frame-var"><span class="lbl" style="color: var(--pink);">start</span><span class="val hl-pink">${f.start}</span></div>
+                                <div class="frame-var"><span class="lbl" style="color: var(--orange);">remain</span><span class="val hl-orange">${f.remain}</span></div>
+                                <div class="frame-var"><span class="lbl">tempList</span><span class="val hl-accent">${f.tempList}</span></div>
+                            </div>
+                        `;
+                    });
+
+                    if (step.arrowType && step.stack.length > 0) {
+                        stackHtml += `
+                        <svg class="stack-arrows">
+                            <defs>
+                                <marker id="arrowhead-call" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                                    <polygon points="0 0, 6 3, 0 6" fill="var(--accent)" />
+                                </marker>
+                                <marker id="arrowhead-return" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                                    <polygon points="0 0, 6 3, 0 6" fill="var(--pink)" />
+                                </marker>
+                            </defs>`;
+                        if (step.arrowType === 'call') {
+                            stackHtml += `<path d="M 20 60 Q 5 40 20 20" class="stack-arrow-path call" marker-end="url(#arrowhead-call)" />`;
+                        } else if (step.arrowType === 'return' && step.stack.length > 0) {
+                            stackHtml += `<path d="M 20 20 Q 5 40 20 60" class="stack-arrow-path return" marker-end="url(#arrowhead-return)" />`;
+                        }
+                        stackHtml += `</svg>`;
                     }
                 }
-            }, 50);
-        }
+                stackHtml += `</div>`;
 
-        // PLAYBACK
-        function nextStep() { if (currentStep < steps.length - 1) { currentStep++; renderStep(); } else stopPlay(); }
-        function prevStep() { if (currentStep > 0) { currentStep--; renderStep(); } }
-        function goToStart() { currentStep = 0; renderStep(); }
-        function goToEnd() { currentStep = steps.length - 1; renderStep(); }
-        function togglePlay() { isPlaying ? stopPlay() : startPlay(); }
-        function startPlay() { if (!steps.length) return; isPlaying = true; document.getElementById('playPauseBtn').textContent = '⏸'; document.getElementById('playPauseBtn').classList.add('active'); const spd = Number.parseInt(document.getElementById('speedSlider').value); playInterval = setInterval(() => { if (currentStep < steps.length - 1) { currentStep++; renderStep(); } else { stopPlay(); } }, spd); }
-        function stopPlay() { isPlaying = false; document.getElementById('playPauseBtn').textContent = '▶'; document.getElementById('playPauseBtn').classList.remove('active'); if (playInterval) { clearInterval(playInterval); playInterval = null; } }
-        document.getElementById('speedSlider').addEventListener('input', () => { if (isPlaying) { stopPlay(); startPlay(); } });
-        document.getElementById('inputArr').addEventListener('keydown', e => { if (e.key === 'Enter') runVisualization(); });
-        document.getElementById('inputTarget').addEventListener('keydown', e => { if (e.key === 'Enter') runVisualization(); });
+                container.innerHTML += eng.createSimpleCard('📚 DFS Call Stack', stackHtml);
+                container.innerHTML += eng.createSimpleCard('💡 Current Operation', `<div class="step-text">${step.desc}</div>`);
+            }
+        });
 
-        renderCode();
+        engine.init();
     </script>
 </body>
 
