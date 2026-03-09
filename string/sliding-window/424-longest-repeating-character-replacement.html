@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Longest Repeating Character Replacement</title>
+    <meta name="description"
+        content="Interactive visualizer for LeetCode 424: Longest Repeating Character Replacement (Brute Force & Optimal Sliding Window).">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../../core/engine.css">
+    <style>
+        /* Variables */
+        .var-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            padding: 10px 14px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .var-name {
+            color: var(--text-dim);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .var-val {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .var-val.hl {
+            color: var(--emerald);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        /* Arrays */
+        .array-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .array-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            position: relative;
+        }
+
+        .cell {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            z-index: 2;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .cell.in-window {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .cell.replaced {
+            background: var(--emerald-light, #d1fae5);
+            border-color: var(--emerald);
+            color: var(--emerald);
+        }
+
+        .cell.invalid {
+            background: var(--pink-light, #fce7f3);
+            border-color: var(--pink, #db2777);
+            color: var(--pink);
+            animation: shake 0.4s ease;
+        }
+
+        .index-label {
+            position: absolute;
+            bottom: -20px;
+            font-size: 10px;
+            color: var(--text-dim);
+            width: 100%;
+            text-align: center;
+            left: 0;
+        }
+
+        /* Pointers */
+        .ptr {
+            position: absolute;
+            top: -30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.4s ease;
+            z-index: 10;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+        .ptr.l-ptr {
+            color: var(--orange, #ea580c);
+        }
+
+        .ptr.r-ptr {
+            color: var(--accent);
+        }
+
+        .ptr-arrow {
+            margin-top: 2px;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        /* Sliding Window Box */
+        .window-box {
+            position: absolute;
+            height: 56px;
+            top: -6px;
+            border: 2px dashed var(--accent);
+            border-radius: 12px;
+            background: rgba(79, 70, 229, 0.05);
+            transition: all 0.4s ease;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .window-box.invalid-win {
+            border-color: var(--pink);
+            background: rgba(219, 39, 119, 0.05);
+        }
+
+        /* Frequency Map */
+        .freq-container {
+            background: var(--bg2);
+            border: 1px dashed var(--orange);
+            padding: 20px;
+            border-radius: 12px;
+            min-width: 250px;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .freq-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--orange);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .freq-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .freq-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .freq-char {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .freq-count {
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .freq-item.is-max {
+            border-color: var(--emerald);
+            background: var(--emerald-light, #d1fae5);
+        }
+
+        /* General Info */
+        .step-text {
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .hl-accent {
+            color: var(--accent);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hl-orange {
+            color: var(--orange, #ea580c);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hl-pink {
+            color: var(--pink, #db2777);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hl-emerald {
+            color: var(--emerald);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-4px);
+            }
+
+            75% {
+                transform: translateX(4px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../../core/engine.js"></script>
+    <script>
+        const CODE_BRUTE = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'int ' }, { t: 'fn', v: 'characterReplacement' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'k' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'maxLen ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'i ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '            int' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'count ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'int' }, { t: 'br', v: '[' }, { t: 'num', v: '26' }, { t: 'br', v: ']' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '            int ' }, { t: 'v', v: 'maxf ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'j ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'i' }, { t: 'op', v: '; ' }, { t: 'v', v: 'j < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'j++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                count[s.charAt(j) - ' }, { t: 'str', v: "'A'" }, { t: 'v', v: ']++;' }] },
+            { tokens: [{ t: 'v', v: '                maxf ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'Math.max(maxf, count[s.charAt(j) - ' }, { t: 'str', v: "'A'" }, { t: 'v', v: '])' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: '(j - i + 1) - maxf <= k' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                    maxLen ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'Math.max(maxLen, j - i + 1)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '                }' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'maxLen' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] }
+        ];
+
+        const CODE_OPTIMAL = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'int ' }, { t: 'fn', v: 'characterReplacement' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'k' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        int' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'count ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'int' }, { t: 'br', v: '[' }, { t: 'num', v: '26' }, { t: 'br', v: ']' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'maxLen ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ', ' }, { t: 'v', v: 'maxf ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ', ' }, { t: 'v', v: 'left ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'right ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: 'v', v: 'right < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'right++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '            count[s.charAt(right) - ' }, { t: 'str', v: "'A'" }, { t: 'v', v: ']++;' }] },
+            { tokens: [{ t: 'v', v: '            maxf ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'Math.max(maxf, count[s.charAt(right) - ' }, { t: 'str', v: "'A'" }, { t: 'v', v: '])' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            while ' }, { t: 'br', v: '(' }, { t: 'v', v: '(right - left + 1) - maxf > k' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                count[s.charAt(left) - ' }, { t: 'str', v: "'A'" }, { t: 'v', v: ']--;' }] },
+            { tokens: [{ t: 'v', v: '                left++;' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'v', v: '            maxLen ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'Math.max(maxLen, right - left + 1)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'maxLen' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ];
+
+        let mode = 'optimal';
+
+        function toMap(countArray) {
+            const m = {};
+            for (let i = 0; i < 26; i++) {
+                if (countArray[i] > 0) m[String.fromCharCode(65 + i)] = countArray[i];
+            }
+            return m;
+        }
+
+        function generateBruteTrace(s, k) {
+            const steps = [];
+            let maxLen = 0;
+
+            steps.push({ line: 2, desc: `Initialize maxLen = 0`, i: -1, j: -1, countMap: {}, maxf: 0, maxLen, str: s, k });
+
+            for (let i = 0; i < s.length; i++) {
+                steps.push({ line: 4, desc: `Loop i = ${i}. Create fresh count array.`, i, j: -1, countMap: {}, maxf: 0, maxLen, str: s, k });
+                const count = new Array(26).fill(0);
+                let maxf = 0;
+
+                for (let j = i; j < s.length; j++) {
+                    const ch = s[j];
+                    count[ch.charCodeAt(0) - 65]++;
+                    steps.push({ line: 7, desc: `Loop j = ${j}, char = '${ch}'. Increment count['${ch}'].`, i, j, countMap: toMap(count), maxf, maxLen, str: s, k });
+
+                    maxf = Math.max(maxf, count[ch.charCodeAt(0) - 65]);
+                    steps.push({ line: 8, desc: `Update maxf = Math.max(${maxf - (maxf === count[ch.charCodeAt(0) - 65] ? 0 : 1)}, count['${ch}']) = ${maxf}`, i, j, countMap: toMap(count), maxf, maxLen, str: s, k });
+
+                    const curLen = j - i + 1;
+                    const replacementsNeeded = curLen - maxf;
+
+                    if (replacementsNeeded <= k) {
+                        steps.push({ line: 9, desc: `Len(${curLen}) - maxf(${maxf}) = ${replacementsNeeded} <= k(${k}). Valid substring.`, i, j, countMap: toMap(count), maxf, maxLen, str: s, k, isValid: true });
+                        if (curLen > maxLen) {
+                            maxLen = curLen;
+                            steps.push({ line: 10, desc: `Update maxLen = ${maxLen}`, i, j, countMap: toMap(count), maxf, maxLen, str: s, k, hlMaxLen: true, isValid: true });
+                        }
+                    } else {
+                        steps.push({ line: 9, desc: `Len(${curLen}) - maxf(${maxf}) = ${replacementsNeeded} > k(${k}). Invalid! Cannot replace enough chars.`, i, j, countMap: toMap(count), maxf, maxLen, str: s, k, isInvalid: true });
+                    }
+                }
+            }
+            steps.push({ line: 14, desc: `Return maxLen = ${maxLen}`, i: -1, j: -1, countMap: {}, maxf: 0, maxLen, str: s, k });
+            return steps;
+        }
+
+        function generateOptimalTrace(s, k) {
+            const steps = [];
+            let maxLen = 0, left = 0, maxf = 0;
+            const count = new Array(26).fill(0);
+
+            steps.push({ line: 3, desc: `Initialize empty count array, maxLen = 0, left = 0, maxf = 0.`, L: -1, R: -1, countMap: {}, maxf: 0, maxLen: 0, str: s, k });
+
+            for (let right = 0; right < s.length; right++) {
+                const ch = s[right];
+                count[ch.charCodeAt(0) - 65]++;
+                steps.push({ line: 5, desc: `Loop right = ${right}, char = '${ch}'. Increment count['${ch}'].`, L: left, R: right, countMap: toMap(count), maxf, maxLen, str: s, k });
+
+                maxf = Math.max(maxf, count[ch.charCodeAt(0) - 65]);
+                steps.push({ line: 6, desc: `Update maxf = ${maxf}`, L: left, R: right, countMap: toMap(count), maxf, maxLen, str: s, k });
+
+                let curLen = right - left + 1;
+                let replacementsNeeded = curLen - maxf;
+
+                steps.push({ line: 7, desc: `Check if window is valid: len(${curLen}) - maxf(${maxf}) = ${replacementsNeeded}. Is it > k(${k})?`, L: left, R: right, countMap: toMap(count), maxf, maxLen, str: s, k, isInvalid: replacementsNeeded > k });
+
+                while ((right - left + 1) - maxf > k) {
+                    const lch = s[left];
+                    count[lch.charCodeAt(0) - 65]--;
+                    steps.push({ line: 8, desc: `Window is INVALID. Decrement count['${lch}'] (s[left]).`, L: left, R: right, countMap: toMap(count), maxf, maxLen, str: s, k, windowShrink: true, isInvalid: true });
+                    left++;
+                    steps.push({ line: 9, desc: `Move left pointer to ${left}`, L: left, R: right, countMap: toMap(count), maxf, maxLen, str: s, k, isInvalid: ((right - left + 1) - maxf > k) });
+                }
+
+                curLen = right - left + 1;
+                if (curLen > maxLen) {
+                    maxLen = curLen;
+                    steps.push({ line: 11, desc: `Update maxLen = Math.max(${maxLen - 1}, ${curLen}) = ${maxLen}`, L: left, R: right, countMap: toMap(count), maxf, maxLen, str: s, k, hlMaxLen: true });
+                } else {
+                    steps.push({ line: 11, desc: `maxLen remains ${maxLen}`, L: left, R: right, countMap: toMap(count), maxf, maxLen, str: s, k });
+                }
+            }
+            steps.push({ line: 13, desc: `Return maxLen = ${maxLen}`, L: left, R: -1, countMap: toMap(count), maxf, maxLen, str: s, k });
+            return steps;
+        }
+
+        const engine = new VizEngine({
+            title: "Longest Repeating Character Replacement",
+            badge: "String / Arrays",
+            tag: "Sliding Window",
+            codeLines: CODE_OPTIMAL,
+            inputs: [
+                { id: "inputStr", label: "String s", default: "AABABBA", width: "160px" },
+                { id: "inputK", label: "k", default: "1", width: "60px" }
+            ],
+            onRun: () => {
+                let s = document.getElementById('inputStr').value;
+                s = s.toUpperCase().replace(/[^A-Z]/g, '');
+                if (!s) s = "AABABBA";
+
+                let k = parseInt(document.getElementById('inputK').value);
+                if (isNaN(k) || k < 0) k = 1;
+
+                return mode === 'brute' ? generateBruteTrace(s, k) : generateOptimalTrace(s, k);
+            },
+            onRenderStep: (step, container, eng) => {
+                let p1 = mode === 'brute' ? step.i : step.L;
+                let p2 = mode === 'brute' ? step.j : step.R;
+                let p1Label = mode === 'brute' ? 'i' : 'L';
+                let p2Label = mode === 'brute' ? 'j' : 'R';
+                let p1Class = 'l-ptr';
+                let p2Class = 'r-ptr';
+
+                // DP / Vars
+                let varsHtml = `<div style="display: flex; gap: 16px; flex-wrap: wrap;">`;
+                varsHtml += `<div class="var-box"><span class="var-name">maxLen</span><span class="var-val${step.hlMaxLen ? ' hl' : ''}">${step.maxLen}</span></div>`;
+                varsHtml += `<div class="var-box"><span class="var-name">maxf</span><span class="var-val hl">${step.maxf}</span></div>`;
+                if (p1 >= 0) varsHtml += `<div class="var-box"><span class="var-name">${p1Label}</span><span class="var-val hl-orange">${p1}</span></div>`;
+                if (p2 >= 0) varsHtml += `<div class="var-box"><span class="var-name">${p2Label}</span><span class="var-val hl-accent">${p2}</span></div>`;
+                varsHtml += `</div>`;
+
+                // HashMap Render
+                let maxfChar = null;
+                for (let k in step.countMap) {
+                    if (step.countMap[k] === step.maxf) maxfChar = k;
+                }
+
+                let freqHtml = `<div class="freq-grid">`;
+                if (Object.keys(step.countMap).length === 0) freqHtml += `<span style="color: var(--text-dim); font-size: 13px; grid-column: span 4;">(Empty)</span>`;
+                for (let k in step.countMap) {
+                    const isMax = k === maxfChar && step.maxf > 0 ? " is-max" : "";
+                    freqHtml += `<div class="freq-item${isMax}">
+                                    <span class="freq-char">${k}</span>
+                                    <span class="freq-count">${step.countMap[k]}</span>
+                                 </div>`;
+                }
+                freqHtml += `</div>`;
+                let mapPanel = `<div class="freq-container"><div class="freq-title">Character Frequencies</div>${freqHtml}</div>`;
+
+                // Array Visual
+                let arrayHtml = `<div class="array-container"><div class="array-row" id="mainArray">`;
+                for (let idx = 0; idx < step.str.length; idx++) {
+                    const c = step.str[idx];
+                    let cls = '';
+                    if (p1 >= 0 && p2 >= 0 && idx >= p1 && idx <= p2) {
+                        cls = ' in-window';
+                        if (c !== maxfChar && step.maxf > 0) {
+                            cls = step.isInvalid ? ' invalid' : ' replaced';
+                        }
+                    }
+                    arrayHtml += `
+                        <div class="cell${cls}" id="cell-${idx}">
+                            ${c}
+                            <div class="index-label">${idx}</div>
+                        </div>`;
+                }
+
+                if (p1 >= 0 && step.str.length > 0) {
+                    arrayHtml += `<div class="ptr ${p1Class}" id="ptr1"><div>${p1Label}</div><div class="ptr-arrow">↓</div></div>`;
+                }
+                if (p2 >= 0 && step.str.length > 0) {
+                    arrayHtml += `<div class="ptr ${p2Class}" id="ptr2"><div>${p2Label}</div><div class="ptr-arrow">↓</div></div>`;
+                }
+                if (p1 >= 0 && p2 >= 0) {
+                    const winClass = step.isInvalid ? ' invalid-win' : '';
+                    arrayHtml += `<div class="window-box${winClass}" id="winBox"></div>`;
+                }
+
+                arrayHtml += `</div></div>`;
+
+                container.innerHTML += eng.createSimpleCard('🔍 Execution Tracking', varsHtml + `<div style="display:flex; gap: 24px; padding-top: 20px; flex-wrap: wrap;">${mapPanel}<div style="flex:1;">${arrayHtml}</div></div>`);
+                container.innerHTML += eng.createSimpleCard('💡 Current Operation', `<div class="step-text">${step.desc}</div>`);
+
+                eng.highlightLine(step.line);
+
+                setTimeout(() => {
+                    const getPtrLeft = (idx) => {
+                        const el = document.getElementById('cell-' + idx);
+                        if (!el) return 0;
+                        return el.offsetLeft + (el.clientWidth / 2) - 10;
+                    };
+
+                    const ptr1 = document.getElementById('ptr1');
+                    if (ptr1) { ptr1.style.left = getPtrLeft(p1) + 'px'; }
+
+                    const ptr2 = document.getElementById('ptr2');
+                    if (ptr2) {
+                        if (p1 === p2) {
+                            ptr1.style.transform = `translateY(-15px)`;
+                            ptr1.innerHTML = `<div>${p1Label},${p2Label}</div><div class="ptr-arrow">↓</div>`;
+                            ptr2.style.display = 'none';
+                        } else {
+                            ptr2.style.left = getPtrLeft(p2) + 'px';
+                        }
+                    }
+
+                    const win = document.getElementById('winBox');
+                    if (win && p1 >= 0 && p2 >= p1) {
+                        const cellL = document.getElementById('cell-' + p1);
+                        const cellR = document.getElementById('cell-' + p2);
+                        if (cellL && cellR) {
+                            win.style.left = (cellL.offsetLeft - 6) + 'px';
+                            win.style.width = (cellR.offsetLeft - cellL.offsetLeft + cellR.clientWidth + 12) + 'px';
+                        }
+                    }
+                }, 0);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const controlsBar = document.querySelector('.controls-bar');
+            const modeToggleHTML = `
+                <div class="mode-toggle">
+                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Sliding Window)</button>
+                </div>
+            `;
+            controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
+
+            setTimeout(() => setMode('optimal'), 10);
+        });
+
+        window.setMode = function (m) {
+            engine.stopPlay();
+            mode = m;
+            document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
+
+            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
+            engine._renderCodeBlock();
+            engine.run();
+        };
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valid Parentheses</title>
+    <meta name="description"
+        content="Interactive visualizer for LeetCode 20: Valid Parentheses (Brute Force String Replacement & Optimal Stack).">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../../core/engine.css">
+    <style>
+        /* Variables */
+        .var-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            padding: 10px 14px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .var-name {
+            color: var(--text-dim);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .var-val {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        /* String Array */
+        .array-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            padding: 20px 20px 40px;
+            position: relative;
+        }
+
+        .array-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            position: relative;
+            flex-wrap: wrap;
+        }
+
+        .cell {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            z-index: 2;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .cell.scanning {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cell.matched {
+            background: var(--emerald-light, #d1fae5);
+            border-color: var(--emerald);
+            color: var(--emerald);
+            transform: scale(0.9);
+            opacity: 0;
+            animation: fadeOut 0.5s ease forwards;
+        }
+
+        .cell.mismatched {
+            background: var(--pink-light, #fce7f3);
+            border-color: var(--pink, #db2777);
+            color: var(--pink);
+            animation: shake 0.4s ease;
+        }
+
+        .cell.removed {
+            display: none;
+        }
+
+        .index-label {
+            position: absolute;
+            bottom: -20px;
+            font-size: 10px;
+            color: var(--text-dim);
+            width: 100%;
+            text-align: center;
+            left: 0;
+        }
+
+        /* Pointers */
+        .ptr {
+            position: absolute;
+            top: -30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.4s ease;
+            z-index: 10;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+        .ptr.i-ptr {
+            color: var(--accent);
+        }
+
+        .ptr-arrow {
+            margin-top: 2px;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        /* Stack Box */
+        .stack-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            background: var(--bg2);
+            border: 3px solid var(--border);
+            border-top: none;
+            padding: 12px;
+            border-radius: 0 0 16px 16px;
+            width: 120px;
+            min-height: 200px;
+            gap: 8px;
+            position: relative;
+        }
+
+        .stack-title {
+            position: absolute;
+            top: -30px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stack-item {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            animation: popDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .stack-item.popping {
+            animation: popOut 0.4s ease forwards;
+        }
+
+        .stack-empty {
+            color: var(--text-dim);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 20px 0;
+        }
+
+        /* Brute Force String Box */
+        .str-display-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            background: var(--bg2);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px dashed var(--border);
+        }
+
+        .str-view {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            padding: 16px 32px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            min-width: 200px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .str-view.updated {
+            border-color: var(--emerald);
+            background: var(--emerald-light);
+            color: var(--emerald);
+            transform: scale(1.05);
+        }
+
+        /* General Info */
+        .step-text {
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .hl-accent {
+            color: var(--accent);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @keyframes popDown {
+            0% {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes popOut {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.2) translateY(-20px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-4px);
+            }
+
+            75% {
+                transform: translateX(4px);
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                transform: scale(0.5);
+                opacity: 0;
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../../core/engine.js"></script>
+    <script>
+        const CODE_BRUTE = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isValid' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'length' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        do ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'v', v: '            length ' }, { t: 'op', v: '= ' }, { t: 'v', v: 's.length()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '            s ' }, { t: 'op', v: '= ' }, { t: 'v', v: 's.replace(' }, { t: 'str', v: '"()"' }, { t: 'v', v: ', ' }, { t: 'str', v: '""' }, { t: 'v', v: ')' }] },
+            { tokens: [{ t: 'v', v: '                 .replace(' }, { t: 'str', v: '"{}"' }, { t: 'v', v: ', ' }, { t: 'str', v: '""' }, { t: 'v', v: ')' }] },
+            { tokens: [{ t: 'v', v: '                 .replace(' }, { t: 'str', v: '"[]"' }, { t: 'v', v: ', ' }, { t: 'str', v: '""' }, { t: 'v', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        } ' }, { t: 'kw', v: 'while ' }, { t: 'br', v: '(' }, { t: 'v', v: 'length != s.length()' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 's.length() == ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ];
+
+        const CODE_OPTIMAL = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isValid' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        Stack<Character> ' }, { t: 'v', v: 'stack ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'Stack<>()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'char ' }, { t: 'v', v: 'c : s.toCharArray()' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "'('" }, { t: 'v', v: ' || c == ' }, { t: 'str', v: "'{'" }, { t: 'v', v: ' || c == ' }, { t: 'str', v: "'['" }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                stack.push(c)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            } else {' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'stack.isEmpty()' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '                char ' }, { t: 'v', v: 'top ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'stack.pop()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "')'" }, { t: 'v', v: ' && top != ' }, { t: 'str', v: "'('" }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "'}'" }, { t: 'v', v: ' && top != ' }, { t: 'str', v: "'{'" }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "']'" }, { t: 'v', v: ' && top != ' }, { t: 'str', v: "'['" }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'stack.isEmpty()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ];
+
+        let mode = 'optimal';
+
+        function generateBruteTrace(s) {
+            const steps = [];
+            let len = -1;
+            let currentS = s;
+
+            steps.push({ line: 2, desc: `Initialize integer length.`, str: currentS, prevLen: len });
+
+            do {
+                len = currentS.length;
+                steps.push({ line: 4, desc: `Record length before replacement: ${len}`, str: currentS, prevLen: len, startLoop: true });
+
+                const nextS = currentS.replace(/\(\)/g, '').replace(/\{\}/g, '').replace(/\[\]/g, '');
+                const changed = nextS !== currentS;
+                currentS = nextS;
+
+                steps.push({ line: 7, desc: `Replace all "()", "{}", "[]" with "". Result string is: "${currentS}"`, str: currentS, prevLen: len, strUpdated: changed });
+
+                steps.push({ line: 8, desc: `Check condition: length (${len}) != s.length() (${currentS.length}). ${len !== currentS.length ? "Continue loop." : "Exit loop."}`, str: currentS, prevLen: len });
+
+            } while (len !== currentS.length);
+
+            const res = currentS.length === 0;
+            steps.push({ line: 9, desc: `String length is ${currentS.length}. ${res ? 'All pairs matched and removed.' : 'Unmatched chars remain.'} Return ${res}.`, str: currentS, prevLen: len, res });
+            return steps;
+        }
+
+        function generateOptimalTrace(s) {
+            const steps = [];
+            const stack = [];
+
+            steps.push({ line: 2, desc: `Initialize empty Stack<Character>.`, i: -1, s, stack: [...stack] });
+
+            for (let i = 0; i < s.length; i++) {
+                const c = s[i];
+                steps.push({ line: 4, desc: `Loop i = ${i}, char = '${c}'`, i, s, stack: [...stack], action: 'scan' });
+
+                if (c === '(' || c === '{' || c === '[') {
+                    steps.push({ line: 4, desc: `Char is an open parenthesis.`, i, s, stack: [...stack], action: 'check_open' });
+                    stack.push(c);
+                    steps.push({ line: 5, desc: `Push '${c}' onto the stack.`, i, s, stack: [...stack], action: 'push' });
+                } else {
+                    steps.push({ line: 6, desc: `Char is a close parenthesis. Check stack.`, i, s, stack: [...stack], action: 'check_close' });
+
+                    if (stack.length === 0) {
+                        steps.push({ line: 7, desc: `Stack is empty! Cannot match '${c}'. Return false.`, i, s, stack: [...stack], action: 'invalid_empty', res: false });
+                        return steps;
+                    }
+
+                    steps.push({ line: 8, desc: `Stack is not empty. Pop the top element.`, i, s, stack: [...stack], action: 'pop_start' });
+                    const top = stack.pop();
+                    steps.push({ line: 8, desc: `Popped: top = '${top}'.`, i, s, stack: [...stack], topChar: top, action: 'pop_done' });
+
+                    let matchLine = 0;
+                    if (c === ')') matchLine = 9;
+                    if (c === '}') matchLine = 10;
+                    if (c === ']') matchLine = 11;
+
+                    let isMatch = false;
+                    if (c === ')' && top === '(') isMatch = true;
+                    if (c === '}' && top === '{') isMatch = true;
+                    if (c === ']' && top === '[') isMatch = true;
+
+                    if (!isMatch) {
+                        steps.push({ line: matchLine, desc: `Mismatch! Current '${c}' does NOT match popped '${top}'. Return false.`, i, s, stack: [...stack], topChar: top, action: 'invalid_mismatch', res: false });
+                        return steps;
+                    } else {
+                        steps.push({ line: matchLine, desc: `Match! Current '${c}' matches popped '${top}'. Continue.`, i, s, stack: [...stack], topChar: top, action: 'match_success' });
+                    }
+                }
+            }
+
+            steps.push({ line: 14, desc: `Finished scanning string. Check if stack is empty.`, i: -1, s, stack: [...stack], action: 'finish' });
+            const res = stack.length === 0;
+            steps.push({ line: 14, desc: `Stack ${res ? 'IS empty. All matched!' : 'is NOT empty. Unmatched openers remain.'} Return ${res}.`, i: -1, s, stack: [...stack], action: 'finish', res });
+
+            return steps;
+        }
+
+        const engine = new VizEngine({
+            title: "Valid Parentheses",
+            badge: "String / Stack",
+            tag: "Stack & Queue",
+            codeLines: CODE_OPTIMAL,
+            inputs: [
+                { id: "inputStr", label: "String s", default: "{[()]}", width: "180px" }
+            ],
+            onRun: () => {
+                let s = document.getElementById('inputStr').value.replace(/[^()\[\]{}]/g, '');
+                if (!s) s = "{[()]}";
+
+                return mode === 'brute' ? generateBruteTrace(s) : generateOptimalTrace(s);
+            },
+            onRenderStep: (step, container, eng) => {
+                let layoutHtml = `<div style="display:flex; flex-direction:column; gap: 20px;">`;
+
+                // If Brute Force Mode
+                if (mode === 'brute') {
+                    let varsHtml = `<div style="display: flex; gap: 16px; justify-content: center; margin-bottom: 10px;">
+                                        <div class="var-box"><span class="var-name">s.length()</span><span class="var-val">${step.str.length}</span></div>
+                                        <div class="var-box"><span class="var-name">length (prev)</span><span class="var-val">${step.prevLen === -1 ? '-' : step.prevLen}</span></div>
+                                    </div>`;
+
+                    let strCls = step.strUpdated ? ' updated' : '';
+                    let strHtml = `<div class="str-display-container">
+                                    <div class="str-view${strCls}">${step.str === '' ? '<span style="color:var(--text-dim);font-weight:400;font-size:16px;">(Empty String)</span>' : step.str}</div>
+                                   </div>`;
+
+                    let resHtml = '';
+                    if (step.res === false) resHtml = `<div style="text-align:center; padding: 10px; background: var(--pink-light); color: var(--pink); border-radius: 8px; font-weight:700;">Result: FALSE</div>`;
+                    if (step.res === true) resHtml = `<div style="text-align:center; padding: 10px; background: var(--emerald-light); color: var(--emerald); border-radius: 8px; font-weight:700;">Result: TRUE</div>`;
+
+                    layoutHtml += `${varsHtml}${strHtml}${resHtml}`;
+                }
+                // If Optimal Mode
+                else {
+                    let sArrHtml = `<div class="array-container"><div class="array-row" id="sArr">`;
+
+                    for (let idx = 0; idx < step.s.length; idx++) {
+                        let cls = '';
+                        if (step.i === idx) {
+                            if (step.action === 'scan' || step.action === 'check_open' || step.action === 'check_close') cls = ' scanning';
+                            if (step.action === 'invalid_empty' || step.action === 'invalid_mismatch') cls = ' mismatched';
+                            if (step.action === 'match_success') cls = ' matched';
+                        }
+                        if (step.i > idx && step.action !== 'push' && !step.action?.startsWith('pop') && !step.action?.startsWith('match') && !step.action?.startsWith('invalid')) {
+                            // Elements already processed
+                            // Normally we don't hide them unless mapped to animation, but a fade on match highlights logic.
+                        }
+                        sArrHtml += `<div class="cell${cls}" id="cell-${idx}">${step.s[idx]}<div class="index-label">${idx}</div></div>`;
+                    }
+                    if (step.s.length === 0) sArrHtml += `<div class="cell" style="border:none;background:transparent;">(Empty)</div>`;
+
+                    if (step.i >= 0 && step.i < step.s.length) {
+                        sArrHtml += `<div class="ptr i-ptr" id="ptr1"><div>i</div><div class="ptr-arrow">↓</div></div>`;
+                    }
+                    sArrHtml += `</div></div>`;
+
+                    // Stack Render
+                    let stackHtml = `<div class="stack-container"><div class="stack-title">Stack</div>`;
+                    if (step.stack.length === 0 && step.action !== 'pop_start') stackHtml += `<div class="stack-empty">Empty</div>`;
+
+                    let drawStack = [...step.stack];
+                    if (step.action === 'pop_start') {
+                        // Keep popped item showing for animation
+                        drawStack.push(step.topChar || '?');
+                    }
+
+                    for (let x = drawStack.length - 1; x >= 0; x--) {
+                        let cls = '';
+                        if (step.action === 'push' && x === drawStack.length - 1) cls = ' stack-item popping'; // Animation re-used as popIn/Down basically
+                        if (step.action === 'pop_start' && x === drawStack.length - 1) cls = ' stack-item popping';
+                        stackHtml += `<div class="stack-item${cls ? cls : ''}">${drawStack[x]}</div>`;
+                    }
+                    stackHtml += `</div>`;
+
+                    let resHtml = '';
+                    if (step.res === false) resHtml = `<div style="text-align:center; padding: 10px; background: var(--pink-light); color: var(--pink); border-radius: 8px; font-weight:700; width:100%;">Result: FALSE</div>`;
+                    if (step.res === true) resHtml = `<div style="text-align:center; padding: 10px; background: var(--emerald-light); color: var(--emerald); border-radius: 8px; font-weight:700; width:100%;">Result: TRUE</div>`;
+
+                    layoutHtml += `<div style="display:flex; gap: 40px; justify-content: center; align-items: stretch; padding-bottom: 20px;">
+                                      <div style="flex: 1;">${sArrHtml}</div>
+                                      ${stackHtml}
+                                   </div>${resHtml}`;
+                }
+
+                layoutHtml += `</div>`;
+
+                container.innerHTML += eng.createSimpleCard('🔍 Execution Tracking', layoutHtml);
+                container.innerHTML += eng.createSimpleCard('💡 Current Operation', `<div class="step-text">${step.desc}</div>`);
+
+                eng.highlightLine(step.line);
+
+                if (mode === 'optimal') {
+                    setTimeout(() => {
+                        const ptr1 = document.getElementById('ptr1');
+                        const sCell = document.getElementById('cell-' + step.i);
+                        if (ptr1 && sCell) {
+                            ptr1.style.left = sCell.offsetLeft + (sCell.clientWidth / 2) - 10 + 'px';
+                        }
+                    }, 0);
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const controlsBar = document.querySelector('.controls-bar');
+            const modeToggleHTML = `
+                <div class="mode-toggle">
+                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force (String Replace)</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Stack)</button>
+                </div>
+            `;
+            controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
+            setTimeout(() => setMode('optimal'), 10);
+        });
+
+        window.setMode = function (m) {
+            engine.stopPlay();
+            mode = m;
+            document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
+            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
+            engine._renderCodeBlock();
+            engine.run();
+        };
+
+    </script>
+</body>
+
+</html>

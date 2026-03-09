@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valid Palindrome</title>
+    <meta name="description"
+        content="Interactive visualizer for LeetCode 125: Valid Palindrome (Brute Force String Reverse & Optimal Two Pointers).">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../../core/engine.css">
+    <style>
+        /* Arrays & Strings */
+        .array-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .array-row {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            position: relative;
+            flex-wrap: wrap;
+        }
+
+        .array-label {
+            position: absolute;
+            left: -90px;
+            top: 12px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .cell {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            z-index: 2;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .cell.scanning {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cell.matched {
+            background: var(--emerald-light, #d1fae5);
+            border-color: var(--emerald);
+            color: var(--emerald);
+            transform: scale(1.1);
+            z-index: 5;
+        }
+
+        .cell.mismatched {
+            background: var(--pink-light, #fce7f3);
+            border-color: var(--pink, #db2777);
+            color: var(--pink);
+            animation: shake 0.4s ease;
+            z-index: 5;
+        }
+
+        .cell.skipped {
+            background: var(--bg2);
+            color: var(--text-dim);
+            border-color: var(--border);
+            border-style: dashed;
+        }
+
+        .cell.built {
+            background: var(--emerald-light, #d1fae5);
+            border-color: var(--emerald);
+            color: var(--emerald);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .index-label {
+            position: absolute;
+            bottom: -18px;
+            font-size: 9px;
+            color: var(--text-dim);
+            width: 100%;
+            text-align: center;
+            left: 0;
+        }
+
+        /* Pointers */
+        .ptr {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.4s ease;
+            z-index: 10;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+        .ptr.i-ptr {
+            color: var(--accent);
+            top: -28px;
+        }
+
+        .ptr.l-ptr {
+            color: var(--orange, #ea580c);
+            top: -28px;
+        }
+
+        .ptr.r-ptr {
+            color: var(--accent);
+            bottom: -28px;
+            top: auto;
+        }
+
+        .ptr.r-ptr .ptr-arrow {
+            transform: rotate(180deg);
+            margin-top: 0;
+            margin-bottom: 2px;
+        }
+
+        .ptr-arrow {
+            margin-top: 2px;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        /* General Info */
+        .step-text {
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .hl-accent {
+            color: var(--accent);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hl-orange {
+            color: var(--orange, #ea580c);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hl-pink {
+            color: var(--pink, #db2777);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-4px);
+            }
+
+            75% {
+                transform: translateX(4px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../../core/engine.js"></script>
+    <script>
+        const CODE_BRUTE = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isPalindrome' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        StringBuilder ' }, { t: 'v', v: 'builder ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'StringBuilder()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'char ' }, { t: 'v', v: 'ch : s.toCharArray()' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'Character.isLetterOrDigit(ch)' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                builder.append(Character.toLowerCase(ch))' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'tp', v: '        String ' }, { t: 'v', v: 'cleaned ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'builder.toString()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        String ' }, { t: 'v', v: 'reversed ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'builder.reverse().toString()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'cleaned.equals(reversed)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ];
+
+        const CODE_OPTIMAL = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isPalindrome' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'left ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ', ' }, { t: 'v', v: 'right ' }, { t: 'op', v: '= ' }, { t: 'v', v: 's.length() - ' }, { t: 'num', v: '1' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        while ' }, { t: 'br', v: '(' }, { t: 'v', v: 'left < right' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '            char ' }, { t: 'v', v: 'l ' }, { t: 'op', v: '= ' }, { t: 'v', v: 's.charAt(left)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '            char ' }, { t: 'v', v: 'r ' }, { t: 'op', v: '= ' }, { t: 'v', v: 's.charAt(right)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'op', v: '!' }, { t: 'v', v: 'Character.isLetterOrDigit(l)' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                left++' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            } ' }, { t: 'kw', v: 'else if ' }, { t: 'br', v: '(' }, { t: 'op', v: '!' }, { t: 'v', v: 'Character.isLetterOrDigit(r)' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                right--' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            } ' }, { t: 'kw', v: 'else if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'Character.toLowerCase(l) != Character.toLowerCase(r)' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '                return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            } else {' }] },
+            { tokens: [{ t: 'v', v: '                left++' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '                right--' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return true' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ];
+
+        let mode = 'optimal';
+
+        function isAlphanumeric(char) {
+            return /^[a-z0-9]+$/i.test(char);
+        }
+
+        function generateBruteTrace(s) {
+            const steps = [];
+            let builder = "";
+            let cleaned = "";
+            let reversed = "";
+
+            steps.push({ line: 3, desc: `Initialize empty StringBuilder.`, i: -1, s, builder });
+
+            for (let i = 0; i < s.length; i++) {
+                const ch = s[i];
+                steps.push({ line: 4, desc: `Loop i = ${i}, char = '${ch}'`, i, s, builder, ch });
+
+                if (isAlphanumeric(ch)) {
+                    steps.push({ line: 5, desc: `'${ch}' is alphanumeric. Append lowercase to builder.`, i, s, builder, ch, action: 'scan' });
+                    builder += ch.toLowerCase();
+                    steps.push({ line: 6, desc: `Builder is now: "${builder}"`, i, s, builder, ch, action: 'build' });
+                } else {
+                    steps.push({ line: 5, desc: `'${ch}' is NOT alphanumeric. Skip it.`, i, s, builder, ch, action: 'skip' });
+                }
+            }
+
+            cleaned = builder;
+            steps.push({ line: 9, desc: `Convert builder to string: cleaned = "${cleaned}"`, i: -1, s, builder, cleaned, reversed: "", action: 'clean' });
+
+            reversed = cleaned.split('').reverse().join('');
+            steps.push({ line: 10, desc: `Reverse string: reversed = "${reversed}"`, i: -1, s, builder, cleaned, reversed, action: 'reverse' });
+
+            steps.push({ line: 11, desc: `Compare cleaned and reversed strings.`, i: -1, s, builder, cleaned, reversed, action: 'compare' });
+
+            const res = cleaned === reversed;
+            if (res) {
+                steps.push({ line: 11, desc: `Strings match perfectly! Return TRUE.`, i: -1, s, builder, cleaned, reversed, action: 'compare_true', res });
+            } else {
+                steps.push({ line: 11, desc: `Strings do NOT match. Return FALSE.`, i: -1, s, builder, cleaned, reversed, action: 'compare_false', res });
+            }
+            return steps;
+        }
+
+        function generateOptimalTrace(s) {
+            const steps = [];
+            let left = 0, right = s.length - 1;
+
+            steps.push({ line: 3, desc: `Initialize pointers: left = 0, right = ${right}.`, left: -1, right: -1, s });
+
+            while (left < right) {
+                steps.push({ line: 4, desc: `Check condition: left (${left}) < right (${right}). Continue.`, left, right, s, action: 'scan' });
+
+                const l = s[left];
+                const r = s[right];
+
+                steps.push({ line: 5, desc: `l = s[${left}] = '${l}'. r = s[${right}] = '${r}'`, left, right, s, action: 'scan' });
+
+                if (!isAlphanumeric(l)) {
+                    steps.push({ line: 7, desc: `'${l}' is NOT alphanumeric. Increment left.`, left, right, s, action: 'skip_l' });
+                    left++;
+                } else if (!isAlphanumeric(r)) {
+                    steps.push({ line: 9, desc: `'${r}' is NOT alphanumeric. Decrement right.`, left, right, s, action: 'skip_r' });
+                    right--;
+                } else {
+                    const lLower = l.toLowerCase();
+                    const rLower = r.toLowerCase();
+
+                    steps.push({ line: 11, desc: `Compare '${lLower}' and '${rLower}'.`, left, right, s, action: 'compare' });
+
+                    if (lLower !== rLower) {
+                        steps.push({ line: 12, desc: `Mismatch found! '${lLower}' != '${rLower}'. Return FALSE.`, left, right, s, action: 'mismatch', res: false });
+                        return steps;
+                    } else {
+                        steps.push({ line: 14, desc: `Match! '${lLower}' == '${rLower}'. Move both pointers inward.`, left, right, s, action: 'match' });
+                        left++;
+                        right--;
+                    }
+                }
+            }
+
+            steps.push({ line: 4, desc: `Check condition: left (${left}) < right (${right}) is FALSE. Loop ends.`, left, right, s, action: 'scan' });
+            steps.push({ line: 18, desc: `All characters matched perfectly. The string is a palindrome. Return TRUE.`, left: -1, right: -1, s, action: 'done', res: true });
+            return steps;
+        }
+
+        const engine = new VizEngine({
+            title: "Valid Palindrome",
+            badge: "String / Two Pointers",
+            tag: "Two Pointers",
+            codeLines: CODE_OPTIMAL,
+            inputs: [
+                { id: "inputStr", label: "String s", default: "A man, a plan, a canal: Panama", width: "220px" }
+            ],
+            onRun: () => {
+                let s = document.getElementById('inputStr').value || "A man, a plan, a canal: Panama";
+                return mode === 'brute' ? generateBruteTrace(s) : generateOptimalTrace(s);
+            },
+            onRenderStep: (step, container, eng) => {
+                let layoutHtml = `<div style="display:flex; flex-direction:column; gap: 24px; padding-bottom: 20px;">`;
+
+                // If Brute Force Mode
+                if (mode === 'brute') {
+                    // Original String Array
+                    let origHtml = `<div class="array-row" id="origArr">`;
+                    if (step.s) origHtml += `<div class="array-label" style="left:-105px;">Original s</div>`;
+                    for (let idx = 0; idx < step.s.length; idx++) {
+                        let cls = '';
+                        if (step.i === idx) {
+                            if (step.action === 'skip') cls = ' skipped';
+                            else if (step.action === 'scan' || step.action === 'build') cls = ' scanning';
+                        }
+                        origHtml += `<div class="cell${cls}" id="cell-${idx}">${step.s[idx]}</div>`;
+                    }
+                    if (step.s.length === 0) origHtml += `<div class="cell">(Empty)</div>`;
+
+                    if (step.i >= 0 && step.i < step.s.length) {
+                        origHtml += `<div class="ptr i-ptr" id="ptr1"><div>i</div><div class="ptr-arrow">↓</div></div>`;
+                    }
+                    origHtml += `</div>`;
+
+                    // Cleaned & Reversed Strings
+                    let cleanHtml = '';
+                    let revHtml = '';
+                    if (step.action === 'clean' || step.action === 'reverse' || step.action?.startsWith('compare')) {
+                        cleanHtml = `<div class="array-row" style="margin-top: 10px;">`;
+                        cleanHtml += `<div class="array-label" style="left:-110px;">Cleaned</div>`;
+                        for (let idx = 0; idx < step.cleaned.length; idx++) {
+                            let cls = step.action?.startsWith('compare') ? (step.res ? ' matched' : (step.res === false ? ' mismatched' : ' scanning')) : ' built';
+                            cleanHtml += `<div class="cell${cls}">${step.cleaned[idx]}</div>`;
+                        }
+                        if (step.cleaned.length === 0) cleanHtml += `<div class="cell">(Empty)</div>`;
+                        cleanHtml += `</div>`;
+
+                        if (step.action === 'reverse' || step.action?.startsWith('compare')) {
+                            revHtml = `<div class="array-row" style="margin-top: 10px;">`;
+                            revHtml += `<div class="array-label" style="left:-110px;">Reversed</div>`;
+                            for (let idx = 0; idx < step.reversed.length; idx++) {
+                                let cls = step.action?.startsWith('compare') ? (step.res ? ' matched' : (step.res === false ? ' mismatched' : ' scanning')) : ' built';
+                                revHtml += `<div class="cell${cls}">${step.reversed[idx]}</div>`;
+                            }
+                            if (step.reversed.length === 0) revHtml += `<div class="cell">(Empty)</div>`;
+                            revHtml += `</div>`;
+                        }
+                    } else {
+                        // Just show builder if building
+                        if (step.builder !== undefined && step.action !== 'clean' && step.action !== 'reverse' && !step.action?.startsWith('compare')) {
+                            cleanHtml = `<div class="array-row" style="margin-top: 10px;">`;
+                            cleanHtml += `<div class="array-label" style="left:-110px;">Builder</div>`;
+                            for (let idx = 0; idx < step.builder.length; idx++) {
+                                let cls = (idx === step.builder.length - 1 && step.action === 'build') ? ' built' : '';
+                                cleanHtml += `<div class="cell${cls}">${step.builder[idx]}</div>`;
+                            }
+                            if (step.builder.length === 0) cleanHtml += `<div class="cell" style="opacity:0.3;">...</div>`;
+                            cleanHtml += `</div>`;
+                        }
+                    }
+
+                    layoutHtml += `<div class="array-container">${origHtml}${cleanHtml}${revHtml}</div>`;
+                }
+                // If Optimal Mode
+                else {
+                    let origHtml = `<div class="array-row" id="origArr">`;
+                    if (step.s) origHtml += `<div class="array-label" style="left:-75px;">String s</div>`;
+                    for (let idx = 0; idx < step.s.length; idx++) {
+                        let cls = '';
+                        if (idx === step.left || idx === step.right) {
+                            if (step.action === 'skip_l' && idx === step.left) cls = ' skipped';
+                            else if (step.action === 'skip_r' && idx === step.right) cls = ' skipped';
+                            else if (step.action === 'mismatch') cls = ' mismatched';
+                            else if (step.action === 'match') cls = ' matched';
+                            else cls = ' scanning';
+                        }
+                        origHtml += `<div class="cell${cls}" id="cell-${idx}">${step.s[idx]}<div class="index-label">${idx}</div></div>`;
+                    }
+                    if (step.s.length === 0) origHtml += `<div class="cell">(Empty)</div>`;
+
+                    if (step.left >= 0 && step.left < step.s.length) {
+                        origHtml += `<div class="ptr l-ptr" id="ptrL"><div>left</div><div class="ptr-arrow">↓</div></div>`;
+                    }
+                    if (step.right >= 0 && step.right < step.s.length) {
+                        origHtml += `<div class="ptr r-ptr" id="ptrR"><div class="ptr-arrow">↑</div><div>right</div></div>`;
+                    }
+                    origHtml += `</div>`;
+
+                    layoutHtml += `<div class="array-container">${origHtml}</div>`;
+                }
+
+                let resHtml = '';
+                if (step.res === false) resHtml = `<div style="text-align:center; padding: 10px; background: var(--pink-light); color: var(--pink); border-radius: 8px; font-weight:700;">Result: FALSE</div>`;
+                if (step.res === true) resHtml = `<div style="text-align:center; padding: 10px; background: var(--emerald-light); color: var(--emerald); border-radius: 8px; font-weight:700;">Result: TRUE</div>`;
+
+                layoutHtml += resHtml + `</div>`;
+
+                container.innerHTML += eng.createSimpleCard('🔍 Execution Tracking', layoutHtml);
+                container.innerHTML += eng.createSimpleCard('💡 Current Operation', `<div class="step-text">${step.desc}</div>`);
+
+                eng.highlightLine(step.line);
+
+                setTimeout(() => {
+                    if (mode === 'brute') {
+                        const ptr1 = document.getElementById('ptr1');
+                        const sCell = document.getElementById('cell-' + step.i);
+                        if (ptr1 && sCell) {
+                            ptr1.style.left = sCell.offsetLeft + (sCell.clientWidth / 2) - 10 + 'px';
+                        }
+                    } else {
+                        const ptrL = document.getElementById('ptrL');
+                        const ptrR = document.getElementById('ptrR');
+                        const lCell = document.getElementById('cell-' + step.left);
+                        const rCell = document.getElementById('cell-' + step.right);
+                        if (ptrL && lCell) {
+                            ptrL.style.left = lCell.offsetLeft + (lCell.clientWidth / 2) - 10 + 'px';
+                        }
+                        if (ptrR && rCell) {
+                            ptrR.style.left = rCell.offsetLeft + (rCell.clientWidth / 2) - 12 + 'px';
+                        }
+                    }
+                }, 0);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const controlsBar = document.querySelector('.controls-bar');
+            const modeToggleHTML = `
+                <div class="mode-toggle">
+                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force (Filter & Reverse)</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Two Pointers)</button>
+                </div>
+            `;
+            controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
+            setTimeout(() => setMode('optimal'), 10);
+        });
+
+        window.setMode = function (m) {
+            engine.stopPlay();
+            mode = m;
+            document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
+            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
+            engine._renderCodeBlock();
+            engine.run();
+        };
+
+    </script>
+</body>
+
+</html>

@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Longest Palindromic Substring</title>
+    <title>Palindromic Substrings</title>
     <meta name="description"
-        content="Interactive visualizer for LeetCode 5: Longest Palindromic Substring (Brute Force & Optimal Center Expansion).">
+        content="Interactive visualizer for LeetCode 647: Palindromic Substrings (Brute Force & Optimal Center Expansion).">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
@@ -148,6 +148,7 @@
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             padding: 12px 14px;
+            position: relative;
         }
 
         .info-card .label {
@@ -189,21 +190,28 @@
             color: var(--yellow, #d97706);
         }
 
-        .result-palindrome {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 26px;
-            font-weight: 700;
-            text-align: center;
-            padding: 16px;
-            background: var(--purple-bg, #f3e8ff);
-            border-radius: var(--radius-sm);
-            border: 1px solid rgba(147, 51, 234, 0.15);
-            letter-spacing: 4px;
-            color: var(--purple, #9333ea);
+        .val-bump {
+            animation: bump 0.4s ease;
         }
 
-        .result-palindrome .pal-char.glow {
-            color: var(--accent);
+        /* Palindromes Found List */
+        .pals-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .pal-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--purple, #9333ea);
+            background: var(--purple-bg, #f3e8ff);
+            border: 1px solid rgba(147, 51, 234, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         /* General Info */
@@ -225,12 +233,6 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        .hl-pink {
-            color: var(--pink, #db2777);
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
         .hl-emerald {
             color: var(--emerald);
             font-weight: 600;
@@ -248,6 +250,32 @@
             font-weight: 600;
             font-family: 'JetBrains Mono', monospace;
         }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes bump {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.4);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 
@@ -258,25 +286,21 @@
 
         const CODE_BRUTE = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
-            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'String ' }, { t: 'fn', v: 'longestPalindrome' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
-            { tokens: [{ t: 'kw', v: '        if ' }, { t: 'br', v: '(' }, { t: 'v', v: 's.length() <= ' }, { t: 'num', v: '1' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return ' }, { t: 'v', v: 's' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'maxLen ' }, { t: 'op', v: '= ' }, { t: 'num', v: '1' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'tp', v: '        String ' }, { t: 'v', v: 'maxStr ' }, { t: 'op', v: '= ' }, { t: 'v', v: 's.substring(' }, { t: 'num', v: '0' }, { t: 'v', v: ', ' }, { t: 'num', v: '1' }, { t: 'v', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'int ' }, { t: 'fn', v: 'countSubstrings' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'count ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'i ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i++' }, { t: 'br', v: ') {' }] },
-            { tokens: [{ t: 'kw', v: '            for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'j ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'i + maxLen' }, { t: 'op', v: '; ' }, { t: 'v', v: 'j < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'j++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'j ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'i' }, { t: 'op', v: '; ' }, { t: 'v', v: 'j < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'j++' }, { t: 'br', v: ') {' }] },
             { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'fn', v: 'isPalindrome' }, { t: 'br', v: '(' }, { t: 'v', v: 's, i, j' }, { t: 'br', v: ')' }, { t: 'br', v: ') {' }] },
-            { tokens: [{ t: 'v', v: '                    maxLen ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'j - i + 1' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'v', v: '                    maxStr ' }, { t: 'op', v: '= ' }, { t: 'v', v: 's.substring(i, j + 1)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '                    count++' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '                }' }] },
             { tokens: [{ t: 'br', v: '            }' }] },
             { tokens: [{ t: 'br', v: '        }' }] },
-            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'maxStr' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'count' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [] },
             { tokens: [{ t: 'kw', v: '    private ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isPalindrome' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'left' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'right' }, { t: 'br', v: ') {' }] },
             { tokens: [{ t: 'kw', v: '        while ' }, { t: 'br', v: '(' }, { t: 'v', v: 'left < right' }, { t: 'br', v: ') {' }] },
-            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 's.charAt(left) != s.charAt(right)' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'v', v: '            left++' }, { t: 'op', v: '; ' }, { t: 'v', v: 'right--' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 's.charAt(left++) != s.charAt(right--)' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '        }' }] },
             { tokens: [{ t: 'kw', v: '        return true' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
@@ -285,26 +309,22 @@
 
         const CODE_OPTIMAL = [
             { tokens: [{ t: 'kw', v: 'class' }, { t: 'tp', v: ' Solution' }, { t: 'br', v: ' {' }] },
-            { tokens: [{ t: 'kw', v: '    public' }, { t: 'tp', v: ' String' }, { t: 'fn', v: ' longestPalindrome' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String' }, { t: '', v: ' s' }, { t: 'br', v: ') {' }] },
-            { tokens: [{ t: 'kw', v: '        if' }, { t: 'br', v: ' (' }, { t: '', v: 's' }, { t: 'op', v: ' == ' }, { t: 'kw', v: 'null' }, { t: 'op', v: ' || ' }, { t: '', v: 's.length()' }, { t: 'op', v: ' < ' }, { t: 'num', v: '1' }, { t: 'br', v: ')' }, { t: 'kw', v: ' return' }, { t: 'str', v: ' ""' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'tp', v: '        int' }, { t: '', v: ' start' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'tp', v: '        int' }, { t: '', v: ' end' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '    public' }, { t: 'tp', v: ' int' }, { t: 'fn', v: ' countSubstrings' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String' }, { t: '', v: ' s' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        int' }, { t: '', v: ' count' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'kw', v: '        for' }, { t: 'br', v: ' (' }, { t: 'tp', v: 'int' }, { t: '', v: ' i' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: '', v: 'i' }, { t: 'op', v: ' < ' }, { t: '', v: 's.length()' }, { t: 'op', v: '; ' }, { t: '', v: 'i++' }, { t: 'br', v: ') {' }] },
-            { tokens: [{ t: 'tp', v: '            int' }, { t: '', v: ' len1' }, { t: 'op', v: ' = ' }, { t: 'fn', v: 'expandFromCenter' }, { t: 'br', v: '(' }, { t: '', v: 's, i, i' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'tp', v: '            int' }, { t: '', v: ' len2' }, { t: 'op', v: ' = ' }, { t: 'fn', v: 'expandFromCenter' }, { t: 'br', v: '(' }, { t: '', v: 's, i, i + 1' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'tp', v: '            int' }, { t: '', v: ' len' }, { t: 'op', v: ' = ' }, { t: 'fn', v: 'Math.max' }, { t: 'br', v: '(' }, { t: '', v: 'len1, len2' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'kw', v: '            if' }, { t: 'br', v: ' (' }, { t: '', v: 'len' }, { t: 'op', v: ' > ' }, { t: '', v: 'end - start' }, { t: 'br', v: ') {' }] },
-            { tokens: [{ t: '', v: '                start' }, { t: 'op', v: ' = ' }, { t: '', v: 'i - (len - 1) / 2' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: '', v: '                end' }, { t: 'op', v: ' = ' }, { t: '', v: 'i + len / 2' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: '', v: '            count' }, { t: 'op', v: ' += ' }, { t: 'fn', v: 'expandFromCenter' }, { t: 'br', v: '(' }, { t: '', v: 's, i, i' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: '', v: '            count' }, { t: 'op', v: ' += ' }, { t: 'fn', v: 'expandFromCenter' }, { t: 'br', v: '(' }, { t: '', v: 's, i, i + 1' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '        }' }] },
-            { tokens: [{ t: 'kw', v: '        return' }, { t: '', v: ' s.substring' }, { t: 'br', v: '(' }, { t: '', v: 'start, end + 1' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        return' }, { t: '', v: ' count' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [] },
             { tokens: [{ t: 'kw', v: '    private' }, { t: 'tp', v: ' int' }, { t: 'fn', v: ' expandFromCenter' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String' }, { t: '', v: ' s, ' }, { t: 'tp', v: 'int' }, { t: '', v: ' left, ' }, { t: 'tp', v: 'int' }, { t: '', v: ' right' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        int' }, { t: '', v: ' subCount' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'kw', v: '        while' }, { t: 'br', v: ' (' }, { t: '', v: 'left' }, { t: 'op', v: ' >= ' }, { t: 'num', v: '0' }, { t: 'op', v: ' && ' }, { t: '', v: 'right' }, { t: 'op', v: ' < ' }, { t: '', v: 's.length()' }, { t: 'op', v: ' && ' }, { t: '', v: 's.charAt(left)' }, { t: 'op', v: ' == ' }, { t: '', v: 's.charAt(right)' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: '', v: '            subCount++' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: '', v: '            left' }, { t: 'op', v: '--' }, { t: 'op', v: '; ' }, { t: '', v: 'right' }, { t: 'op', v: '++' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '        }' }] },
-            { tokens: [{ t: 'kw', v: '        return' }, { t: '', v: ' right - left - 1' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        return' }, { t: '', v: ' subCount' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
         ].map(line => {
@@ -316,24 +336,25 @@
 
         function generateBruteTrace(s) {
             const steps = [];
-            if (!s || s.length <= 1) { steps.push({ codeLine: 2, desc: 'Length <= 1. Return immediately.', vars: {}, charStates: [] }); return steps; }
-            let maxLen = 1;
-            let maxStr = s.substring(0, 1);
+            if (!s) return steps;
 
-            steps.push({ codeLine: 4, desc: `Initialize <span class="hl-cyan">maxLen = 1</span>, <span class="hl-purple">maxStr = "${maxStr}"</span>`, vars: { i: '-', j: '-', maxLen, left: '-', right: '-' }, charStates: new Array(s.length).fill('default'), bp: maxStr });
+            let count = 0;
+            const pals = [];
+
+            steps.push({ codeLine: 3, desc: `Initialize <span class="hl-cyan">count = 0</span>`, vars: { i: '-', j: '-', left: '-', right: '-', count }, charStates: new Array(s.length).fill('default'), pals: [...pals] });
 
             for (let i = 0; i < s.length; i++) {
                 const cs = new Array(s.length).fill('default'); cs[i] = 'pointer-i';
-                steps.push({ codeLine: 5, desc: `Outer loop <span class="hl-cyan">i = ${i}</span>`, vars: { i, j: '-', maxLen, left: '-', right: '-' }, charStates: cs, bp: maxStr });
+                steps.push({ codeLine: 4, desc: `Outer loop <span class="hl-cyan">i = ${i}</span>`, vars: { i, j: '-', left: '-', right: '-', count }, charStates: cs, pals: [...pals] });
 
-                for (let j = i + maxLen; j < s.length; j++) {
+                for (let j = i; j < s.length; j++) {
                     const st = new Array(s.length).fill('default'); st[i] = 'pointer-i'; st[j] = 'pointer-j';
-                    steps.push({ codeLine: 7, desc: `Inner loop <span class="hl-orange">j = ${j}</span>. Check if substring <span class="hl-purple">"${s.substring(i, j + 1)}"</span> is a palindrome.`, vars: { i, j, maxLen, left: '-', right: '-' }, charStates: st, bp: maxStr });
+                    steps.push({ codeLine: 5, desc: `Inner loop <span class="hl-orange">j = ${j}</span>. Check if substring <span class="hl-purple">"${s.substring(i, j + 1)}"</span> is a palindrome.`, vars: { i, j, left: '-', right: '-', count }, charStates: st, pals: [...pals] });
 
                     let left = i, right = j;
                     let isPal = true;
 
-                    steps.push({ codeLine: 16, desc: `Call helper isPalindrome(s, ${left}, ${right}).`, vars: { i, j, maxLen, left, right }, charStates: [...st], bp: maxStr });
+                    steps.push({ codeLine: 14, desc: `Call helper isPalindrome(s, ${left}, ${right}).`, vars: { i, j, left, right, count }, charStates: [...st], pals: [...pals] });
 
                     while (left < right) {
                         const checkSt = [...st];
@@ -343,12 +364,12 @@
                         if (s.charAt(left) !== s.charAt(right)) {
                             isPal = false;
                             checkSt[left] = 'mismatch'; checkSt[right] = 'mismatch';
-                            steps.push({ codeLine: 18, desc: `'${s.charAt(left)}' != '${s.charAt(right)}'. Mismatch!`, vars: { i, j, maxLen, left, right }, charStates: checkSt, bp: maxStr });
+                            steps.push({ codeLine: 16, desc: `'${s.charAt(left)}' != '${s.charAt(right)}'. Mismatch!`, vars: { i, j, left, right, count }, charStates: checkSt, pals: [...pals] });
                             break;
                         }
 
                         checkSt[left] = 'matched'; checkSt[right] = 'matched';
-                        steps.push({ codeLine: 19, desc: `'${s.charAt(left)}' == '${s.charAt(right)}'. Match! Move inwards.`, vars: { i, j, maxLen, left, right }, charStates: checkSt, bp: maxStr });
+                        steps.push({ codeLine: 16, desc: `'${s.charAt(left)}' == '${s.charAt(right)}'. Match! left++, right--`, vars: { i, j, left, right, count }, charStates: checkSt, pals: [...pals] });
                         left++;
                         right--;
                     }
@@ -356,102 +377,115 @@
                     if (isPal) {
                         const bs = [...st];
                         for (let k = i; k <= j; k++) bs[k] = 'best-palindrome';
-                        steps.push({ codeLine: 21, desc: `Substring is a palindrome! return true.`, vars: { i, j, maxLen, left: '-', right: '-' }, charStates: bs, bp: maxStr });
+                        steps.push({ codeLine: 18, desc: `Substring is a palindrome! return true.`, vars: { i, j, left: '-', right: '-', count }, charStates: bs, pals: [...pals] });
 
-                        let curLen = j - i + 1;
-                        maxLen = curLen;
-                        maxStr = s.substring(i, j + 1);
-                        steps.push({ codeLine: 9, desc: `Update maxLen = ${maxLen}, maxStr = "${maxStr}"`, vars: { i, j, maxLen, left: '-', right: '-' }, charStates: bs, bp: maxStr });
+                        count++;
+                        pals.push(s.substring(i, j + 1));
+                        steps.push({ codeLine: 7, desc: `Increment count! <span class="hl-purple">count = ${count}</span>`, vars: { i, j, left: '-', right: '-', count }, charStates: bs, pals: [...pals], bumpCount: true });
                     }
                 }
             }
 
-            const fs = new Array(s.length).fill('default');
-            const startIndex = s.indexOf(maxStr);
-            for (let k = startIndex; k < startIndex + maxLen; k++) fs[k] = 'best-palindrome';
-
-            steps.push({ codeLine: 13, desc: `Return "<span class="hl-purple">${maxStr}</span>"`, vars: { i: '-', j: '-', maxLen, left: '-', right: '-' }, charStates: fs, bp: maxStr, finalResult: maxStr });
+            steps.push({ codeLine: 11, desc: `Finished all loops. Return total count = <span class="hl-purple">${count}</span>`, vars: { i: '-', j: '-', left: '-', right: '-', count }, charStates: new Array(s.length).fill('default'), pals: [...pals], finalResult: count });
             return steps;
         }
 
         function generateOptimalTrace(s) {
             const steps = [];
-            if (!s || s.length < 1) { steps.push({ codeLine: 2, desc: 'Empty input — return ""', vars: {}, charStates: [] }); return steps; }
-            let start = 0, end = 0;
-            steps.push({ codeLine: 4, desc: 'Initialize <span class="hl-cyan">start = 0</span>, <span class="hl-cyan">end = 0</span>', vars: { start: 0, end: 0, i: '-', left: '-', right: '-', len1: '-', len2: '-', len: '-' }, charStates: new Array(s.length).fill('default'), bp: s.substring(start, end + 1) });
+            if (!s) return steps;
+
+            let count = 0;
+            const pals = [];
+
+            steps.push({ codeLine: 3, desc: `Initialize <span class="hl-cyan">count = 0</span>`, vars: { i: '-', left: '-', right: '-', subCount: '-', count }, charStates: new Array(s.length).fill('default'), pals: [...pals] });
 
             for (let i = 0; i < s.length; i++) {
                 const cs = new Array(s.length).fill('default'); cs[i] = 'pointer-i';
-                steps.push({ codeLine: 6, desc: `Outer loop: <span class="hl-yellow">i = ${i}</span>, center at '<span class="hl-purple">${s[i]}</span>'`, vars: { start, end, i, left: '-', right: '-', len1: '-', len2: '-', len: '-' }, charStates: cs, bp: s.substring(start, end + 1) });
+                steps.push({ codeLine: 4, desc: `Loop: <span class="hl-yellow">i = ${i}</span>, center at '<span class="hl-purple">${s[i]}</span>'`, vars: { i, left: '-', right: '-', subCount: '-', count }, charStates: cs, pals: [...pals] });
 
                 const odd = traceExpand(s, i, i);
-                odd.steps.forEach(st => { st.vars.start = start; st.vars.end = end; st.vars.i = i; st.bp = s.substring(start, end + 1); steps.push(st); });
-                const len1 = odd.result;
-                steps.push({ codeLine: 6, desc: `Odd expansion: <span class="hl-emerald">len1 = ${len1}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2: '-', len: '-' }, charStates: odd.matched, bp: s.substring(start, end + 1) });
+                odd.steps.forEach(st => {
+                    st.vars.i = i;
+                    st.vars.count = count;
+                    st.pals = [...pals, ...(st.tempPals || [])];
+                    steps.push(st);
+                });
+
+                count += odd.result;
+                pals.push(...odd.foundPals);
+                steps.push({ codeLine: 5, desc: `Odd expansion finished. Found ${odd.result} palindromes here. count += ${odd.result} → <span class="hl-purple">${count}</span>`, vars: { i, left: '-', right: '-', subCount: '-', count }, charStates: odd.matched, pals: [...pals], bumpCount: odd.result > 0 });
 
                 const even = traceExpand(s, i, i + 1);
-                even.steps.forEach(st => { st.vars.start = start; st.vars.end = end; st.vars.i = i; st.bp = s.substring(start, end + 1); steps.push(st); });
-                const len2 = even.result;
-                steps.push({ codeLine: 7, desc: `Even expansion: <span class="hl-emerald">len2 = ${len2}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2, len: '-' }, charStates: even.matched, bp: s.substring(start, end + 1) });
+                even.steps.forEach(st => {
+                    st.vars.i = i;
+                    st.vars.count = count;
+                    st.pals = [...pals, ...(st.tempPals || [])];
+                    steps.push(st);
+                });
 
-                const len = Math.max(len1, len2);
-                steps.push({ codeLine: 8, desc: `<span class="hl-purple">len = max(${len1}, ${len2}) = ${len}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2, len }, charStates: new Array(s.length).fill('default'), bp: s.substring(start, end + 1) });
-
-                if (len > end - start) {
-                    const os = start, oe = end;
-                    start = i - Math.floor((len - 1) / 2);
-                    end = i + Math.floor(len / 2);
-                    const bs = new Array(s.length).fill('default');
-                    for (let k = start; k <= end; k++) bs[k] = 'best-palindrome';
-                    steps.push({ codeLine: 11, desc: `New best! <span class="hl-purple">len ${len} > ${oe - os}</span> → <span class="hl-cyan">start=${start}, end=${end}</span> → "<span class="hl-purple">${s.substring(start, end + 1)}</span>"`, vars: { start, end, i, left: '-', right: '-', len1, len2, len }, charStates: bs, bp: s.substring(start, end + 1) });
-                } else {
-                    steps.push({ codeLine: 9, desc: `No update: <span class="hl-cyan">len ${len} ≤ ${end - start}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2, len }, charStates: new Array(s.length).fill('default'), bp: s.substring(start, end + 1) });
-                }
+                count += even.result;
+                pals.push(...even.foundPals);
+                steps.push({ codeLine: 6, desc: `Even expansion finished. Found ${even.result} palindromes here. count += ${even.result} → <span class="hl-purple">${count}</span>`, vars: { i, left: '-', right: '-', subCount: '-', count }, charStates: even.matched, pals: [...pals], bumpCount: even.result > 0 });
             }
-            const fs = new Array(s.length).fill('default');
-            for (let k = start; k <= end; k++) fs[k] = 'best-palindrome';
-            steps.push({ codeLine: 14, desc: `Return "<span class="hl-purple">${s.substring(start, end + 1)}</span>"`, vars: { start, end }, charStates: fs, bp: s.substring(start, end + 1), finalResult: s.substring(start, end + 1) });
+
+            steps.push({ codeLine: 8, desc: `Return total count = <span class="hl-purple">${count}</span>`, vars: { i: '-', left: '-', right: '-', subCount: '-', count }, charStates: new Array(s.length).fill('default'), pals: [...pals], finalResult: count });
             return steps;
         }
 
         function traceExpand(s, iL, iR) {
-            const steps = []; let left = iL, right = iR;
+            const steps = [];
+            let left = iL, right = iR;
+            let subCount = 0;
+            const foundPals = [];
+
             const label = iL === iR ? 'Odd' : 'Even';
             const es = new Array(s.length).fill('default');
+
             if (left >= 0 && left < s.length) es[left] = 'pointer-left';
             if (right >= 0 && right < s.length) es[right] = right === left ? 'pointer-left' : 'pointer-right';
-            steps.push({ codeLine: 16, desc: `${label}: <span class="hl-emerald">expandFromCenter(s, ${iL}, ${iR})</span>`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: es });
+
+            steps.push({ codeLine: 11, desc: `${label}: <span class="hl-emerald">expandFromCenter(s, ${iL}, ${iR})</span>`, vars: { left, right, subCount: 0 }, charStates: es, tempPals: [...foundPals] });
+
             let matched = new Array(s.length).fill('default');
+
             while (left >= 0 && right < s.length && s[left] === s[right]) {
                 const st = new Array(s.length).fill('default');
                 st[left] = 'pointer-left'; if (right !== left) st[right] = 'pointer-right';
-                for (let k = left; k <= right; k++) if (k !== left && k !== right) st[k] = 'matched';
+                for (let k = left; k <= right; k++) if (k !== left && k !== right) st[k] = 'best-palindrome';
                 matched = [...st];
-                steps.push({ codeLine: 17, desc: `Match! s[${left}]='<span class="hl-emerald">${s[left]}</span>' == s[${right}]='<span class="hl-emerald">${s[right]}</span>'`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: st });
+
+                steps.push({ codeLine: 13, desc: `Match! s[${left}]='<span class="hl-emerald">${s[left]}</span>' == s[${right}]='<span class="hl-emerald">${s[right]}</span>'`, vars: { left, right, subCount }, charStates: st, tempPals: [...foundPals] });
+
+                subCount++;
+                const p = s.substring(left, right + 1);
+                foundPals.push(p);
+
+                steps.push({ codeLine: 14, desc: `Increment subCount = ${subCount}. Found palindrome "<span class="hl-purple">${p}</span>". Expand left--, right++`, vars: { left, right, subCount }, charStates: st, tempPals: [...foundPals] });
+
                 left--; right++;
             }
             if (left >= 0 && right < s.length) {
                 const st = [...matched]; if (left >= 0 && left < s.length) st[left] = 'mismatch'; if (right < s.length) st[right] = 'mismatch';
-                steps.push({ codeLine: 17, desc: `Mismatch: s[${left}]='${s[left]}' ≠ s[${right}]='${s[right]}'`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: st });
+                steps.push({ codeLine: 13, desc: `Mismatch: s[${left}]='${s[left]}' ≠ s[${right}]='${s[right]}'`, vars: { left, right, subCount }, charStates: st, tempPals: [...foundPals] });
             } else {
-                steps.push({ codeLine: 17, desc: `Out of bounds (left=${left}, right=${right})`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: matched });
+                steps.push({ codeLine: 13, desc: `Out of bounds (left=${left}, right=${right})`, vars: { left, right, subCount }, charStates: matched, tempPals: [...foundPals] });
             }
-            const res = right - left - 1;
-            steps.push({ codeLine: 20, desc: `Return <span class="hl-cyan">${right} - ${left} - 1 = ${res}</span>`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: matched });
-            return { steps, result: res, matched };
+            steps.push({ codeLine: 17, desc: `Return <span class="hl-cyan">subCount = ${subCount}</span>`, vars: { left, right, subCount }, charStates: matched, tempPals: [...foundPals] });
+
+            return { steps, result: subCount, matched, foundPals };
         }
 
         const engine = new VizEngine({
-            title: "Longest Palindromic Substring",
+            title: "Palindromic Substrings",
             badge: "String / DP",
             tag: "Center Expansion",
             codeLines: CODE_OPTIMAL,
             inputs: [
-                { id: "inputStr", label: "String s", default: "babad", width: "160px" }
+                { id: "inputStr", label: "String s", default: "abc", width: "160px" }
             ],
             onRun: () => {
                 let s = document.getElementById('inputStr').value.trim();
-                if (!s) s = "babad";
+                if (!s) s = "abc";
                 window.engineCache = { s };
                 return mode === 'brute' ? generateBruteTrace(s) : generateOptimalTrace(s);
             },
@@ -481,7 +515,7 @@
                 let varConfigs = [];
                 if (mode === 'brute') {
                     varConfigs = [
-                        { k: 'maxLen', l: 'maxLen', c: 'cyan' },
+                        { k: 'count', l: 'count (total)', c: 'purple' },
                         { k: 'i', l: 'i', c: 'yellow' },
                         { k: 'j', l: 'j', c: 'orange' },
                         { k: 'left', l: 'left', c: 'emerald' },
@@ -489,20 +523,18 @@
                     ];
                 } else {
                     varConfigs = [
-                        { k: 'len', l: 'len (max)', c: 'purple' },
-                        { k: 'start', l: 'start', c: 'cyan' },
-                        { k: 'end', l: 'end', c: 'cyan' },
+                        { k: 'count', l: 'count (total)', c: 'purple' },
                         { k: 'i', l: 'i (center)', c: 'yellow' },
+                        { k: 'subCount', l: 'subCount', c: 'cyan' },
                         { k: 'left', l: 'left', c: 'emerald' },
-                        { k: 'right', l: 'right', c: 'pink' },
-                        { k: 'len1', l: 'len1 (odd)', c: 'emerald' },
-                        { k: 'len2', l: 'len2 (even)', c: 'emerald' }
+                        { k: 'right', l: 'right', c: 'pink' }
                     ];
                 }
 
                 varConfigs.forEach(vc => {
                     if (v[vc.k] !== undefined && v[vc.k] !== '-') {
-                        varsHtml += `<div class="info-card ${vc.c}"><div class="label">${vc.l}</div><div class="value">${v[vc.k]}</div></div>`;
+                        const bumpCss = (vc.k === 'count' && step.bumpCount) ? ' val-bump' : '';
+                        varsHtml += `<div class="info-card ${vc.c}"><div class="label">${vc.l}</div><div class="value${bumpCss}">${v[vc.k]}</div></div>`;
                     }
                 });
                 varsHtml += `</div>`;
@@ -510,14 +542,17 @@
 
                 container.innerHTML += eng.createSimpleCard('💡 Step Detail', `<div class="step-text">${step.desc}</div>`);
 
-                const bp = step.finalResult || (step.bp || "");
+                // Palindromes Output
+                const palsList = step.pals || [];
+                let palsHtml = `<div class="pals-container">`;
+                palsList.forEach((p, idx) => {
+                    palsHtml += `<div class="pal-badge" style="animation-delay: ${(idx > palsList.length - 3) ? '0ms' : '0ms'}">${esc(p)}</div>`;
+                });
+                if (palsList.length === 0) palsHtml += `<div style="font-size:13px; color:var(--text-dim); padding: 8px;">(None found yet)</div>`;
+                palsHtml += `</div>`;
 
-                const title = step.finalResult ? '🏆 Final Result' : '🏆 Best Palindrome So Far';
-                let chars = `<span style="color:var(--text-dim); font-size: 14px;">(Empty)</span>`;
-                if (bp) {
-                    chars = bp.split('').map(c => `<span class="pal-char ${step.finalResult ? 'glow' : ''}">${esc(c)}</span>`).join('');
-                }
-                container.innerHTML += eng.createSimpleCard(title, `<div class="result-palindrome">${chars}</div>`);
+                const title = step.finalResult !== undefined ? '🏆 Final Result (Total Palindromes)' : '📋 Palindromes Found Tracker';
+                container.innerHTML += eng.createSimpleCard(title, palsHtml);
 
                 eng.highlightLine(step.codeLine);
             }

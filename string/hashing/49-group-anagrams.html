@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Anagrams</title>
+    <meta name="description"
+        content="Interactive visualizer for LeetCode 49: Group Anagrams (Brute Force Sort Key & Optimal Frequency Array Key).">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../../core/engine.css">
+    <style>
+        /* Arrays */
+        .array-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .array-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .str-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            background: white;
+            padding: 10px 14px;
+            transition: all 0.3s;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .str-box.active {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            color: var(--accent);
+        }
+
+        .str-box.done {
+            background: var(--bg2);
+            color: var(--text-dim);
+            opacity: 0.6;
+        }
+
+        .idx-lbl {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 6px;
+        }
+
+        /* Hash Map */
+        .map-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 12px;
+        }
+
+        .map-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--orange);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .map-entry {
+            display: flex;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            animation: fadeUp 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .map-key-area {
+            flex: 0 0 200px;
+            background: white;
+            border-right: 1px solid var(--border);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .map-key-lbl {
+            font-size: 10px;
+            color: var(--text-dim);
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .map-key {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            word-break: break-all;
+            text-align: center;
+        }
+
+        .map-val-area {
+            flex: 1;
+            padding: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .map-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            background: white;
+            border: 1px dashed var(--accent);
+            color: var(--text);
+            padding: 6px 12px;
+            border-radius: 6px;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .map-entry.highlight {
+            border-color: var(--emerald);
+            box-shadow: 0 0 0 2px var(--emerald-light);
+        }
+
+        .map-entry.highlight .map-key-area {
+            background: var(--emerald-light);
+        }
+
+        .map-entry.highlight .map-key {
+            color: var(--emerald);
+        }
+
+        .map-entry.highlight .map-val:last-child {
+            background: var(--emerald);
+            color: white;
+            border-color: var(--emerald);
+        }
+
+        /* General Info */
+        .step-text {
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .hl-accent {
+            color: var(--accent);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hl-orange {
+            color: var(--orange, #ea580c);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hl-emerald {
+            color: var(--emerald);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../../core/engine.js"></script>
+    <script>
+        const CODE_BRUTE = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'List<List<String>> ' }, { t: 'fn', v: 'groupAnagrams' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'strs' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        Map<String, List<String>> ' }, { t: 'v', v: 'map ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'HashMap<>()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's : strs' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '            char' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'arr ' }, { t: 'op', v: '= ' }, { t: 'v', v: 's.toCharArray()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '            Arrays.sort(arr)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '            String ' }, { t: 'v', v: 'key ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'String' }, { t: 'br', v: '(' }, { t: 'v', v: 'arr' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '            map.putIfAbsent(key, ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'ArrayList<>()' }, { t: 'v', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '            map.get(key).add(s)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'ArrayList<>' }, { t: 'br', v: '(' }, { t: 'v', v: 'map.values()' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ];
+
+        const CODE_OPTIMAL = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'List<List<String>> ' }, { t: 'fn', v: 'groupAnagrams' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'strs' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        Map<String, List<String>> ' }, { t: 'v', v: 'map ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'HashMap<>()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's : strs' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '            int' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'count ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'int' }, { t: 'br', v: '[' }, { t: 'num', v: '26' }, { t: 'br', v: ']' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'char ' }, { t: 'v', v: 'c : s.toCharArray()' }, { t: 'br', v: ') ' }, { t: 'v', v: 'count[c - ' }, { t: 'str', v: "'a'" }, { t: 'v', v: ']++' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '            String ' }, { t: 'v', v: 'key ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'Arrays.toString(count)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '            map.putIfAbsent(key, ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'ArrayList<>()' }, { t: 'v', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '            map.get(key).add(s)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'ArrayList<>' }, { t: 'br', v: '(' }, { t: 'v', v: 'map.values()' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ];
+
+        let mode = 'optimal';
+
+        function cloneMap(map) {
+            const m = {};
+            for (let k in map) m[k] = [...map[k]];
+            return m;
+        }
+
+        function generateBruteTrace(strs) {
+            const steps = [];
+            const map = {};
+
+            steps.push({ line: 3, desc: `Initialize empty HashMap<String, List<String>> to group the anagrams.`, currStr: -1, map: {} });
+
+            for (let i = 0; i < strs.length; i++) {
+                const s = strs[i];
+                steps.push({ line: 4, desc: `Process string: "${s}"`, currStr: i, map: cloneMap(map) });
+
+                steps.push({ line: 5, desc: `Convert "${s}" to character array.`, currStr: i, map: cloneMap(map) });
+
+                let arr = s.split('');
+                arr.sort();
+                let key = arr.join('');
+                steps.push({ line: 6, desc: `Sort the character array algebraically: "${arr.join(',')}"`, currStr: i, map: cloneMap(map) });
+
+                steps.push({ line: 7, desc: `Create String key = "${key}"`, currStr: i, activeKey: key, map: cloneMap(map) });
+
+                if (!map[key]) {
+                    map[key] = [];
+                    steps.push({ line: 8, desc: `Key "${key}" not in map. Creating new ArrayList for this key.`, currStr: i, activeKey: key, map: cloneMap(map) });
+                } else {
+                    steps.push({ line: 8, desc: `Key "${key}" already exists in map. Skipping putIfAbsent.`, currStr: i, activeKey: key, map: cloneMap(map) });
+                }
+
+                map[key].push(s);
+                steps.push({ line: 9, desc: `Add "${s}" to the list corresponding to key "${key}".`, currStr: i, activeKey: key, map: cloneMap(map), hlUpdate: true });
+            }
+
+            steps.push({ line: 11, desc: `Finished processing all strings. Return all lists from the map values.`, currStr: -1, map: cloneMap(map) });
+            return steps;
+        }
+
+        function generateOptimalTrace(strs) {
+            const steps = [];
+            const map = {};
+
+            steps.push({ line: 3, desc: `Initialize empty HashMap<String, List<String>> map.`, currStr: -1, map: {} });
+
+            for (let i = 0; i < strs.length; i++) {
+                const s = strs[i];
+                steps.push({ line: 4, desc: `Process string: "${s}"`, currStr: i, map: cloneMap(map) });
+
+                steps.push({ line: 5, desc: `Create new frequency int[26] count array.`, currStr: i, map: cloneMap(map) });
+
+                let count = new Array(26).fill(0);
+                for (let c of s) {
+                    count[c.charCodeAt(0) - 97]++;
+                }
+
+                // Formulate a clean array-like string representation as seen in Java Arrays.toString
+                let key = "[" + count.join(", ") + "]";
+
+                steps.push({ line: 6, desc: `Count frequencies of all characters in "${s}".`, currStr: i, countArr: [...count], map: cloneMap(map) });
+
+                steps.push({ line: 7, desc: `Convert frequency array to string key.`, currStr: i, countArr: [...count], activeKey: key, map: cloneMap(map) });
+
+                if (!map[key]) {
+                    map[key] = [];
+                    steps.push({ line: 8, desc: `Key string not in map. Creating new ArrayList for this key.`, currStr: i, countArr: [...count], activeKey: key, map: cloneMap(map) });
+                } else {
+                    steps.push({ line: 8, desc: `Key already exists in map. Skipping putIfAbsent.`, currStr: i, countArr: [...count], activeKey: key, map: cloneMap(map) });
+                }
+
+                map[key].push(s);
+                steps.push({ line: 9, desc: `Add "${s}" to the list corresponding to the frequency array key.`, currStr: i, countArr: [...count], activeKey: key, map: cloneMap(map), hlUpdate: true });
+            }
+
+            steps.push({ line: 11, desc: `Finished processing all strings. Return map.values() as a list of lists.`, currStr: -1, map: cloneMap(map) });
+            return steps;
+        }
+
+        const engine = new VizEngine({
+            title: "Group Anagrams",
+            badge: "Array / Hash Table / String",
+            tag: "Sorting & Arrays",
+            codeLines: CODE_OPTIMAL,
+            inputs: [
+                { id: "inputStr", label: "Strings (comma separated)", default: "eat,tea,tan,ate,nat,bat", width: "240px" }
+            ],
+            onRun: () => {
+                let input = document.getElementById('inputStr').value;
+                if (!input) input = "eat,tea,tan,ate,nat,bat";
+                const strs = input.split(',').map(s => s.trim().toLowerCase().replace(/[^a-z]/g, '')).filter(s => s.length > 0);
+                if (strs.length === 0) strs.push("eat", "tea", "tan", "ate", "nat", "bat");
+
+                return mode === 'brute' ? generateBruteTrace(strs) : generateOptimalTrace(strs);
+            },
+            onRenderStep: (step, container, eng) => {
+                let layoutHtml = `<div style="display:flex; flex-direction:column; gap: 20px;">`;
+
+                // INPUT ARRAY RENDER
+                let inputHtml = `<div style="font-size:11px; font-weight:700; color:var(--text-dim); text-transform:uppercase; margin-bottom:12px;">Input String Array</div><div class="array-row">`;
+
+                const originalStrs = eng.trace[1]?.map ? Object.values(eng.trace[0]?.map || {}).flat() : []; // Hacky way to retrieve original if we need it, but we can just use the DOM input
+                let inputStrEl = document.getElementById('inputStr').value || "eat,tea,tan,ate,nat,bat";
+                const strs = inputStrEl.split(',').map(s => s.trim().toLowerCase().replace(/[^a-z]/g, '')).filter(s => s.length > 0);
+                if (strs.length === 0) strs.push("eat", "tea", "tan", "ate", "nat", "bat");
+
+                strs.forEach((s, idx) => {
+                    let cls = '';
+                    if (step.currStr === idx) cls = ' active';
+                    else if (step.currStr > idx) cls = ' done';
+
+                    inputHtml += `<div class="str-box${cls}">
+                                    "${s}"
+                                    <div class="idx-lbl">Index ${idx}</div>
+                                  </div>`;
+                });
+                inputHtml += `</div>`;
+
+                // HASH MAP RENDER
+                let mapHtml = `<div class="map-container"><div class="map-title">HashMap&lt;String, List&lt;String&gt;&gt; map</div>`;
+                let hasEntries = false;
+
+                for (let k in step.map) {
+                    hasEntries = true;
+                    // Create abbreviated key display for optimal mode array
+                    let displayKey = k;
+                    if (mode === 'optimal') {
+                        // The string representation for Java int[] takes up too much space. Let's make it pretty and scannable.
+                        displayKey = `<div style="font-size:9px; color:var(--text-dim); line-height:1.2;">[${k.substring(1, k.length - 1)}]</div>`;
+                    }
+
+                    const isHl = (step.hlUpdate && k === step.activeKey) ? ' highlight' : '';
+
+                    let valsHtml = '';
+                    step.map[k].forEach(v => {
+                        valsHtml += `<div class="map-val">"${v}"</div>`;
+                    });
+
+                    mapHtml += `
+                        <div class="map-entry${isHl}">
+                            <div class="map-key-area">
+                                <div class="map-key-lbl">Map Key (String)</div>
+                                <div class="map-key">${displayKey}</div>
+                            </div>
+                            <div class="map-val-area">
+                                ${valsHtml}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (!hasEntries) mapHtml += `<div style="padding: 24px; text-align: center; color: var(--text-dim); background: var(--bg2); border-radius: 12px; border: 1px dashed var(--border); font-size: 13px;">(Map is Empty)</div>`;
+
+                mapHtml += `</div>`;
+
+                layoutHtml += `${inputHtml}${mapHtml}</div>`;
+
+                container.innerHTML += eng.createSimpleCard('🔍 Execution Tracking', layoutHtml);
+                container.innerHTML += eng.createSimpleCard('💡 Current Operation', `<div class="step-text">${step.desc}</div>`);
+
+                eng.highlightLine(step.line);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const controlsBar = document.querySelector('.controls-bar');
+            const modeToggleHTML = `
+                <div class="mode-toggle">
+                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force (Sort String Key)</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Frequency Array Key)</button>
+                </div>
+            `;
+            controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
+            setTimeout(() => setMode('optimal'), 10);
+        });
+
+        window.setMode = function (m) {
+            engine.stopPlay();
+            mode = m;
+            document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
+            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
+            engine._renderCodeBlock();
+            engine.run();
+        };
+
+    </script>
+</body>
+
+</html>

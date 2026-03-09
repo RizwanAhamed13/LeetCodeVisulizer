@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimum Window Substring</title>
+    <meta name="description"
+        content="Interactive visualizer for LeetCode 76: Minimum Window Substring (Brute Force & Optimal Sliding Window).">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../../core/engine.css">
+    <style>
+        /* Variables */
+        .var-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            padding: 10px 14px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .var-name {
+            color: var(--text-dim);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .var-val {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .var-val.hl {
+            color: var(--emerald);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        /* String Arrays */
+        .array-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .array-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            position: relative;
+        }
+
+        .array-label {
+            position: absolute;
+            left: -90px;
+            top: 12px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .cell {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            z-index: 2;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .cell.in-window {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .cell.matching {
+            background: var(--emerald-light, #d1fae5);
+            border-color: var(--emerald);
+            color: var(--emerald);
+        }
+
+        .cell.min-win {
+            border: 3px solid var(--orange);
+        }
+
+        .cell.target-char {
+            background: var(--bg3);
+            border-color: var(--text-dim);
+        }
+
+        .index-label {
+            position: absolute;
+            bottom: -20px;
+            font-size: 10px;
+            color: var(--text-dim);
+            width: 100%;
+            text-align: center;
+            left: 0;
+        }
+
+        /* Pointers */
+        .ptr {
+            position: absolute;
+            top: -30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.4s ease;
+            z-index: 10;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+        .ptr.l-ptr {
+            color: var(--orange, #ea580c);
+        }
+
+        .ptr.r-ptr {
+            color: var(--accent);
+        }
+
+        .ptr-arrow {
+            margin-top: 2px;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        /* Sliding Window Box */
+        .window-box {
+            position: absolute;
+            height: 56px;
+            top: -6px;
+            border: 2px dashed var(--accent);
+            border-radius: 12px;
+            background: rgba(79, 70, 229, 0.05);
+            transition: all 0.4s ease;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .window-box.valid-win {
+            border-color: var(--emerald);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        /* Frequency Map */
+        .freq-container {
+            background: var(--bg2);
+            border: 1px dashed var(--orange);
+            padding: 20px;
+            border-radius: 12px;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .freq-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--orange);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .freq-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .freq-row {
+            display: grid;
+            grid-template-columns: 40px 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+            background: white;
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .freq-char {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            justify-self: center;
+        }
+
+        .freq-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .val {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 14px;
+        }
+
+        .need-val {
+            font-weight: 700;
+            color: var(--orange);
+            font-size: 14px;
+        }
+
+        .freq-row.matched {
+            border-color: var(--emerald);
+            background: var(--emerald-light, #d1fae5);
+        }
+
+        .freq-row.matched .val,
+        .freq-row.matched .need-val {
+            color: var(--emerald);
+        }
+
+        /* General Info */
+        .step-text {
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .hl-accent {
+            color: var(--accent);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hl-orange {
+            color: var(--orange, #ea580c);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hl-emerald {
+            color: var(--emerald);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../../core/engine.js"></script>
+    <script>
+        const CODE_BRUTE = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'String ' }, { t: 'fn', v: 'minWindow' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 't' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '        if ' }, { t: 'br', v: '(' }, { t: 'v', v: 's.length() < t.length()' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return ' }, { t: 'str', v: '""' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        int' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'tCount ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'int' }, { t: 'br', v: '[' }, { t: 'num', v: '128' }, { t: 'br', v: ']' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'char ' }, { t: 'v', v: 'c : t.toCharArray()' }, { t: 'br', v: ') ' }, { t: 'v', v: 'tCount[c]++' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'minLen ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'Integer.MAX_VALUE' }, { t: 'op', v: ', ' }, { t: 'v', v: 'minStart ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'i ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '            int' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'window ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'int' }, { t: 'br', v: '[' }, { t: 'num', v: '128' }, { t: 'br', v: ']' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'j ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'i' }, { t: 'op', v: '; ' }, { t: 'v', v: 'j < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'j++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                window[s.charAt(j)]++;' }] },
+            { tokens: [{ t: 'tp', v: '                boolean ' }, { t: 'v', v: 'isValid ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'true' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '                for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'c ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: 'v', v: 'c < 128' }, { t: 'op', v: '; ' }, { t: 'v', v: 'c++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '                    if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'window[c] < tCount[c]' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                        isValid ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'false' }, { t: 'op', v: '; ' }, { t: 'kw', v: 'break' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '                    }' }] },
+            { tokens: [{ t: 'br', v: '                }' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'isValid' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '                    if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'j - i + 1 < minLen' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                        minLen ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'j - i + 1' }, { t: 'op', v: '; ' }, { t: 'v', v: 'minStart ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'i' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '                    }' }] },
+            { tokens: [{ t: 'kw', v: '                    break' }, { t: 'op', v: '; ' }, { t: 'br', v: '// Any larger j is longer' }] },
+            { tokens: [{ t: 'br', v: '                }' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'minLen == Integer.MAX_VALUE ? ' }, { t: 'str', v: '""' }, { t: 'op', v: ' : ' }, { t: 'v', v: 's.substring(minStart, minStart + minLen)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] }
+        ];
+
+        const CODE_OPTIMAL = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'String ' }, { t: 'fn', v: 'minWindow' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 't' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        int' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'tCount ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'int' }, { t: 'br', v: '[' }, { t: 'num', v: '128' }, { t: 'br', v: ']' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'need ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'char ' }, { t: 'v', v: 'c : t.toCharArray()' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'tCount[c] == ' }, { t: 'num', v: '0' }, { t: 'br', v: ') ' }, { t: 'v', v: 'need++' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '            tCount[c]++' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'tp', v: '        int' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'window ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'int' }, { t: 'br', v: '[' }, { t: 'num', v: '128' }, { t: 'br', v: ']' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'have ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ', ' }, { t: 'v', v: 'left ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ', ' }, { t: 'v', v: 'minLen ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'Integer.MAX_VALUE' }, { t: 'op', v: ', ' }, { t: 'v', v: 'minStart ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'right ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: 'v', v: 'right < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'right++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '            char ' }, { t: 'v', v: 'c ' }, { t: 'op', v: '= ' }, { t: 'v', v: 's.charAt(right)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '            window[c]++' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'window[c] == tCount[c]' }, { t: 'br', v: ') ' }, { t: 'v', v: 'have++' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            while ' }, { t: 'br', v: '(' }, { t: 'v', v: 'have == need' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'right - left + 1 < minLen' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                    minLen ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'right - left + 1' }, { t: 'op', v: '; ' }, { t: 'v', v: 'minStart ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'left' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '                }' }] },
+            { tokens: [{ t: 'tp', v: '                char ' }, { t: 'v', v: 'lch ' }, { t: 'op', v: '= ' }, { t: 'v', v: 's.charAt(left)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '                window[lch]--' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'window[lch] < tCount[lch]' }, { t: 'br', v: ') ' }, { t: 'v', v: 'have--' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '                left++' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'minLen == Integer.MAX_VALUE ? ' }, { t: 'str', v: '""' }, { t: 'op', v: ' : ' }, { t: 'v', v: 's.substring(minStart, minStart + minLen)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ];
+
+        let mode = 'optimal';
+
+        function buildTCount(t) {
+            const count = {};
+            for (let c of t) count[c] = (count[c] || 0) + 1;
+            return count;
+        }
+
+        function cloneMap(map) {
+            return JSON.parse(JSON.stringify(map));
+        }
+
+        function isValidWin(win, tCount) {
+            for (let c in tCount) {
+                if ((win[c] || 0) < tCount[c]) return false;
+            }
+            return true;
+        }
+
+        function generateBruteTrace(s, t) {
+            const steps = [];
+            const tCount = buildTCount(t);
+            let minLen = Infinity, minStart = 0;
+
+            steps.push({ line: 4, desc: `Build target frequency map from string t="${t}"`, i: -1, j: -1, win: {}, minLen, minStart, s, t, tCount });
+            steps.push({ line: 6, desc: `Initialize minLen = Infinity, minStart = 0`, i: -1, j: -1, win: {}, minLen, minStart, s, t, tCount });
+
+            for (let i = 0; i < s.length; i++) {
+                steps.push({ line: 7, desc: `Loop i = ${i}. Create fresh window frequency map.`, i, j: -1, win: {}, minLen, minStart, s, t, tCount });
+                const win = {};
+
+                for (let j = i; j < s.length; j++) {
+                    const ch = s[j];
+                    win[ch] = (win[ch] || 0) + 1;
+                    steps.push({ line: 10, desc: `Loop j = ${j}, char = '${ch}'. Add to window freq map.`, i, j, win: cloneMap(win), minLen, minStart, s, t, tCount });
+
+                    const valid = isValidWin(win, tCount);
+                    if (valid) {
+                        steps.push({ line: 17, desc: `Check frequencies: Window contains all characters needed. Substring is VALID!`, i, j, win: cloneMap(win), minLen, minStart, s, t, tCount, isWinValid: true });
+                        let curLen = j - i + 1;
+                        if (curLen < minLen) {
+                            minLen = curLen;
+                            minStart = i;
+                            steps.push({ line: 19, desc: `Update minLen to ${minLen} and minStart to ${minStart}`, i, j, win: cloneMap(win), minLen, minStart, s, t, tCount, hlMinLen: true, isWinValid: true });
+                        }
+                        steps.push({ line: 21, desc: `Optimization (break): Since we found a valid window starting at i=${i}, any longer window starting at i will just be longer but still valid. No need to check further j's. break inner loop.`, i, j, win: cloneMap(win), minLen, minStart, s, t, tCount, isWinValid: true });
+                        break;
+                    } else {
+                        steps.push({ line: 13, desc: `Check frequencies: Window is missing characters. Need to expand window.`, i, j, win: cloneMap(win), minLen, minStart, s, t, tCount, isWinValid: false });
+                    }
+                }
+            }
+            steps.push({ line: 25, desc: `Return substring from ${minStart} with length ${minLen === Infinity ? 0 : minLen}`, i: -1, j: -1, win: {}, minLen, minStart, s, t, tCount });
+            return steps;
+        }
+
+        function generateOptimalTrace(s, t) {
+            const steps = [];
+            const tCount = buildTCount(t);
+            let need = Object.keys(tCount).length;
+            let have = 0, minLen = Infinity, minStart = 0, left = 0;
+            const win = {};
+
+            steps.push({ line: 4, desc: `Build target freq map. Count unique chars required. need = ${need}.`, L: -1, R: -1, win: {}, have, need, minLen, minStart, s, t, tCount });
+            steps.push({ line: 10, desc: `Initialize have=0, minLen=Infinity, left=0.`, L: left, R: -1, win: {}, have, need, minLen, minStart, s, t, tCount });
+
+            for (let right = 0; right < s.length; right++) {
+                const ch = s[right];
+                win[ch] = (win[ch] || 0) + 1;
+                steps.push({ line: 13, desc: `Loop right = ${right}, char = '${ch}'. Add to window freq map.`, L: left, R: right, win: cloneMap(win), have, need, minLen, minStart, s, t, tCount });
+
+                if (tCount[ch] && win[ch] === tCount[ch]) {
+                    have++;
+                    steps.push({ line: 14, desc: `Window freq for '${ch}' reached target count! have++ -> ${have}`, L: left, R: right, win: cloneMap(win), have, need, minLen, minStart, s, t, tCount, hlHave: true });
+                }
+
+                steps.push({ line: 15, desc: `Check while (have == need). ${have} == ${need}? ${have === need}`, L: left, R: right, win: cloneMap(win), have, need, minLen, minStart, s, t, tCount, isWinValid: have === need });
+
+                while (have === need) {
+                    let curLen = right - left + 1;
+                    if (curLen < minLen) {
+                        minLen = curLen;
+                        minStart = left;
+                        steps.push({ line: 17, desc: `Valid Window! Update minLen to ${minLen} and minStart to ${minStart}`, L: left, R: right, win: cloneMap(win), have, need, minLen, minStart, s, t, tCount, hlMinLen: true, isWinValid: true });
+                    }
+
+                    const lch = s[left];
+                    win[lch]--;
+                    steps.push({ line: 20, desc: `Try to shrink: Remove s[left]='${lch}' from window freq.`, L: left, R: right, win: cloneMap(win), have, need, minLen, minStart, s, t, tCount, isWinValid: true, windowShrink: true });
+
+                    if (tCount[lch] && win[lch] < tCount[lch]) {
+                        have--;
+                        steps.push({ line: 21, desc: `'${lch}' freq fell below required! have-- -> ${have}. Window becomes invalid.`, L: left, R: right, win: cloneMap(win), have, need, minLen, minStart, s, t, tCount, hlHave: true, isWinValid: false });
+                    }
+                    left++;
+                    steps.push({ line: 22, desc: `Move left pointer to ${left}`, L: left, R: right, win: cloneMap(win), have, need, minLen, minStart, s, t, tCount, isWinValid: have === need });
+                }
+            }
+            steps.push({ line: 25, desc: `Return substring from ${minStart} with length ${minLen === Infinity ? 0 : minLen}`, L: left, R: -1, win: cloneMap(win), have, need, minLen, minStart, s, t, tCount });
+            return steps;
+        }
+
+        const engine = new VizEngine({
+            title: "Minimum Window Substring",
+            badge: "String / Arrays",
+            tag: "Sliding Window",
+            codeLines: CODE_OPTIMAL,
+            inputs: [
+                { id: "inputS", label: "String s", default: "ADOBECODEBANC", width: "160px" },
+                { id: "inputT", label: "Target t", default: "ABC", width: "80px" }
+            ],
+            onRun: () => {
+                let s = document.getElementById('inputS').value || "ADOBECODEBANC";
+                let t = document.getElementById('inputT').value || "ABC";
+
+                return mode === 'brute' ? generateBruteTrace(s, t) : generateOptimalTrace(s, t);
+            },
+            onRenderStep: (step, container, eng) => {
+                let p1 = mode === 'brute' ? step.i : step.L;
+                let p2 = mode === 'brute' ? step.j : step.R;
+                let p1Label = mode === 'brute' ? 'i' : 'L';
+                let p2Label = mode === 'brute' ? 'j' : 'R';
+                let p1Class = 'l-ptr';
+                let p2Class = 'r-ptr';
+
+                let mLenStr = step.minLen === Infinity ? 'INF' : step.minLen;
+
+                // DP / Vars
+                let varsHtml = `<div style="display: flex; gap: 16px; flex-wrap: wrap;">`;
+                varsHtml += `<div class="var-box"><span class="var-name">minLen</span><span class="var-val${step.hlMinLen ? ' hl' : ''}">${mLenStr}</span></div>`;
+                if (mode === 'optimal') {
+                    varsHtml += `<div class="var-box"><span class="var-name">have</span><span class="var-val${step.hlHave ? ' hl' : ''}">${step.have}</span></div>`;
+                    varsHtml += `<div class="var-box"><span class="var-name">need</span><span class="var-val">${step.need}</span></div>`;
+                }
+                if (step.minLen !== Infinity) varsHtml += `<div class="var-box"><span class="var-name">minStart</span><span class="var-val">${step.minStart}</span></div>`;
+                if (p1 >= 0) varsHtml += `<div class="var-box"><span class="var-name">${p1Label}</span><span class="var-val hl-orange">${p1}</span></div>`;
+                if (p2 >= 0) varsHtml += `<div class="var-box"><span class="var-name">${p2Label}</span><span class="var-val hl-accent">${p2}</span></div>`;
+                varsHtml += `</div>`;
+
+                // HashMap Render (Only show tracking characters)
+                let freqHtml = `<div class="freq-grid">`;
+                freqHtml += `<div style="display:flex; justify-content:space-between; width:100%; border-bottom:1px solid var(--border); padding-bottom:4px; font-size:10px; font-weight:700; color:var(--text-dim);"><span>CHAR</span><span style="display:flex; gap:20px;"><span>WIN</span><span>T</span></span></div>`;
+
+                for (let k in step.tCount) {
+                    const needC = step.tCount[k];
+                    const winC = step.win[k] || 0;
+                    const isMatched = winC >= needC ? " matched" : "";
+
+                    freqHtml += `<div class="freq-row${isMatched}">
+                                    <span class="freq-char">${k}</span>
+                                    <span class="freq-count"><span class="val">${winC}</span> <span class="need-val">${needC}</span></span>
+                                 </div>`;
+                }
+                freqHtml += `</div>`;
+                let mapPanel = `<div class="freq-container"><div class="freq-title">Character Tracker</div>${freqHtml}</div>`;
+
+                // Target Array
+                let tArrayHtml = `<div class="array-row"><div class="array-label">Target t</div>`;
+                for (let idx = 0; idx < step.t.length; idx++) {
+                    tArrayHtml += `<div class="cell target-char">${step.t[idx]}</div>`;
+                }
+                tArrayHtml += `</div>`;
+
+                // Main Array Visual
+                let arrayHtml = `<div class="array-container">${tArrayHtml}<div class="array-row" id="mainArray"><div class="array-label">String s</div>`;
+                for (let idx = 0; idx < step.s.length; idx++) {
+                    const c = step.s[idx];
+                    let cls = '';
+                    if (p1 >= 0 && p2 >= 0 && idx >= p1 && idx <= p2) {
+                        cls = ' in-window';
+                        if (step.tCount[c]) cls = step.isWinValid ? ' matching' : ' in-window';
+                    }
+
+                    // Highlight the minWindow
+                    if (step.minLen !== Infinity && idx >= step.minStart && idx < step.minStart + step.minLen) {
+                        cls += ' min-win';
+                    }
+
+                    arrayHtml += `
+                        <div class="cell${cls}" id="cell-${idx}">
+                            ${c}
+                            <div class="index-label">${idx}</div>
+                        </div>`;
+                }
+
+                if (p1 >= 0 && step.s.length > 0) {
+                    arrayHtml += `<div class="ptr ${p1Class}" id="ptr1"><div>${p1Label}</div><div class="ptr-arrow">↓</div></div>`;
+                }
+                if (p2 >= 0 && step.s.length > 0) {
+                    arrayHtml += `<div class="ptr ${p2Class}" id="ptr2"><div>${p2Label}</div><div class="ptr-arrow">↓</div></div>`;
+                }
+                if (p1 >= 0 && p2 >= 0) {
+                    const winClass = step.isWinValid ? ' valid-win' : '';
+                    arrayHtml += `<div class="window-box${winClass}" id="winBox"></div>`;
+                }
+
+                arrayHtml += `</div></div>`;
+
+                container.innerHTML += eng.createSimpleCard('🔍 Execution Tracking', varsHtml + `<div style="display:flex; gap: 24px; padding-top: 20px; flex-wrap: wrap;">${mapPanel}<div style="flex:1;">${arrayHtml}</div></div>`);
+                container.innerHTML += eng.createSimpleCard('💡 Current Operation', `<div class="step-text">${step.desc}</div>`);
+
+                eng.highlightLine(step.line);
+
+                setTimeout(() => {
+                    const getPtrLeft = (idx) => {
+                        const el = document.getElementById('cell-' + idx);
+                        if (!el) return 0;
+                        return el.offsetLeft + (el.clientWidth / 2) - 10;
+                    };
+
+                    const ptr1 = document.getElementById('ptr1');
+                    if (ptr1) { ptr1.style.left = getPtrLeft(p1) + 'px'; }
+
+                    const ptr2 = document.getElementById('ptr2');
+                    if (ptr2) {
+                        if (p1 === p2) {
+                            ptr1.style.transform = `translateY(-15px)`;
+                            ptr1.innerHTML = `<div>${p1Label},${p2Label}</div><div class="ptr-arrow">↓</div>`;
+                            ptr2.style.display = 'none';
+                        } else {
+                            ptr2.style.left = getPtrLeft(p2) + 'px';
+                        }
+                    }
+
+                    const win = document.getElementById('winBox');
+                    if (win && p1 >= 0 && p2 >= p1) {
+                        const cellL = document.getElementById('cell-' + p1);
+                        const cellR = document.getElementById('cell-' + p2);
+                        if (cellL && cellR) {
+                            win.style.left = (cellL.offsetLeft - 6) + 'px';
+                            win.style.width = (cellR.offsetLeft - cellL.offsetLeft + cellR.clientWidth + 12) + 'px';
+                        }
+                    }
+                }, 0);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const controlsBar = document.querySelector('.controls-bar');
+            const modeToggleHTML = `
+                <div class="mode-toggle">
+                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Sliding Window)</button>
+                </div>
+            `;
+            controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
+
+            setTimeout(() => setMode('optimal'), 10);
+        });
+
+        window.setMode = function (m) {
+            engine.stopPlay();
+            mode = m;
+            document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
+
+            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
+            engine._renderCodeBlock();
+            engine.run();
+        };
+
+    </script>
+</body>
+
+</html>

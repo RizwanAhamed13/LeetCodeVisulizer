@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valid Anagram</title>
+    <meta name="description"
+        content="Interactive visualizer for LeetCode 242: Valid Anagram (Brute Force Sort & Optimal HashMap/Frequency Array).">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../../core/engine.css">
+    <style>
+        /* Arrays */
+        .array-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .array-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            position: relative;
+        }
+
+        .array-label {
+            position: absolute;
+            left: -80px;
+            top: 12px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .cell {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            z-index: 2;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .cell.scanning {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .cell.matched {
+            background: var(--emerald-light, #d1fae5);
+            border-color: var(--emerald);
+            color: var(--emerald);
+        }
+
+        .cell.mismatched {
+            background: var(--pink-light, #fce7f3);
+            border-color: var(--pink, #db2777);
+            color: var(--pink);
+            animation: shake 0.4s ease;
+        }
+
+        .index-label {
+            position: absolute;
+            bottom: -20px;
+            font-size: 10px;
+            color: var(--text-dim);
+            width: 100%;
+            text-align: center;
+            left: 0;
+        }
+
+        /* Pointers */
+        .ptr {
+            position: absolute;
+            top: -30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.4s ease;
+            z-index: 10;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+        .ptr.i-ptr {
+            color: var(--accent);
+        }
+
+        .ptr-arrow {
+            margin-top: 2px;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        /* Frequency Array Tracker */
+        .freq-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--bg2);
+            border: 1px dashed var(--orange);
+            padding: 20px;
+            border-radius: 12px;
+            min-width: 300px;
+        }
+
+        .freq-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--orange);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .freq-grid {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            gap: 6px;
+        }
+
+        .freq-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .freq-char {
+            font-size: 10px;
+            font-weight: 700;
+            background: var(--bg3);
+            padding: 4px;
+            width: 100%;
+            text-align: center;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .freq-val {
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s;
+        }
+
+        .freq-box.modified .freq-val {
+            color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .freq-box.invalid .freq-val {
+            color: white;
+            background: var(--pink);
+            border-radius: 0;
+        }
+
+        .freq-box.valid .freq-val {
+            color: var(--emerald);
+            background: var(--emerald-light);
+        }
+
+        /* General Info */
+        .step-text {
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .hl-accent {
+            color: var(--accent);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hl-orange {
+            color: var(--orange, #ea580c);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-4px);
+            }
+
+            75% {
+                transform: translateX(4px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../../core/engine.js"></script>
+    <script>
+        const CODE_BRUTE = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isAnagram' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 't' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '        if ' }, { t: 'br', v: '(' }, { t: 'v', v: 's.length() != t.length()' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        char' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'sArr ' }, { t: 'op', v: '= ' }, { t: 'v', v: 's.toCharArray()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        char' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'tArr ' }, { t: 'op', v: '= ' }, { t: 'v', v: 't.toCharArray()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '        Arrays.sort(sArr)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '        Arrays.sort(tArr)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'i ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i < sArr.length' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'sArr[i] != tArr[i]' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return true' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ];
+
+        const CODE_OPTIMAL = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isAnagram' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 't' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '        if ' }, { t: 'br', v: '(' }, { t: 'v', v: 's.length() != t.length()' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        int' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'count ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'int' }, { t: 'br', v: '[' }, { t: 'num', v: '26' }, { t: 'br', v: ']' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'i ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '            count[s.charAt(i) - ' }, { t: 'str', v: "'a'" }, { t: 'v', v: ']++;' }] },
+            { tokens: [{ t: 'v', v: '            count[t.charAt(i) - ' }, { t: 'str', v: "'a'" }, { t: 'v', v: ']--;' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'c : count' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c != ' }, { t: 'num', v: '0' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return true' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ];
+
+        let mode = 'optimal';
+
+        function generateBruteTrace(s, t) {
+            const steps = [];
+            const lenS = s.length, lenT = t.length;
+
+            steps.push({ line: 3, desc: `Check lengths: s.length (${lenS}) != t.length (${lenT})?`, i: -1, sArr: s.split(''), tArr: t.split(''), status: lenS !== lenT ? 'diff_len' : 'same_len' });
+
+            if (lenS !== lenT) {
+                steps.push({ line: 3, desc: `Lengths differ! Strings cannot be anagrams. Return false.`, i: -1, sArr: s.split(''), tArr: t.split(''), returnedFalse: true });
+                return steps;
+            }
+
+            let sArr = s.split('');
+            let tArr = t.split('');
+
+            steps.push({ line: 4, desc: `Convert s to char array.`, i: -1, sArr, tArr });
+            steps.push({ line: 5, desc: `Convert t to char array.`, i: -1, sArr, tArr });
+
+            sArr = sArr.slice().sort();
+            steps.push({ line: 6, desc: `Sort sArr alphabetically.`, i: -1, sArr, tArr });
+
+            tArr = tArr.slice().sort();
+            steps.push({ line: 7, desc: `Sort tArr alphabetically.`, i: -1, sArr, tArr });
+
+            for (let i = 0; i < sArr.length; i++) {
+                steps.push({ line: 8, desc: `Loop i = ${i}. Compare sArr[${i}] and tArr[${i}].`, i, sArr, tArr });
+                if (sArr[i] !== tArr[i]) {
+                    steps.push({ line: 9, desc: `Mismatch found! '${sArr[i]}' != '${tArr[i]}'. Return false.`, i, sArr, tArr, returnedFalse: true, mismatched: true });
+                    return steps;
+                } else {
+                    steps.push({ line: 8, desc: `Matched '${sArr[i]}' == '${tArr[i]}'`, i, sArr, tArr, matched: true });
+                }
+            }
+
+            steps.push({ line: 11, desc: `All characters matched perfectly. The strings are anagrams. Return true.`, i: -1, sArr, tArr, returnedTrue: true });
+            return steps;
+        }
+
+        function generateOptimalTrace(s, t) {
+            const steps = [];
+            const lenS = s.length, lenT = t.length;
+
+            steps.push({ line: 3, desc: `Check lengths: s.length (${lenS}) != t.length (${lenT})?`, cIndex: -1, count: new Array(26).fill(0), sArr: s.split(''), tArr: t.split('') });
+
+            if (lenS !== lenT) {
+                steps.push({ line: 3, desc: `Lengths differ! Strings cannot be anagrams. Return false.`, cIndex: -1, count: new Array(26).fill(0), sArr: s.split(''), tArr: t.split(''), returnedFalse: true });
+                return steps;
+            }
+
+            let count = new Array(26).fill(0);
+            steps.push({ line: 4, desc: `Initialize frequency array count[] of size 26 with 0s.`, scanIdx: -1, cIndex: -1, count: [...count], sArr: s.split(''), tArr: t.split('') });
+
+            for (let i = 0; i < s.length; i++) {
+                const sChar = s[i], tChar = t[i];
+                const sOffset = sChar.charCodeAt(0) - 97;
+                const tOffset = tChar.charCodeAt(0) - 97;
+
+                steps.push({ line: 5, desc: `Loop i = ${i}. Look at s[${i}]='${sChar}' and t[${i}]='${tChar}'`, scanIdx: i, cIndex: -1, count: [...count], sArr: s.split(''), tArr: t.split('') });
+
+                count[sOffset]++;
+                steps.push({ line: 6, desc: `Increment count['${sChar}'] -> ${count[sOffset]}`, scanIdx: i, cIndex: sOffset, count: [...count], sArr: s.split(''), tArr: t.split('') });
+
+                count[tOffset]--;
+                steps.push({ line: 7, desc: `Decrement count['${tChar}'] -> ${count[tOffset]}`, scanIdx: i, cIndex: tOffset, count: [...count], sArr: s.split(''), tArr: t.split('') });
+            }
+
+            steps.push({ line: 9, desc: `Finished counting. Now verify if frequency array is all 0s.`, scanIdx: -1, cIndex: -1, count: [...count], sArr: s.split(''), tArr: t.split('') });
+
+            for (let c = 0; c < 26; c++) {
+                if (count[c] !== 0) {
+                    steps.push({ line: 10, desc: `count['${String.fromCharCode(c + 97)}'] is ${count[c]} != 0. Therefore, not an anagram. Return false.`, scanIdx: -1, cIndex: c, count: [...count], sArr: s.split(''), tArr: t.split(''), isInvalid: true, returnedFalse: true });
+                    return steps;
+                } else if (c % 3 === 0) {
+                    // Small step optimization: don't show every 0 check unless it's first few or last to avoid huge trace
+                    steps.push({ line: 10, desc: `Checking counts... (Scanning array)`, scanIdx: -1, cIndex: c, count: [...count], sArr: s.split(''), tArr: t.split(''), isValid: true });
+                }
+            }
+
+            steps.push({ line: 12, desc: `All counts are 0! The strings are valid anagrams. Return true.`, scanIdx: -1, cIndex: -1, count: [...count], sArr: s.split(''), tArr: t.split(''), returnedTrue: true });
+            return steps;
+        }
+
+        const engine = new VizEngine({
+            title: "Valid Anagram",
+            badge: "String / Hash Table",
+            tag: "Sorting & Arrays",
+            codeLines: CODE_OPTIMAL,
+            inputs: [
+                { id: "inputS", label: "String s", default: "anagram", width: "120px" },
+                { id: "inputT", label: "String t", default: "nagaram", width: "120px" }
+            ],
+            onRun: () => {
+                let s = document.getElementById('inputS').value.toLowerCase().replace(/[^a-z]/g, '') || "anagram";
+                let t = document.getElementById('inputT').value.toLowerCase().replace(/[^a-z]/g, '') || "nagaram";
+
+                return mode === 'brute' ? generateBruteTrace(s, t) : generateOptimalTrace(s, t);
+            },
+            onRenderStep: (step, container, eng) => {
+                let layoutHtml = `<div style="display:flex; flex-direction:column; gap: 24px;">`;
+
+                // If Brute Force Mode
+                if (mode === 'brute') {
+                    let sArrHtml = `<div class="array-row" id="sArr"><div class="array-label">String s</div>`;
+                    let tArrHtml = `<div class="array-row" id="tArr"><div class="array-label">String t</div>`;
+
+                    for (let idx = 0; idx < step.sArr.length; idx++) {
+                        let cls = '';
+                        if (step.i === idx) {
+                            cls = step.mismatched ? ' mismatched' : (step.matched ? ' matched' : ' scanning');
+                        }
+                        sArrHtml += `<div class="cell${cls}" id="scell-${idx}">${step.sArr[idx]}<div class="index-label">${idx}</div></div>`;
+                    }
+                    for (let idx = 0; idx < step.tArr.length; idx++) {
+                        let cls = '';
+                        if (step.i === idx) {
+                            cls = step.mismatched ? ' mismatched' : (step.matched ? ' matched' : ' scanning');
+                        }
+                        tArrHtml += `<div class="cell${cls}" id="tcell-${idx}">${step.tArr[idx]}<div class="index-label">${idx}</div></div>`;
+                    }
+
+                    if (step.i >= 0 && step.i < step.sArr.length) {
+                        sArrHtml += `<div class="ptr i-ptr" id="ptr1" style="top: -30px;"><div>i</div><div class="ptr-arrow">↓</div></div>`;
+                        tArrHtml += `<div class="ptr i-ptr" id="ptr2" style="bottom: -30px; top:auto;"><div>i</div><div class="ptr-arrow" style="transform: rotate(180deg); margin-top:0; margin-bottom:2px;">↑</div></div>`;
+                    }
+
+                    sArrHtml += `</div>`;
+                    tArrHtml += `</div>`;
+
+                    let resHtml = '';
+                    if (step.returnedFalse) resHtml = `<div style="text-align:center; padding: 10px; background: var(--pink-light); color: var(--pink); border-radius: 8px; font-weight:700;">Result: FALSE</div>`;
+                    if (step.returnedTrue) resHtml = `<div style="text-align:center; padding: 10px; background: var(--emerald-light); color: var(--emerald); border-radius: 8px; font-weight:700;">Result: TRUE</div>`;
+
+                    layoutHtml += `<div class="array-container">${sArrHtml}${tArrHtml}</div>${resHtml}`;
+                }
+                // If Optimal Mode
+                else {
+                    let sArrHtml = `<div class="array-row" id="sArr"><div class="array-label">String s</div>`;
+                    let tArrHtml = `<div class="array-row" id="tArr"><div class="array-label">String t</div>`;
+
+                    for (let idx = 0; idx < step.sArr.length; idx++) {
+                        let cls = (step.scanIdx === idx) ? ' scanning' : '';
+                        sArrHtml += `<div class="cell${cls}">${step.sArr[idx]}<div class="index-label">${idx}</div></div>`;
+                    }
+                    for (let idx = 0; idx < step.tArr.length; idx++) {
+                        let cls = (step.scanIdx === idx) ? ' scanning' : '';
+                        tArrHtml += `<div class="cell${cls}">${step.tArr[idx]}<div class="index-label">${idx}</div></div>`;
+                    }
+                    if (step.sArr.length === 0) sArrHtml += `<div class="cell">(Empty)</div>`;
+                    if (step.tArr.length === 0) tArrHtml += `<div class="cell">(Empty)</div>`;
+
+                    sArrHtml += `</div>`;
+                    tArrHtml += `</div>`;
+
+                    let arrayContainer = `<div class="array-container" style="padding-top:10px;">${sArrHtml}${tArrHtml}</div>`;
+
+                    let freqHtml = `<div class="freq-container"><div class="freq-title">Frequency Array int[26] count</div><div class="freq-grid">`;
+                    for (let c = 0; c < 26; c++) {
+                        let cls = (step.cIndex === c) ? ' modified' : '';
+                        if (step.cIndex === c && step.isInvalid) cls = ' invalid';
+                        if (step.cIndex === c && step.isValid) cls = ' valid';
+
+                        freqHtml += `<div class="freq-box${cls}">
+                                        <div class="freq-char">${String.fromCharCode(c + 97)}</div>
+                                        <div class="freq-val">${step.count[c]}</div>
+                                     </div>`;
+                    }
+                    freqHtml += `</div></div>`;
+
+                    let resHtml = '';
+                    if (step.returnedFalse) resHtml = `<br><div style="text-align:center; padding: 10px; background: var(--pink-light); color: var(--pink); border-radius: 8px; font-weight:700;">Result: FALSE</div>`;
+                    if (step.returnedTrue) resHtml = `<br><div style="text-align:center; padding: 10px; background: var(--emerald-light); color: var(--emerald); border-radius: 8px; font-weight:700;">Result: TRUE</div>`;
+
+                    layoutHtml += `${arrayContainer}${freqHtml}${resHtml}`;
+                }
+
+                layoutHtml += `</div>`;
+
+                container.innerHTML += eng.createSimpleCard('🔍 Execution Tracking', layoutHtml);
+                container.innerHTML += eng.createSimpleCard('💡 Current Operation', `<div class="step-text">${step.desc}</div>`);
+
+                eng.highlightLine(step.line);
+
+                if (mode === 'brute') {
+                    setTimeout(() => {
+                        const ptr1 = document.getElementById('ptr1');
+                        const sCell = document.getElementById('scell-' + step.i);
+                        if (ptr1 && sCell) {
+                            ptr1.style.left = sCell.offsetLeft + (sCell.clientWidth / 2) - 10 + 'px';
+                        }
+                        const ptr2 = document.getElementById('ptr2');
+                        const tCell = document.getElementById('tcell-' + step.i);
+                        if (ptr2 && tCell) {
+                            ptr2.style.left = tCell.offsetLeft + (tCell.clientWidth / 2) - 10 + 'px';
+                        }
+                    }, 0);
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const controlsBar = document.querySelector('.controls-bar');
+            const modeToggleHTML = `
+                <div class="mode-toggle">
+                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Frequency Array)</button>
+                </div>
+            `;
+            controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
+            setTimeout(() => setMode('optimal'), 10);
+        });
+
+        window.setMode = function (m) {
+            engine.stopPlay();
+            mode = m;
+            document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
+            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
+            engine._renderCodeBlock();
+            engine.run();
+        };
+
+    </script>
+</body>
+
+</html>
