@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizing Sliding Window | Dual Protocol Layout</title>
+    <meta name="description"
+        content="Interactive dry-run visualization of Go-Back-N and Selective Repeat protocols with two distinct arrays and 4 pointers.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #ffffff;
+            --bg2: #f8f9fc;
+            --bg3: #f1f3f8;
+            --card-bg: #ffffff;
+            --code-bg: #fafbfe;
+            --border: #e2e5ef;
+            --text: #1a1d2e;
+            --text-secondary: #4a5068;
+            --text-dim: #8891a8;
+            --accent: #4f46e5;
+            --accent-light: #ede9fe;
+            --emerald: #059669;
+            --emerald-bg: #ecfdf5;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+            --radius: 14px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg2);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .header h1 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .header .tag {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--accent);
+            background: var(--accent-light);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* ===== CONTROLS BAR ===== */
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 24px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: var(--bg2);
+            padding: 3px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-right: 12px;
+        }
+
+        .mode-btn {
+            padding: 6px 14px;
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dim);
+            cursor: pointer;
+            border-radius: 7px;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: var(--bg);
+            color: var(--accent);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .btn-restart {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-restart:hover {
+            background: #4338ca;
+        }
+
+        .playback {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .playback button {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .playback button:hover:not(:disabled) {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .playback button:disabled {
+            opacity: 0.3;
+        }
+
+        .speed-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 6px;
+        }
+
+        .speed-group label {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .step-info {
+            margin-left: auto;
+            font-size: 13px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .step-info span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            height: calc(100vh - 106px);
+        }
+
+        /* ===== STEP PANEL ===== */
+        .step-panel {
+            background: var(--code-bg);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            padding: 10px 16px;
+            background: rgba(250, 251, 254, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-dim);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .step-item {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--bg3);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .step-item:hover {
+            background: var(--bg3);
+        }
+
+        .step-item.active {
+            background: var(--highlight-line);
+            border-left: 3px solid var(--accent);
+        }
+
+        .step-num {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-dim);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .step-item.active .step-num {
+            color: var(--accent);
+        }
+
+        .step-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .step-item.active .step-title {
+            color: var(--text);
+        }
+
+        /* ===== VIZ PANEL ===== */
+        .viz-panel {
+            overflow-y: auto;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* Arrays */
+        .array-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 45px 20px 55px;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .array-label {
+            position: absolute;
+            top: 12px;
+            left: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .array-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .cell {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg3);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dim);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .cell.sent {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .cell.received {
+            background: var(--emerald-bg);
+            border-color: var(--emerald);
+            color: var(--emerald);
+        }
+
+        .cell.buffered {
+            border-style: dashed;
+            border-color: var(--emerald);
+            background: white;
+            color: var(--emerald);
+        }
+
+        .window {
+            position: absolute;
+            height: 64px;
+            top: 37px;
+            border: 3px solid var(--accent);
+            border-radius: 12px;
+            background: rgba(79, 70, 229, 0.05);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .window.receiver {
+            border-color: var(--emerald);
+            background: rgba(5, 150, 105, 0.05);
+        }
+
+        /* Pointers */
+        .pointer {
+            position: absolute;
+            width: 2px;
+            height: 25px;
+            background: var(--accent);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+
+        .pointer::after {
+            content: attr(data-label);
+            position: absolute;
+            white-space: nowrap;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: white;
+            background: var(--accent);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .pointer.top {
+            top: -28px;
+        }
+
+        .pointer.top::after {
+            top: -16px;
+        }
+
+        .pointer.top::before {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: -4px;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid var(--accent);
+        }
+
+        .pointer.bottom {
+            bottom: -28px;
+        }
+
+        .pointer.bottom::after {
+            bottom: -16px;
+        }
+
+        .pointer.bottom::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid var(--accent);
+        }
+
+        .pointer.emerald {
+            background: var(--emerald);
+        }
+
+        .pointer.emerald::after {
+            background: var(--emerald);
+        }
+
+        .pointer.emerald::before {
+            border-top-color: var(--emerald);
+            border-bottom-color: var(--emerald);
+        }
+
+        /* Network */
+        .medium {
+            width: 100%;
+            max-width: 800px;
+            height: 100px;
+            position: relative;
+            border-radius: var(--radius);
+            border: 1px dashed var(--border);
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .packet {
+            position: absolute;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            z-index: 20;
+            color: white;
+            transition: all 0.5s;
+            top: 35px;
+        }
+
+        .packet.data {
+            background: var(--accent);
+        }
+
+        .packet.ack {
+            background: var(--emerald);
+        }
+
+        .packet.lost {
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        /* Explanation */
+        .info-card {
+            width: 100%;
+            max-width: 800px;
+            background: #fffbe6;
+            padding: 24px;
+            border-radius: var(--radius);
+            border: 1px solid #ffe58f;
+        }
+
+        .info-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+
+        .info-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #856404;
+        }
+
+        @media (max-width: 900px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+
+            .step-panel {
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <a href="../index.html" class="back-btn">← Home</a>
+        <h1>Sliding Window Protocol</h1>
+        <span class="tag" id="currentModeLabel">Go-Back-N</span>
+    </div>
+
+    <div class="controls-bar">
+        <div class="mode-toggle">
+            <button class="mode-btn active" id="btn-gbn" onclick="setMode('gbn')">Go-Back-N</button>
+            <button class="mode-btn" id="btn-sr" onclick="setMode('sr')">Selective Repeat</button>
+        </div>
+        <button class="btn btn-restart" onclick="restart()">↺ Restart</button>
+        <div class="playback">
+            <button onclick="goToStep(0)">⏮</button>
+            <button onclick="prevStep()" id="prevBtn">◀</button>
+            <button id="playPauseBtn" onclick="togglePlay()">▶</button>
+            <button onclick="nextStep()" id="nextBtn">▶</button>
+            <button onclick="goToStep(currentSteps.length - 1)">⏭</button>
+        </div>
+        <div class="step-info">Step <span id="stepCurrent">0</span> / <span id="stepTotal">0</span></div>
+    </div>
+
+    <div class="main">
+        <div class="step-panel" id="stepList"></div>
+        <div class="viz-panel">
+
+            <div class="array-container">
+                <div class="array-label">Sender Buffer</div>
+                <div class="window" id="senderWindow"></div>
+                <div class="pointer top" id="ptr-s-base" data-label="S_base"></div>
+                <div class="pointer bottom" id="ptr-s-next" data-label="S_next"></div>
+                <div class="array-row" id="senderRow"></div>
+            </div>
+
+            <div class="medium" id="networkMedium"></div>
+
+            <div class="array-container">
+                <div class="array-label">Receiver Buffer</div>
+                <div class="window receiver" id="receiverWindow"></div>
+                <div class="pointer top emerald" id="ptr-r-base" data-label="R_base"></div>
+                <div class="pointer bottom emerald" id="ptr-r-next" data-label="R_next"></div>
+                <div class="array-row" id="receiverRow"></div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-title" id="infoTitle">Mode: Go-Back-N</div>
+                <div class="info-text" id="infoText"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const GBN_STEPS = [
+            { title: "Setup Parameters", desc: "Window Size = 4. S_base tracks the oldest unacknowledged frame. S_next is where new transmissions happen. R_expected is the strict sequence number the receiver demands.", sBase: 0, sNext: 0, rBase: 0, rNext: 0, sState: [], rState: [], packets: [] },
+            { title: "Pipelining Frames", desc: "The sender pushes multiple frames (0-3) onto the network simultaneously. This 'pipelining' prevents the network from sitting idle waiting for single ACKs.", sBase: 0, sNext: 4, rBase: 0, rNext: 0, sState: [0, 1, 2, 3], rState: [], packets: [{ v: 0, p: 0.8, t: 'data' }, { v: 1, p: 0.6, t: 'data' }, { v: 2, p: 0.4, t: 'data' }, { v: 3, p: 0.2, t: 'data' }] },
+            { title: "In-Order Delivery", desc: "Frame 0 arrives safely. It matches R_expected (0). The receiver accepts it, increments R_expected, and sends back a cumulative ACK 1 (saying 'I am ready for 1').", sBase: 0, sNext: 4, rBase: 1, rNext: 1, sState: [0, 1, 2, 3], rState: [0], packets: [{ v: 1, p: 0.5, t: 'ack' }, { v: 1, p: 0.8, t: 'data' }, { v: 2, p: 0.6, t: 'data' }, { v: 3, p: 0.4, t: 'data' }] },
+            { title: "Sliding The Window", desc: "ACK 1 arrives! S_base slides forward to 1. This confirmation creates space in the sender's window, allowing it to inject frame 4 into the network.", sBase: 1, sNext: 5, rBase: 1, rNext: 1, sState: [1, 2, 3, 4], rState: [0], packets: [{ v: 4, p: 0.2, t: 'data' }, { v: 2, p: 0.8, t: 'data' }] },
+            { title: "Network Loss", desc: "Frame 2 gets dropped in transit. Frame 1 arrives safely, R_expected becomes 2, and ACK 2 is sent. The receiver is now strictly waiting for frame 2.", sBase: 1, sNext: 5, rBase: 2, rNext: 2, sState: [2, 3, 4], rState: [0, 1], packets: [{ v: 2, p: 0.5, t: 'data', lost: true }, { v: 3, p: 0.8, t: 'data' }, { v: 4, p: 0.6, t: 'data' }] },
+            { title: "Strict Ordering Flaw", desc: "Frames 3 and 4 arrive safely, but R_expected is stuck at 2. GBN absolutely requires in-order delivery. It drops 3 and 4 entirely and stubbornly repeats ACK 2.", sBase: 1, sNext: 5, rBase: 2, rNext: 2, sState: [2, 3, 4], rState: [0, 1], packets: [{ v: 2, p: 0.4, t: 'ack' }, { v: 3, p: 1.0, t: 'data', rej: true }, { v: 4, p: 0.8, t: 'data', rej: true }] },
+            { title: "Sender Timeout", desc: "The sender's timer for frame 2 expires. Because no ACK greater than 2 arrived, GBN pessimistically assumes everything from S_base onward was destroyed.", sBase: 2, sNext: 2, rBase: 2, rNext: 2, sState: [], rState: [0, 1], packets: [] },
+            { title: "Go-Back-N Retransmission", desc: "The defining moment of GBN: The sender rolls S_next back to S_base (2) and retransmits the ENTIRE window (2, 3, and 4), wasting bandwidth on 3 and 4.", sBase: 2, sNext: 5, rBase: 2, rNext: 2, sState: [2, 3, 4], rState: [0, 1], packets: [{ v: 2, p: 0.1, t: 'data' }, { v: 3, p: 0.08, t: 'data' }, { v: 4, p: 0.06, t: 'data' }] },
+            { title: "System Recovery", desc: "Frame 2 finally arrives! It matches R_expected. The receiver accepts it, increments R_expected, and the system restores perfect synchronization.", sBase: 2, sNext: 5, rBase: 3, rNext: 3, sState: [2, 3, 4], rState: [0, 1, 2], packets: [{ v: 3, p: 0.5, t: 'ack' }] }
+        ];
+
+        const SR_STEPS = [
+            { title: "Setup Parameters", desc: "Window Size = 4. Selective Repeat (SR) uses two full windows. The receiver has its own buffer to catch out-of-order packets, breaking GBN's strict dependency.", sBase: 0, sNext: 0, rBase: 0, rNext: 0, sState: [], rState: [], packets: [] },
+            { title: "Pipelining Frames", desc: "Just like GBN, the sender transmits frames 0-3 simultaneously. Both protocols rely on this burst behavior for high throughput.", sBase: 0, sNext: 4, rBase: 0, rNext: 0, sState: [0, 1, 2, 3], rState: [], packets: [{ v: 0, p: 0.8, t: 'data' }, { v: 1, p: 0.6, t: 'data' }, { v: 2, p: 0.4, t: 'data' }, { v: 3, p: 0.2, t: 'data' }] },
+            { title: "Individual ACKs", desc: "Frame 0 arrives. Unlike GBN's cumulative ACKs ('ready for 1'), SR sends an individual ACK ('I received exactly 0'). R_base slides forward.", sBase: 0, sNext: 4, rBase: 1, rNext: 1, sState: [0, 1, 2, 3], rState: [0], packets: [{ v: 0, p: 0.5, t: 'ack' }, { v: 1, p: 0.8, t: 'data' }, { v: 2, p: 0.6, t: 'data' }, { v: 3, p: 0.4, t: 'data' }] },
+            { title: "Network Loss", desc: "Frame 2 disappears. Frame 1 arrives safely, confirming its receipt with ACK 1, and the receiver slides R_base. Sender sees ACK 0 and sends frame 4.", sBase: 1, sNext: 5, rBase: 1, rNext: 1, sState: [1, 2, 3, 4], rState: [0], packets: [{ v: 2, p: 0.5, t: 'data', lost: true }, { v: 1, p: 1.0, t: 'data' }, { v: 3, p: 0.8, t: 'data' }, { v: 4, p: 0.6, t: 'data' }] },
+            { title: "Out-of-Order Buffering", desc: "THE FIX: Frames 3 and 4 arrive. R_base is stuck at 2, but 3 and 4 fit inside the receiver's window! Receiver BUFFERS them and sends individual ACKs for 3 & 4.", sBase: 2, sNext: 5, rBase: 2, rNext: 5, sState: [2, 3, 4], rState: [0, 1, 3, 4], packets: [{ v: 3, p: 0.4, t: 'ack' }, { v: 4, p: 0.2, t: 'ack' }] },
+            { title: "Sender State", desc: "Sender receives ACKs for 3 and 4 and marks them done. But S_base CANNOT slide because frame 2 is still unacknowledged entirely.", sBase: 2, sNext: 5, rBase: 2, rNext: 5, sState: [2, 3, 4], rState: [0, 1, 3, 4], packets: [] },
+            { title: "Selective Timeout", desc: "The independent timer for frame 2 expires. SR behaves surgically: it ONLY resends the missing frame 2, saving network bandwidth.", sBase: 2, sNext: 5, rBase: 2, rNext: 5, sState: [2, 3, 4], rState: [0, 1, 3, 4], packets: [{ v: 2, p: 0.1, t: 'data' }] },
+            { title: "Receiver Cascade", desc: "Frame 2 arrives! R_base moves to 3, but wait—3 & 4 are already buffered! The receiver delivers 2, 3, and 4 instantly, cascading R_base all the way forward to 5.", sBase: 2, sNext: 5, rBase: 5, rNext: 5, sState: [2, 3, 4], rState: [0, 1, 2, 3, 4], packets: [{ v: 2, p: 0.5, t: 'ack' }] },
+            { title: "Full Synchronization", desc: "The sender receives ACK 2. Since 3 and 4 were marked done, S_base jumps directly to 5. Both sender and receiver arrays are now perfectly synced.", sBase: 5, sNext: 5, rBase: 5, rNext: 5, sState: [], rState: [0, 1, 2, 3, 4], packets: [] }
+        ];
+
+        let mode = 'gbn';
+        let currentSteps = GBN_STEPS;
+        let currentStep = 0;
+        let isPlaying = false;
+        let playInterval = null;
+
+        function setMode(m) {
+            stop();
+            mode = m;
+            currentSteps = (m === 'gbn') ? GBN_STEPS : SR_STEPS;
+            document.getElementById('btn-gbn').classList.toggle('active', m === 'gbn');
+            document.getElementById('btn-sr').classList.toggle('active', m === 'sr');
+            document.getElementById('currentModeLabel').innerText = (m === 'gbn') ? 'Go-Back-N' : 'Selective Repeat';
+            document.getElementById('infoTitle').innerText = 'Mode: ' + (m === 'gbn' ? 'Go-Back-N' : 'Selective Repeat');
+
+            // Re-label 4th pointer
+            document.getElementById('ptr-r-next').setAttribute('data-label', m === 'gbn' ? 'R_expected' : 'R_buffered_end');
+
+            restart();
+        }
+
+        function init() {
+            const create = (id, p) => {
+                const r = document.getElementById(id); r.innerHTML = '';
+                for (let i = 0; i < 8; i++) { const c = document.createElement('div'); c.className = 'cell'; c.id = p + '-c-' + i; c.innerText = i; r.appendChild(c); }
+            };
+            create('senderRow', 's'); create('receiverRow', 'r');
+            setMode('gbn');
+        }
+
+        function updateUI() {
+            const s = currentSteps[currentStep];
+            document.getElementById('stepCurrent').innerText = currentStep;
+            document.getElementById('stepTotal').innerText = currentSteps.length - 1;
+            document.getElementById('infoText').innerText = s.desc;
+
+            for (let i = 0; i < 8; i++) {
+                const sc = document.getElementById('s-c-' + i); sc.className = 'cell' + (s.sState.includes(i) ? ' sent' : '');
+                const rc = document.getElementById('r-c-' + i);
+                rc.className = 'cell';
+                if (s.rState.includes(i)) {
+                    // In SR, if it's accepted but not at base, it's buffered
+                    if (mode === 'sr' && i >= s.rBase) rc.classList.add('buffered');
+                    else rc.classList.add('received');
+                }
+            }
+
+            const win = (id, base, p) => {
+                const w = document.getElementById(id); const c = document.getElementById(p + '-c-' + base);
+                if (!c) return;
+                w.style.left = (c.offsetLeft - 6) + 'px'; w.style.width = (48 * 4 + 8 * 3 + 12) + 'px';
+            };
+            win('senderWindow', s.sBase, 's'); win('receiverWindow', s.rBase, 'r');
+
+            const ptr = (id, idx, p) => {
+                const el = document.getElementById(id); const c = document.getElementById(p + '-c-' + Math.min(idx, 7));
+                if (!c) return;
+                let l = c.offsetLeft + 24; if (idx > 7) l += 30;
+                el.style.left = l + 'px';
+            };
+            ptr('ptr-s-base', s.sBase, 's'); ptr('ptr-s-next', s.sNext, 's');
+            ptr('ptr-r-base', s.rBase, 'r'); ptr('ptr-r-next', s.rNext, 'r');
+
+            const med = document.getElementById('networkMedium'); med.innerHTML = '';
+            s.packets.forEach(p => {
+                const d = document.createElement('div'); d.className = 'packet ' + p.t + (p.lost ? ' lost' : '');
+                d.innerText = (p.t === 'data' ? 'F' : 'A') + p.v + (p.rej ? ' ❌' : '');
+                const start = p.t === 'data' ? 40 : med.clientWidth - 40, end = p.t === 'data' ? med.clientWidth - 40 : 40;
+                d.style.left = (start + (end - start) * p.p) + 'px';
+                med.appendChild(d);
+                if (p.lost) setTimeout(() => d.classList.add('lost'), 50);
+            });
+
+            const list = document.getElementById('stepList'); list.innerHTML = '';
+            currentSteps.forEach((st, i) => {
+                const div = document.createElement('div'); div.className = 'step-item ' + (i === currentStep ? 'active' : '');
+                div.onclick = () => goToStep(i);
+                div.innerHTML = `<span class="step-num">STEP ${i}</span><div class="step-title">${st.title}</div>`;
+                list.appendChild(div);
+                if (i === currentStep) div.scrollIntoView({ block: 'nearest' });
+            });
+
+            document.getElementById('prevBtn').disabled = currentStep === 0;
+            document.getElementById('nextBtn').disabled = currentStep === currentSteps.length - 1;
+        }
+
+        function nextStep() { if (currentStep < currentSteps.length - 1) { currentStep++; updateUI(); } else stop(); }
+        function prevStep() { if (currentStep > 0) { currentStep--; updateUI(); } }
+        function goToStep(i) { currentStep = i; updateUI(); }
+        function restart() { currentStep = 0; updateUI(); }
+        function togglePlay() { isPlaying ? stop() : play(); }
+        function play() { isPlaying = true; document.getElementById('playPauseBtn').innerText = '⏸'; playInterval = setInterval(nextStep, 1500); }
+        function stop() { isPlaying = false; document.getElementById('playPauseBtn').innerText = '▶'; clearInterval(playInterval); }
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>
