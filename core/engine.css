@@ -1,0 +1,494 @@
+/* core/engine.css */
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #ffffff;
+    --bg2: #f8f9fc;
+    --bg3: #f1f3f8;
+    --card-bg: #ffffff;
+    --code-bg: #fafbfe;
+    --border: #e2e5ef;
+    --text: #1a1d2e;
+    --text-secondary: #4a5068;
+    --text-dim: #8891a8;
+    --accent: #4f46e5;
+    --accent-light: #ede9fe;
+    --accent2: #7c3aed;
+    --emerald: #059669;
+    --emerald-bg: #ecfdf5;
+    --orange: #ea580c;
+    --orange-bg: #fff7ed;
+    --pink: #db2777;
+    --pink-light: #fce7f3;
+    --cyan: #0891b2;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+    --highlight-line: rgba(79, 70, 229, 0.06);
+    --radius: 14px;
+    --radius-sm: 10px;
+}
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg2);
+    color: var(--text);
+    min-height: 100vh;
+    overflow: hidden; /* App feels like an IDE now */
+    display: flex;
+    flex-direction: column;
+}
+
+/* HEADER & CONTROLS */
+.header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+}
+
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .2s;
+}
+
+.back-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.header .badge {
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.header h1 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.header .tag {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.controls-bar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 24px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    min-height: 52px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-group label {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+}
+
+.input-group input[type="text"] {
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    color: var(--accent);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    width: 280px;
+    outline: none;
+    transition: border-color .2s;
+}
+
+.input-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+}
+
+.btn-run {
+    background: var(--accent);
+    color: #fff;
+    margin-right: 8px;
+}
+
+.btn-run:hover {
+    background: var(--accent2);
+    box-shadow: var(--shadow-md);
+}
+
+.playback {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+}
+
+.playback button {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all .15s;
+}
+
+.playback button:hover,
+.playback button.active {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.speed-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 6px;
+}
+
+.speed-group label {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 500;
+}
+
+.speed-slider {
+    -webkit-appearance: none;
+    width: 72px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+}
+
+.speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(79, 70, 229, 0.3);
+}
+
+.step-info {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.step-info span {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* MAIN LAYOUT (Resizable Grid) */
+.main-split {
+    display: flex;
+    height: 100%;
+    flex: 1;
+    overflow: hidden;
+}
+
+.pane {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.code-pane {
+    width: 460px; /* Default width */
+    min-width: 250px;
+    background: var(--code-bg);
+}
+
+.resizer {
+    width: 6px;
+    cursor: col-resize;
+    background: var(--border);
+    transition: background 0.2s;
+    user-select: none;
+}
+
+.resizer:hover, .resizer.dragging {
+    background: var(--accent);
+}
+
+.viz-pane {
+    flex: 1;
+    min-width: 400px;
+    background: var(--bg2);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 24px;
+    gap: 20px;
+}
+
+/* CODE PANEL STYLES */
+.code-panel {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.code-panel::-webkit-scrollbar {
+    width: 5px;
+}
+
+.code-panel::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+.code-title {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(250, 251, 254, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 600;
+}
+
+.code-title .dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-red { background: #ff5f56; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green { background: #27c93f; }
+
+.code-lines {
+    padding: 12px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.85;
+}
+
+.code-line {
+    display: flex;
+    padding: 0 16px 0 0;
+    transition: background .2s;
+    position: relative;
+    cursor: pointer;
+}
+
+.code-line.active {
+    background: var(--highlight-line);
+    border-left: 3px solid var(--accent);
+}
+
+.code-line.active .line-num {
+    color: var(--accent);
+}
+
+.line-num {
+    display: inline-block;
+    width: 42px;
+    text-align: right;
+    padding-right: 16px;
+    color: #c8cdd8;
+    user-select: none;
+    flex-shrink: 0;
+    font-size: 11px;
+}
+
+.line-content {
+    white-space: pre;
+    color: var(--text);
+}
+
+.kw { color: #8b5cf6; font-weight: 500; }
+.tp { color: #0891b2; }
+.fn { color: #2563eb; }
+.str { color: #059669; }
+.num { color: #ea580c; }
+.op { color: #64748b; }
+.br { color: #94a3b8; }
+.ret { color: #dc2626; font-weight: 500; }
+
+/* VIZ PANEL STYLES */
+.viz-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow-sm);
+    /* By default let cards set their height based on content */
+    display: flex;
+    flex-direction: column;
+}
+
+/* User wants extendable/zoomable logic. We encapsulate spaces. */
+.zoomable-container {
+    width: 100%;
+    min-height: 250px;
+    /* Allow card to resize if user drags corner */
+    resize: vertical; 
+    overflow: hidden; /* Hide outer scroll. Panning inside canvas */
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    border-radius: var(--radius-sm);
+    position: relative;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.zoomable-container:active {
+    cursor: grabbing;
+}
+
+.zoomable-canvas {
+    /* Transforms managed via JS */
+    position: absolute;
+    transform-origin: 0 0;
+    /* Make canvas infinite essentially, elements rely on abspos or layout */
+    will-change: transform;
+    pointer-events: none; /* Let parent handle drag */
+}
+
+/* Allow children in canvas to respond to events if needed */
+.zoomable-canvas > * {
+    pointer-events: auto;
+}
+
+.section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Base generic state trackers */
+.state-tracker {
+    background: var(--orange-bg);
+    border: 1px solid var(--orange);
+    color: var(--orange);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.state-tracker span.label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--orange);
+    opacity: 0.8;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Step texts */
+.step-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+.step-text .hl-accent { color: var(--accent); font-weight: 600; }
+.step-text .hl-emerald { color: var(--emerald); font-weight: 600; }
+.step-text .hl-orange { color: var(--orange); font-weight: 600; }
+.step-text .hl-pink { color: var(--pink); font-weight: 600; }
+
+.welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    gap: 14px;
+    padding: 40px;
+}
+
+.welcome-icon { font-size: 56px; margin-bottom: 4px; }
+.welcome h2 { font-size: 20px; font-weight: 700; color: var(--text); }
+.welcome p { color: var(--text-secondary); font-size: 14px; max-width: 380px; line-height: 1.6; }
+
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+    animation: fadeSlideIn .3s ease forwards;
+}
