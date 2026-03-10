@@ -387,7 +387,7 @@
                 // TREE VISUALIZATION
                 const ts = step.treeVisualState;
                 let treeHtml = `<div class="tree-container">`;
-                let svgHtml = '<svg class="tree-svg">';
+                let svgHtml = '<svg class="tree-svg" xmlns="http://www.w3.org/2000/svg">';
 
                 if (ts && ts.edges) {
                     ts.edges.forEach(e => {

@@ -331,7 +331,7 @@
             onRenderStep: (step, container, eng) => {
                 // TREE VISUALIZATION
                 let treeHtml = `<div class="tree-container">`;
-                let svgHtml = '<svg class="tree-svg">';
+                let svgHtml = '<svg class="tree-svg" xmlns="http://www.w3.org/2000/svg">';
                 treeNodes.forEach(n => {
                     if (n.left) svgHtml += `<line x1="${n.x}" y1="${n.y}" x2="${n.left.x}" y2="${n.left.y}" class="tree-edge ${step.activeNode === n.left.id || step.activeNode === n.id ? 'active' : ''}" />`;
                     if (n.right) svgHtml += `<line x1="${n.x}" y1="${n.y}" x2="${n.right.x}" y2="${n.right.y}" class="tree-edge ${step.activeNode === n.right.id || step.activeNode === n.id ? 'active' : ''}" />`;
@@ -370,7 +370,7 @@
 
                     if (step.arrowType && step.stack.length > 1) {
                         stackHtml += `
-                        <svg class="stack-arrows">
+                        <svg class="stack-arrows" xmlns="http://www.w3.org/2000/svg">
                             <defs>
                                 <marker id="arrowhead-call" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
                                     <polygon points="0 0, 6 3, 0 6" fill="var(--accent)" />

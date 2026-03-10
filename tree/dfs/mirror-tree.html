@@ -410,7 +410,7 @@
                 // TREE VISUALIZATION
                 const ts = step.treeVisualState;
                 let treeHtml = `<div class="tree-container">`;
-                let svgHtml = '<svg class="tree-svg">';
+                let svgHtml = '<svg class="tree-svg" xmlns="http://www.w3.org/2000/svg">';
 
                 if (ts && ts.edges) {
                     ts.edges.forEach(e => {
@@ -462,7 +462,7 @@
 
                     if (step.arrowType && step.stack.length > 1) {
                         stackHtml += `
-                        <svg class="stack-arrows">
+                        <svg class="stack-arrows" xmlns="http://www.w3.org/2000/svg">
                             <defs>
                                 <marker id="arrowhead-call" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
                                     <polygon points="0 0, 6 3, 0 6" fill="var(--accent)" />

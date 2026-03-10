@@ -10,7 +10,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="../../core/engine.css">
+    <link rel="stylesheet" href="../core/engine.css">
     <style>
         /* RESULTS DP STATE */
         .dp-state {
@@ -270,7 +270,7 @@
 </head>
 
 <body>
-    <script src="../../core/engine.js"></script>
+    <script src="../core/engine.js"></script>
     <script>
         const CODE_LINES = [
             { tokens: [{ t: 'kw', v: 'class' }, { t: 'tp', v: ' Solution' }, { t: 'br', v: ' {' }] },
@@ -474,7 +474,7 @@
                 let twWidth = ts && ts.maxWidth ? Math.max(600, ts.maxWidth + 100) : 600;
                 let twHtml = `<div class="tree-wrapper" style="min-width: ${twWidth}px;">`;
 
-                let svgHtml = '<svg class="tree-svg">';
+                let svgHtml = '<svg class="tree-svg" xmlns="http://www.w3.org/2000/svg">';
                 if (ts && ts.edges) {
                     ts.edges.forEach(e => {
                         const sourceNode = ts.nodes.find(n => n.id === e.source);
@@ -529,7 +529,7 @@
 
                     if (step.arrowType && step.stack.length > 0) {
                         stackHtml += `
-                        <svg class="stack-arrows">
+                        <svg class="stack-arrows" xmlns="http://www.w3.org/2000/svg">
                             <defs>
                                 <marker id="arrowhead-call" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
                                     <polygon points="0 0, 6 3, 0 6" fill="var(--accent)" />
