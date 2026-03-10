@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Longest Repeating Character Replacement</title>
     <meta name="description"
-        content="Interactive visualizer for LeetCode 424: Longest Repeating Character Replacement (Brute Force & Optimal Sliding Window).">
+        content="Interactive visualizer for LeetCode 424: Longest Repeating Character Replacement (Brute Force, Better, Optimal).">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
@@ -274,7 +274,35 @@
 <body>
     <script src="../../core/engine.js"></script>
     <script>
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
         const CODE_BRUTE = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'int ' }, { t: 'fn', v: 'characterReplacement' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'k' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'maxLen ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'i ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'j ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'i' }, { t: 'op', v: '; ' }, { t: 'v', v: 'j < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'j++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'isValidSubstring(s, i, j, k)' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                    maxLen ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'Math.max(maxLen, j - i + 1)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '                }' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'maxLen' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [] },
+            { tokens: [{ t: 'kw', v: '    private ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isValidSubstring' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'start' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'end' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'k' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        int' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'count ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'int' }, { t: 'br', v: '[' }, { t: 'num', v: '26' }, { t: 'br', v: ']' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'maxf ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'm ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'start' }, { t: 'op', v: '; ' }, { t: 'v', v: 'm <= end' }, { t: 'op', v: '; ' }, { t: 'v', v: 'm++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '            count[s.charAt(m) - ' }, { t: 'str', v: "'A'" }, { t: 'v', v: ']++;' }] },
+            { tokens: [{ t: 'v', v: '            maxf ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'Math.max(maxf, count[s.charAt(m) - ' }, { t: 'str', v: "'A'" }, { t: 'v', v: '])' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'br', v: '(' }, { t: 'v', v: 'end - start + 1' }, { t: 'br', v: ')' }, { t: 'v', v: ' - maxf <= k' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] }
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
+
+        const CODE_BETTER = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
             { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'int ' }, { t: 'fn', v: 'characterReplacement' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'k' }, { t: 'br', v: ') {' }] },
             { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'maxLen ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
@@ -292,7 +320,7 @@
             { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'maxLen' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] }
-        ];
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
 
         const CODE_OPTIMAL = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
@@ -311,7 +339,7 @@
             { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'maxLen' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
-        ];
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
 
         let mode = 'optimal';
 
@@ -324,6 +352,53 @@
         }
 
         function generateBruteTrace(s, k) {
+            const steps = [];
+            let maxLen = 0;
+
+            steps.push({ line: 2, desc: `Initialize maxLen = 0`, i: -1, j: -1, m: -1, countMap: {}, maxf: 0, maxLen, str: s, k });
+
+            for (let i = 0; i < s.length; i++) {
+                steps.push({ line: 3, desc: `Outer Loop <b>i=${i}</b>`, i, j: -1, m: -1, countMap: {}, maxf: 0, maxLen, str: s, k });
+
+                for (let j = i; j < s.length; j++) {
+                    steps.push({ line: 4, desc: `Inner Loop <b>j=${j}</b>. Examining substring "${s.substring(i, j + 1)}".`, i, j, m: -1, countMap: {}, maxf: 0, maxLen, str: s, k });
+
+                    steps.push({ line: 13, desc: `Call <b>isValidSubstring(s, ${i}, ${j}, ${k})</b>`, i, j, m: -1, countMap: {}, maxf: 0, maxLen, str: s, k });
+                    const count = new Array(26).fill(0);
+                    let maxf = 0;
+                    steps.push({ line: 14, desc: `Create new count array[26] and maxf = 0.`, i, j, m: -1, countMap: {}, maxf: 0, maxLen, str: s, k });
+
+                    for (let m = i; m <= j; m++) {
+                        const ch = s[m];
+                        count[ch.charCodeAt(0) - 65]++;
+                        steps.push({ line: 17, desc: `Loop m = ${m}, char = '${ch}'. Increment count['${ch}'].`, i, j, m, countMap: toMap(count), maxf, maxLen, str: s, k });
+
+                        maxf = Math.max(maxf, count[ch.charCodeAt(0) - 65]);
+                        steps.push({ line: 18, desc: `Update maxf = Math.max(maxf, count['${ch}']) = ${maxf}`, i, j, m, countMap: toMap(count), maxf, maxLen, str: s, k });
+                    }
+
+                    const curLen = j - i + 1;
+                    const isValid = (curLen - maxf) <= k;
+
+                    if (isValid) {
+                        steps.push({ line: 20, desc: `Len(${curLen}) - maxf(${maxf}) = ${curLen - maxf} <= k(${k}). Valid! Return <b>true</b>.`, i, j, m: -1, countMap: toMap(count), maxf, maxLen, str: s, k, isValidSubstringRet: true });
+                        if (curLen > maxLen) {
+                            maxLen = curLen;
+                            steps.push({ line: 6, desc: `Valid substring! Update maxLen = Math.max(${maxLen - 1}, ${curLen}) = ${maxLen}`, i, j, m: -1, countMap: toMap(count), maxf, maxLen, str: s, k, hlMaxLen: true });
+                        } else {
+                            steps.push({ line: 6, desc: `Valid substring! maxLen remains ${maxLen}`, i, j, m: -1, countMap: toMap(count), maxf, maxLen, str: s, k });
+                        }
+                    } else {
+                        steps.push({ line: 20, desc: `Len(${curLen}) - maxf(${maxf}) = ${curLen - maxf} > k(${k}). Invalid! Return <b>false</b>.`, i, j, m: -1, countMap: toMap(count), maxf, maxLen, str: s, k, isInvalid: true });
+                        steps.push({ line: 5, desc: `isValidSubstring returned false. Do not update maxLen.`, i, j, m: -1, countMap: toMap(count), maxf, maxLen, str: s, k, isInvalid: true });
+                    }
+                }
+            }
+            steps.push({ line: 10, desc: `Return maxLen = ${maxLen}`, i: -1, j: -1, m: -1, countMap: {}, maxf: 0, maxLen, str: s, k });
+            return steps;
+        }
+
+        function generateBetterTrace(s, k) {
             const steps = [];
             let maxLen = 0;
 
@@ -417,22 +492,33 @@
                 let k = parseInt(document.getElementById('inputK').value);
                 if (isNaN(k) || k < 0) k = 1;
 
-                return mode === 'brute' ? generateBruteTrace(s, k) : generateOptimalTrace(s, k);
+                if (mode === 'brute') return generateBruteTrace(s, k);
+                if (mode === 'better') return generateBetterTrace(s, k);
+                return generateOptimalTrace(s, k);
             },
             onRenderStep: (step, container, eng) => {
-                let p1 = mode === 'brute' ? step.i : step.L;
-                let p2 = mode === 'brute' ? step.j : step.R;
-                let p1Label = mode === 'brute' ? 'i' : 'L';
-                let p2Label = mode === 'brute' ? 'j' : 'R';
-                let p1Class = 'l-ptr';
-                let p2Class = 'r-ptr';
+                let p1 = mode === 'optimal' ? step.L : step.i;
+                let p2 = mode === 'optimal' ? step.R : step.j;
+                let p3 = step.m !== undefined ? step.m : -1;
+
+                let p1Label = mode === 'optimal' ? 'L' : 'i';
+                let p2Label = mode === 'optimal' ? 'R' : 'j';
+
+                let p1Class = mode === 'optimal' ? 'l-ptr' : 'i-ptr';
+                let p2Class = mode === 'optimal' ? 'r-ptr' : 'j-ptr';
 
                 // DP / Vars
                 let varsHtml = `<div style="display: flex; gap: 16px; flex-wrap: wrap;">`;
                 varsHtml += `<div class="var-box"><span class="var-name">maxLen</span><span class="var-val${step.hlMaxLen ? ' hl' : ''}">${step.maxLen}</span></div>`;
-                varsHtml += `<div class="var-box"><span class="var-name">maxf</span><span class="var-val hl">${step.maxf}</span></div>`;
-                if (p1 >= 0) varsHtml += `<div class="var-box"><span class="var-name">${p1Label}</span><span class="var-val hl-orange">${p1}</span></div>`;
-                if (p2 >= 0) varsHtml += `<div class="var-box"><span class="var-name">${p2Label}</span><span class="var-val hl-accent">${p2}</span></div>`;
+                if (mode !== 'optimal') {
+                    if (p1 >= 0) varsHtml += `<div class="var-box"><span class="var-name">i</span><span class="var-val hl-orange">${p1}</span></div>`;
+                    if (p2 >= 0) varsHtml += `<div class="var-box"><span class="var-name">j</span><span class="var-val hl-accent">${p2}</span></div>`;
+                    if (p3 >= 0) varsHtml += `<div class="var-box"><span class="var-name">m</span><span class="var-val hl-pink">${p3}</span></div>`;
+                } else {
+                    varsHtml += `<div class="var-box"><span class="var-name">maxf</span><span class="var-val hl">${step.maxf}</span></div>`;
+                    if (p1 >= 0) varsHtml += `<div class="var-box"><span class="var-name">L</span><span class="var-val hl-orange">${p1}</span></div>`;
+                    if (p2 >= 0) varsHtml += `<div class="var-box"><span class="var-name">R</span><span class="var-val hl-accent">${p2}</span></div>`;
+                }
                 varsHtml += `</div>`;
 
                 // HashMap Render
@@ -442,13 +528,15 @@
                 }
 
                 let freqHtml = `<div class="freq-grid">`;
-                if (Object.keys(step.countMap).length === 0) freqHtml += `<span style="color: var(--text-dim); font-size: 13px; grid-column: span 4;">(Empty)</span>`;
-                for (let k in step.countMap) {
-                    const isMax = k === maxfChar && step.maxf > 0 ? " is-max" : "";
-                    freqHtml += `<div class="freq-item${isMax}">
-                                    <span class="freq-char">${k}</span>
-                                    <span class="freq-count">${step.countMap[k]}</span>
-                                 </div>`;
+                if (!step.countMap || Object.keys(step.countMap).length === 0) freqHtml += `<span style="color: var(--text-dim); font-size: 13px; grid-column: span 4;">(Empty)</span>`;
+                else {
+                    for (let k in step.countMap) {
+                        const isMax = k === maxfChar && step.maxf > 0 ? " is-max" : "";
+                        freqHtml += `<div class="freq-item${isMax}">
+                                        <span class="freq-char">${k}</span>
+                                        <span class="freq-count">${step.countMap[k]}</span>
+                                     </div>`;
+                    }
                 }
                 freqHtml += `</div>`;
                 let mapPanel = `<div class="freq-container"><div class="freq-title">Character Frequencies</div>${freqHtml}</div>`;
@@ -460,7 +548,9 @@
                     let cls = '';
                     if (p1 >= 0 && p2 >= 0 && idx >= p1 && idx <= p2) {
                         cls = ' in-window';
-                        if (c !== maxfChar && step.maxf > 0) {
+                        if (c !== maxfChar && step.maxf > 0 &&
+                            // Only show replacements in optimal or better where maxf logic is applied inline
+                            (mode === 'optimal' || mode === 'better' || (mode === 'brute' && step.isValidSubstringRet))) {
                             cls = step.isInvalid ? ' invalid' : ' replaced';
                         }
                     }
@@ -471,12 +561,10 @@
                         </div>`;
                 }
 
-                if (p1 >= 0 && step.str.length > 0) {
-                    arrayHtml += `<div class="ptr ${p1Class}" id="ptr1"><div>${p1Label}</div><div class="ptr-arrow">↓</div></div>`;
-                }
-                if (p2 >= 0 && step.str.length > 0) {
-                    arrayHtml += `<div class="ptr ${p2Class}" id="ptr2"><div>${p2Label}</div><div class="ptr-arrow">↓</div></div>`;
-                }
+                if (p1 >= 0 && step.str.length > 0) arrayHtml += `<div class="ptr ${p1Class}" id="ptr1"><div>${p1Label}</div><div class="ptr-arrow">↓</div></div>`;
+                if (p2 >= 0 && step.str.length > 0) arrayHtml += `<div class="ptr ${p2Class}" id="ptr2"><div>${p2Label}</div><div class="ptr-arrow">↓</div></div>`;
+                if (p3 >= 0 && step.str.length > 0) arrayHtml += `<div class="ptr" style="color:var(--pink)" id="ptr3"><div>m</div><div class="ptr-arrow">↓</div></div>`;
+
                 if (p1 >= 0 && p2 >= 0) {
                     const winClass = step.isInvalid ? ' invalid-win' : '';
                     arrayHtml += `<div class="window-box${winClass}" id="winBox"></div>`;
@@ -500,14 +588,23 @@
                     if (ptr1) { ptr1.style.left = getPtrLeft(p1) + 'px'; }
 
                     const ptr2 = document.getElementById('ptr2');
-                    if (ptr2) {
-                        if (p1 === p2) {
-                            ptr1.style.transform = `translateY(-15px)`;
-                            ptr1.innerHTML = `<div>${p1Label},${p2Label}</div><div class="ptr-arrow">↓</div>`;
-                            ptr2.style.display = 'none';
-                        } else {
-                            ptr2.style.left = getPtrLeft(p2) + 'px';
-                        }
+                    if (ptr2) { ptr2.style.left = getPtrLeft(p2) + 'px'; }
+
+                    const ptr3 = document.getElementById('ptr3');
+                    if (ptr3) { ptr3.style.left = getPtrLeft(p3) + 'px'; }
+
+                    let overlap12 = p1 === p2;
+                    let overlap23 = p2 === p3;
+
+                    if (overlap12 && ptr1 && ptr2) {
+                        ptr1.style.transform = `translateY(-15px)`;
+                        ptr1.innerHTML = `<div>${p1Label},${p2Label}</div><div class="ptr-arrow">↓</div>`;
+                        ptr2.style.display = 'none';
+                    }
+                    if (overlap23 && ptr2 && ptr3) {
+                        ptr2.style.transform = `translateY(-15px)`;
+                        ptr2.innerHTML = `<div>${p2Label},m</div><div class="ptr-arrow">↓</div>`;
+                        ptr3.style.display = 'none';
                     }
 
                     const win = document.getElementById('winBox');
@@ -527,8 +624,9 @@
             const controlsBar = document.querySelector('.controls-bar');
             const modeToggleHTML = `
                 <div class="mode-toggle">
-                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force</button>
-                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Sliding Window)</button>
+                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute (O(n³))</button>
+                    <button class="mode-btn" id="btn-better" onclick="setMode('better')">Better (O(n²))</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (O(n))</button>
                 </div>
             `;
             controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
@@ -540,9 +638,13 @@
             engine.stopPlay();
             mode = m;
             document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-better').classList.toggle('active', m === 'better');
             document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
 
-            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
+            if (m === 'brute') engine.codeLines = CODE_BRUTE;
+            else if (m === 'better') engine.codeLines = CODE_BETTER;
+            else engine.codeLines = CODE_OPTIMAL;
+
             engine._renderCodeBlock();
             engine.run();
         };

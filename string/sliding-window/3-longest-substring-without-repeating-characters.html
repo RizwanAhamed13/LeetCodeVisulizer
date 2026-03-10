@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Longest Substring Without Repeating Characters</title>
     <meta name="description"
-        content="Interactive visualizer for LeetCode 3: Longest Substring Without Repeating Characters (Brute Force & Optimal Sliding Window).">
+        content="Interactive visualizer for LeetCode 3: Longest Substring Without Repeating Characters (Brute Force, Better, Optimal).">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
@@ -255,7 +255,35 @@
 <body>
     <script src="../../core/engine.js"></script>
     <script>
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
         const CODE_BRUTE = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'int ' }, { t: 'fn', v: 'lengthOfLongestSubstring' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'maxLen ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'i ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'j ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'i' }, { t: 'op', v: '; ' }, { t: 'v', v: 'j < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'j++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'checkDuplicates(s, i, j)' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                    maxLen ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'Math.max(maxLen, j - i + 1)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '                }' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'maxLen' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [] },
+            { tokens: [{ t: 'kw', v: '    private ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'checkDuplicates' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'start' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'end' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        Set<Character> ' }, { t: 'v', v: 'set ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'HashSet<>()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'k ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'start' }, { t: 'op', v: '; ' }, { t: 'v', v: 'k <= end' }, { t: 'op', v: '; ' }, { t: 'v', v: 'k++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            char ' }, { t: 'v', v: 'c ' }, { t: 'op', v: '= ' }, { t: 'v', v: 's.charAt(k)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'set.contains(c)' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '            set.add(c)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return true' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] }
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
+
+        const CODE_BETTER = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
             { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'int ' }, { t: 'fn', v: 'lengthOfLongestSubstring' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
             { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'maxLen ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
@@ -270,7 +298,7 @@
             { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'maxLen' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
-        ];
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
 
         const CODE_OPTIMAL = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
@@ -288,13 +316,59 @@
             { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'maxLen' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
-        ];
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
 
         let mode = 'optimal';
 
         function generateBruteTrace(s) {
             const steps = [];
-            const chars = s.split('');
+            let maxLen = 0;
+
+            steps.push({ line: 2, desc: `Initialize <span class="hl-accent">maxLen = 0</span>`, i: -1, j: -1, k: -1, set: [], maxLen: 0, str: s });
+
+            for (let i = 0; i < s.length; i++) {
+                steps.push({ line: 3, desc: `Outer Loop <b>i=${i}</b>`, i, j: -1, k: -1, set: [], maxLen, str: s });
+
+                for (let j = i; j < s.length; j++) {
+                    steps.push({ line: 4, desc: `Inner Loop <b>j=${j}</b>. Examining substring "${s.substring(i, j + 1)}".`, i, j, k: -1, set: [], maxLen, str: s });
+
+                    const currentSet = new Set();
+                    steps.push({ line: 14, desc: `Call <span class="hl-orange">checkDuplicates(s, ${i}, ${j})</span>. Create new HashSet.`, i, j, k: -1, set: Array.from(currentSet), maxLen, str: s });
+
+                    let isDup = false;
+                    for (let k = i; k <= j; k++) {
+                        const ch = s[k];
+                        steps.push({ line: 16, desc: `Check if set contains '${ch}'...`, i, j, k, set: Array.from(currentSet), maxLen, str: s, isDupObj: currentSet.has(ch) });
+                        if (currentSet.has(ch)) {
+                            isDup = true;
+                            steps.push({ line: 17, desc: `Duplicate '${ch}' found! Return <b>false</b>.`, i, j, k, set: Array.from(currentSet), maxLen, str: s, isDupObj: true });
+                            break;
+                        }
+                        currentSet.add(ch);
+                        steps.push({ line: 18, desc: `Add '${ch}' to set.`, i, j, k, set: Array.from(currentSet), maxLen, str: s });
+                    }
+
+                    if (!isDup) {
+                        steps.push({ line: 20, desc: `No duplicates found in "${s.substring(i, j + 1)}". Return <b>true</b>.`, i, j, k: -1, set: Array.from(currentSet), maxLen, str: s });
+
+                        const curLen = j - i + 1;
+                        if (curLen > maxLen) {
+                            maxLen = curLen;
+                            steps.push({ line: 6, desc: `Update maxLen = Math.max(${maxLen - 1}, ${curLen}) = ${maxLen}`, i, j, k: -1, set: Array.from(currentSet), maxLen, str: s, hlMaxLen: true });
+                        } else {
+                            steps.push({ line: 6, desc: `maxLen remains ${maxLen}`, i, j, k: -1, set: Array.from(currentSet), maxLen, str: s });
+                        }
+                    } else {
+                        steps.push({ line: 5, desc: `If statement evaluates to false. Do not update maxLen.`, i, j, k: -1, set: Array.from(currentSet), maxLen, str: s, isDupObj: true });
+                    }
+                }
+            }
+            steps.push({ line: 10, desc: `Return maxLen = ${maxLen}`, i: -1, j: -1, k: -1, set: [], maxLen, str: s });
+            return steps;
+        }
+
+        function generateBetterTrace(s) {
+            const steps = [];
             let maxLen = 0;
 
             steps.push({ line: 2, desc: `Initialize maxLen = 0`, i: -1, j: -1, set: [], maxLen: 0, str: s });
@@ -305,10 +379,10 @@
 
                 for (let j = i; j < s.length; j++) {
                     const ch = s[j];
-                    steps.push({ line: 6, desc: `Loop j = ${j}, char = '${ch}'. Check if '${ch}' is in set.`, i, j, set: Array.from(currentSet), maxLen, str: s, isDup: currentSet.has(ch) });
+                    steps.push({ line: 6, desc: `Loop j = ${j}, char = '${ch}'. Check if '${ch}' is in set.`, i, j, set: Array.from(currentSet), maxLen, str: s, isDupObj: currentSet.has(ch) });
 
                     if (currentSet.has(ch)) {
-                        steps.push({ line: 6, desc: `'${ch}' is already in the set! Duplicate found. Break inner loop.`, i, j, set: Array.from(currentSet), maxLen, str: s, isDup: true });
+                        steps.push({ line: 6, desc: `'${ch}' is already in the set! Duplicate found. Break inner loop.`, i, j, set: Array.from(currentSet), maxLen, str: s, isDupObj: true });
                         break;
                     }
 
@@ -338,7 +412,7 @@
 
             for (let right = 0; right < s.length; right++) {
                 const ch = s[right];
-                steps.push({ line: 5, desc: `Loop right = ${right}, char = '${ch}'. Check if '${ch}' is in set.`, L: left, R: right, set: Array.from(currentSet), maxLen, str: s, isDup: currentSet.has(ch) });
+                steps.push({ line: 5, desc: `Loop right = ${right}, char = '${ch}'. Check if '${ch}' is in set.`, L: left, R: right, set: Array.from(currentSet), maxLen, str: s, isDupObj: currentSet.has(ch) });
 
                 while (currentSet.has(s[right])) {
                     const lch = s[left];
@@ -373,30 +447,31 @@
             ],
             onRun: () => {
                 const s = document.getElementById('inputStr').value || "abcabcbb";
-                return mode === 'brute' ? generateBruteTrace(s) : generateOptimalTrace(s);
+                if (mode === 'brute') return generateBruteTrace(s);
+                if (mode === 'better') return generateBetterTrace(s);
+                return generateOptimalTrace(s);
             },
             onRenderStep: (step, container, eng) => {
-                // Determine layout vars based on mode
-                let p1 = mode === 'brute' ? step.i : step.L;
-                let p2 = mode === 'brute' ? step.j : step.R;
-                let p1Label = mode === 'brute' ? 'i' : 'L';
-                let p2Label = mode === 'brute' ? 'j' : 'R';
-                let p1Class = mode === 'brute' ? 'i-ptr' : 'l-ptr';
-                let p2Class = mode === 'brute' ? 'j-ptr' : 'r-ptr';
+                let p1 = mode === 'optimal' ? step.L : step.i;
+                let p2 = mode === 'optimal' ? step.R : step.j;
+                let p3 = step.k !== undefined ? step.k : -1;
+                let p1Label = mode === 'optimal' ? 'L' : 'i';
+                let p2Label = mode === 'optimal' ? 'R' : 'j';
+                let p1Class = mode === 'optimal' ? 'l-ptr' : 'i-ptr';
+                let p2Class = mode === 'optimal' ? 'r-ptr' : 'j-ptr';
 
                 // DP / Vars
                 let varsHtml = `<div style="display: flex; gap: 16px; flex-wrap: wrap;">`;
                 varsHtml += `<div class="var-box"><span class="var-name">maxLen</span><span class="var-val${step.hlMaxLen ? ' hl' : ''}">${step.maxLen}</span></div>`;
                 if (p1 >= 0) varsHtml += `<div class="var-box"><span class="var-name">${p1Label}</span><span class="var-val hl-orange">${p1}</span></div>`;
                 if (p2 >= 0) varsHtml += `<div class="var-box"><span class="var-name">${p2Label}</span><span class="var-val hl-accent">${p2}</span></div>`;
+                if (p3 >= 0) varsHtml += `<div class="var-box"><span class="var-name">k</span><span class="var-val hl-pink">${p3}</span></div>`;
                 varsHtml += `</div>`;
 
                 // Hash Set Render
                 let setHtml = `<div class="set-items">`;
-                if (step.set.length === 0) setHtml += `<span style="color: var(--text-dim); font-size: 13px;">(Empty)</span>`;
-                step.set.forEach(c => {
-                    setHtml += `<div class="set-item">${c}</div>`;
-                });
+                if (!step.set || step.set.length === 0) setHtml += `<span style="color: var(--text-dim); font-size: 13px;">(Empty)</span>`;
+                else step.set.forEach(c => { setHtml += `<div class="set-item">${c}</div>`; });
                 setHtml += `</div>`;
 
                 let setPanel = `<div class="set-container"><div class="set-title">Hash Set</div>${setHtml}</div>`;
@@ -408,35 +483,23 @@
                     let cls = '';
                     if (p1 >= 0 && p2 >= 0 && idx >= p1 && idx <= p2) {
                         cls = ' in-window';
-                        if (idx === p2 && step.isDup) cls += ' dup';
+                        if ((idx === p2 || idx === p3) && step.isDupObj) cls += ' dup';
                     }
-                    arrayHtml += `
-                        <div class="cell${cls}" id="cell-${idx}">
-                            ${c}
-                            <div class="index-label">${idx}</div>
-                        </div>`;
+                    arrayHtml += `<div class="cell${cls}" id="cell-${idx}">${c}<div class="index-label">${idx}</div></div>`;
                 }
 
-                if (p1 >= 0 && step.str.length > 0) {
-                    arrayHtml += `<div class="ptr ${p1Class}" id="ptr1"><div>${p1Label}</div><div class="ptr-arrow">↓</div></div>`;
-                }
-                if (p2 >= 0 && step.str.length > 0) {
-                    arrayHtml += `<div class="ptr ${p2Class}" id="ptr2"><div>${p2Label}</div><div class="ptr-arrow">↓</div></div>`;
-                }
-                if (p1 >= 0 && p2 >= 0) {
-                    arrayHtml += `<div class="window-box" id="winBox"></div>`;
-                }
+                if (p1 >= 0 && step.str.length > 0) arrayHtml += `<div class="ptr ${p1Class}" id="ptr1"><div>${p1Label}</div><div class="ptr-arrow">↓</div></div>`;
+                if (p2 >= 0 && step.str.length > 0) arrayHtml += `<div class="ptr ${p2Class}" id="ptr2"><div>${p2Label}</div><div class="ptr-arrow">↓</div></div>`;
+                if (p3 >= 0 && step.str.length > 0) arrayHtml += `<div class="ptr ptr" style="color:var(--pink)" id="ptr3"><div>k</div><div class="ptr-arrow">↓</div></div>`;
 
+                if (p1 >= 0 && p2 >= 0) arrayHtml += `<div class="window-box" id="winBox"></div>`;
                 arrayHtml += `</div></div>`;
 
-                // Layout Structure
                 container.innerHTML += eng.createSimpleCard('🔍 Execution Tracking', varsHtml + `<div style="display:flex; gap: 24px; padding-top: 20px; flex-wrap: wrap;">${setPanel}<div style="flex:1;">${arrayHtml}</div></div>`);
                 container.innerHTML += eng.createSimpleCard('💡 Current Operation', `<div class="step-text">${step.desc}</div>`);
 
-                // Map engine codeline selection
                 eng.highlightLine(step.line);
 
-                // Position Pointers using setTimeout to ensure DOM is drawn
                 setTimeout(() => {
                     const getPtrLeft = (idx) => {
                         const el = document.getElementById('cell-' + idx);
@@ -445,18 +508,28 @@
                     };
 
                     const ptr1 = document.getElementById('ptr1');
-                    if (ptr1) { ptr1.style.left = getPtrLeft(p1) + 'px'; }
+                    if (ptr1) ptr1.style.left = getPtrLeft(p1) + 'px';
 
                     const ptr2 = document.getElementById('ptr2');
-                    if (ptr2) {
-                        // If p1 and p2 overlap, avoid text collision
-                        if (p1 === p2) {
-                            ptr1.style.transform = `translateY(-15px)`;
-                            ptr1.innerHTML = `<div>${p1Label},${p2Label}</div><div class="ptr-arrow">↓</div>`;
-                            ptr2.style.display = 'none';
-                        } else {
-                            ptr2.style.left = getPtrLeft(p2) + 'px';
-                        }
+                    if (ptr2) ptr2.style.left = getPtrLeft(p2) + 'px';
+
+                    const ptr3 = document.getElementById('ptr3');
+                    if (ptr3) ptr3.style.left = getPtrLeft(p3) + 'px';
+
+                    // Collision handles
+                    let overlap12 = p1 === p2;
+                    let overlap23 = p2 === p3;
+                    let overlap13 = p1 === p3;
+
+                    if (overlap12 && ptr1 && ptr2) {
+                        ptr1.style.transform = `translateY(-15px)`;
+                        ptr1.innerHTML = `<div>${p1Label},${p2Label}</div><div class="ptr-arrow">↓</div>`;
+                        ptr2.style.display = 'none';
+                    }
+                    if (overlap23 && ptr2 && ptr3) {
+                        ptr2.style.transform = `translateY(-15px)`;
+                        ptr2.innerHTML = `<div>${p2Label},k</div><div class="ptr-arrow">↓</div>`;
+                        ptr3.style.display = 'none';
                     }
 
                     const win = document.getElementById('winBox');
@@ -472,18 +545,16 @@
             }
         });
 
-        // Setup custom mode toggle
         document.addEventListener('DOMContentLoaded', () => {
             const controlsBar = document.querySelector('.controls-bar');
             const modeToggleHTML = `
                 <div class="mode-toggle">
-                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force</button>
-                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Sliding Window)</button>
+                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute (O(n³))</button>
+                    <button class="mode-btn" id="btn-better" onclick="setMode('better')">Better (O(n²))</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (O(n))</button>
                 </div>
             `;
             controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
-
-            // Wait a tick for engine to mount, then run
             setTimeout(() => setMode('optimal'), 10);
         });
 
@@ -491,15 +562,16 @@
             engine.stopPlay();
             mode = m;
             document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-better').classList.toggle('active', m === 'better');
             document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
 
-            // Swap code panels
-            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
-            engine._renderCodeBlock();
+            if (m === 'brute') engine.codeLines = CODE_BRUTE;
+            else if (m === 'better') engine.codeLines = CODE_BETTER;
+            else engine.codeLines = CODE_OPTIMAL;
 
+            engine._renderCodeBlock();
             engine.run();
         };
-
     </script>
 </body>
 

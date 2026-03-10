@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Valid Anagram</title>
     <meta name="description"
-        content="Interactive visualizer for LeetCode 242: Valid Anagram (Brute Force Sort & Optimal HashMap/Frequency Array).">
+        content="Interactive visualizer for LeetCode 242: Valid Anagram (Brute Force Sort, Better Hash Map, Optimal Frequency Array).">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
@@ -112,7 +112,7 @@
             line-height: 1;
         }
 
-        /* Frequency Array Tracker */
+        /* Hash Map & Frequency Tracker */
         .freq-container {
             display: flex;
             flex-direction: column;
@@ -132,6 +132,62 @@
             margin-bottom: 16px;
         }
 
+        /* For Better approach HashMap */
+        .hash-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
+        .hash-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s;
+        }
+
+        .hash-char {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .hash-val {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .hash-box.modified {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .hash-box.invalid {
+            border-color: var(--pink);
+            background: var(--pink-light);
+        }
+
+        .hash-box.invalid .hash-val {
+            color: var(--pink);
+        }
+
+        .hash-box.valid {
+            border-color: var(--emerald);
+            background: var(--emerald-light);
+        }
+
+        .hash-box.valid .hash-val {
+            color: var(--emerald);
+        }
+
+        /* For Optimal approach Freq Arr */
         .freq-grid {
             display: grid;
             grid-template-columns: repeat(13, 1fr);
@@ -224,6 +280,8 @@
 <body>
     <script src="../../core/engine.js"></script>
     <script>
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
         const CODE_BRUTE = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
             { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isAnagram' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 't' }, { t: 'br', v: ') {' }] },
@@ -238,7 +296,24 @@
             { tokens: [{ t: 'kw', v: '        return true' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
-        ];
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
+
+        const CODE_BETTER = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isAnagram' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'op', v: ', ' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 't' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '        if ' }, { t: 'br', v: '(' }, { t: 'v', v: 's.length() != t.length()' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '        Map<Character, Integer> map ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'v', v: 'HashMap<>()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'i ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i < s.length()' }, { t: 'op', v: '; ' }, { t: 'v', v: 'i++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '            map.put(s.charAt(i), map.getOrDefault(s.charAt(i), ' }, { t: 'num', v: '0' }, { t: 'v', v: ') + ' }, { t: 'num', v: '1' }, { t: 'v', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '            map.put(t.charAt(i), map.getOrDefault(t.charAt(i), ' }, { t: 'num', v: '0' }, { t: 'v', v: ') - ' }, { t: 'num', v: '1' }, { t: 'v', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'int ' }, { t: 'v', v: 'val : map.values()' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'val != ' }, { t: 'num', v: '0' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return true' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
 
         const CODE_OPTIMAL = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
@@ -255,9 +330,13 @@
             { tokens: [{ t: 'kw', v: '        return true' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
-        ];
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
 
         let mode = 'optimal';
+
+        function cloneMap(map) {
+            return JSON.parse(JSON.stringify(map));
+        }
 
         function generateBruteTrace(s, t) {
             const steps = [];
@@ -293,6 +372,47 @@
             }
 
             steps.push({ line: 11, desc: `All characters matched perfectly. The strings are anagrams. Return true.`, i: -1, sArr, tArr, returnedTrue: true });
+            return steps;
+        }
+
+        function generateBetterTrace(s, t) {
+            const steps = [];
+            const lenS = s.length, lenT = t.length;
+
+            steps.push({ line: 3, desc: `Check lengths: s.length (${lenS}) != t.length (${lenT})?`, scanIdx: -1, mapVal: {}, sArr: s.split(''), tArr: t.split('') });
+
+            if (lenS !== lenT) {
+                steps.push({ line: 3, desc: `Lengths differ! Strings cannot be anagrams. Return false.`, scanIdx: -1, mapVal: {}, sArr: s.split(''), tArr: t.split(''), returnedFalse: true });
+                return steps;
+            }
+
+            let map = {};
+            steps.push({ line: 4, desc: `Initialize HashMap to store character frequencies.`, scanIdx: -1, mapVal: {}, sArr: s.split(''), tArr: t.split('') });
+
+            for (let i = 0; i < s.length; i++) {
+                const sChar = s[i], tChar = t[i];
+
+                steps.push({ line: 5, desc: `Loop i = ${i}. Look at s[${i}]='${sChar}' and t[${i}]='${tChar}'`, scanIdx: i, mapVal: cloneMap(map), sArr: s.split(''), tArr: t.split('') });
+
+                map[sChar] = (map[sChar] || 0) + 1;
+                steps.push({ line: 6, desc: `Increment count for '${sChar}' from String s -> map['${sChar}'] = ${map[sChar]}`, scanIdx: i, activeChar: sChar, mapVal: cloneMap(map), sArr: s.split(''), tArr: t.split('') });
+
+                map[tChar] = (map[tChar] || 0) - 1;
+                steps.push({ line: 7, desc: `Decrement count for '${tChar}' from String t -> map['${tChar}'] = ${map[tChar]}`, scanIdx: i, activeChar: tChar, mapVal: cloneMap(map), sArr: s.split(''), tArr: t.split('') });
+            }
+
+            steps.push({ line: 9, desc: `Finished counting. Now evaluate the HashMap values.`, scanIdx: -1, mapVal: cloneMap(map), sArr: s.split(''), tArr: t.split('') });
+
+            for (let k in map) {
+                if (map[k] !== 0) {
+                    steps.push({ line: 10, desc: `map['${k}'] is ${map[k]} (not 0). Therefore, strings are not anagrams. Return false.`, scanIdx: -1, activeChar: k, mapVal: cloneMap(map), sArr: s.split(''), tArr: t.split(''), isInvalid: true, returnedFalse: true });
+                    return steps;
+                } else {
+                    steps.push({ line: 10, desc: `map['${k}'] is 0. Valid.`, scanIdx: -1, activeChar: k, mapVal: cloneMap(map), sArr: s.split(''), tArr: t.split(''), isValid: true });
+                }
+            }
+
+            steps.push({ line: 12, desc: `All counts are 0! The strings are valid anagrams. Return true.`, scanIdx: -1, mapVal: cloneMap(map), sArr: s.split(''), tArr: t.split(''), returnedTrue: true });
             return steps;
         }
 
@@ -353,66 +473,71 @@
                 let s = document.getElementById('inputS').value.toLowerCase().replace(/[^a-z]/g, '') || "anagram";
                 let t = document.getElementById('inputT').value.toLowerCase().replace(/[^a-z]/g, '') || "nagaram";
 
-                return mode === 'brute' ? generateBruteTrace(s, t) : generateOptimalTrace(s, t);
+                if (mode === 'brute') return generateBruteTrace(s, t);
+                if (mode === 'better') return generateBetterTrace(s, t);
+                return generateOptimalTrace(s, t);
             },
             onRenderStep: (step, container, eng) => {
                 let layoutHtml = `<div style="display:flex; flex-direction:column; gap: 24px;">`;
 
-                // If Brute Force Mode
-                if (mode === 'brute') {
-                    let sArrHtml = `<div class="array-row" id="sArr"><div class="array-label">String s</div>`;
-                    let tArrHtml = `<div class="array-row" id="tArr"><div class="array-label">String t</div>`;
+                // Common Array Visuals for all approaches
+                let sArrHtml = `<div class="array-row" id="sArr"><div class="array-label">String s</div>`;
+                let tArrHtml = `<div class="array-row" id="tArr"><div class="array-label">String t</div>`;
 
-                    for (let idx = 0; idx < step.sArr.length; idx++) {
-                        let cls = '';
-                        if (step.i === idx) {
-                            cls = step.mismatched ? ' mismatched' : (step.matched ? ' matched' : ' scanning');
-                        }
-                        sArrHtml += `<div class="cell${cls}" id="scell-${idx}">${step.sArr[idx]}<div class="index-label">${idx}</div></div>`;
+                for (let idx = 0; idx < step.sArr.length; idx++) {
+                    let cls = '';
+                    if (mode === 'brute') {
+                        if (step.i === idx) cls = step.mismatched ? ' mismatched' : (step.matched ? ' matched' : ' scanning');
+                    } else {
+                        if (step.scanIdx === idx) cls = ' scanning';
                     }
-                    for (let idx = 0; idx < step.tArr.length; idx++) {
-                        let cls = '';
-                        if (step.i === idx) {
-                            cls = step.mismatched ? ' mismatched' : (step.matched ? ' matched' : ' scanning');
-                        }
-                        tArrHtml += `<div class="cell${cls}" id="tcell-${idx}">${step.tArr[idx]}<div class="index-label">${idx}</div></div>`;
-                    }
-
-                    if (step.i >= 0 && step.i < step.sArr.length) {
-                        sArrHtml += `<div class="ptr i-ptr" id="ptr1" style="top: -30px;"><div>i</div><div class="ptr-arrow">↓</div></div>`;
-                        tArrHtml += `<div class="ptr i-ptr" id="ptr2" style="bottom: -30px; top:auto;"><div>i</div><div class="ptr-arrow" style="transform: rotate(180deg); margin-top:0; margin-bottom:2px;">↑</div></div>`;
-                    }
-
-                    sArrHtml += `</div>`;
-                    tArrHtml += `</div>`;
-
-                    let resHtml = '';
-                    if (step.returnedFalse) resHtml = `<div style="text-align:center; padding: 10px; background: var(--pink-light); color: var(--pink); border-radius: 8px; font-weight:700;">Result: FALSE</div>`;
-                    if (step.returnedTrue) resHtml = `<div style="text-align:center; padding: 10px; background: var(--emerald-light); color: var(--emerald); border-radius: 8px; font-weight:700;">Result: TRUE</div>`;
-
-                    layoutHtml += `<div class="array-container">${sArrHtml}${tArrHtml}</div>${resHtml}`;
+                    sArrHtml += `<div class="cell${cls}" id="scell-${idx}">${step.sArr[idx]}<div class="index-label">${idx}</div></div>`;
                 }
-                // If Optimal Mode
-                else {
-                    let sArrHtml = `<div class="array-row" id="sArr"><div class="array-label">String s</div>`;
-                    let tArrHtml = `<div class="array-row" id="tArr"><div class="array-label">String t</div>`;
-
-                    for (let idx = 0; idx < step.sArr.length; idx++) {
-                        let cls = (step.scanIdx === idx) ? ' scanning' : '';
-                        sArrHtml += `<div class="cell${cls}">${step.sArr[idx]}<div class="index-label">${idx}</div></div>`;
+                for (let idx = 0; idx < step.tArr.length; idx++) {
+                    let cls = '';
+                    if (mode === 'brute') {
+                        if (step.i === idx) cls = step.mismatched ? ' mismatched' : (step.matched ? ' matched' : ' scanning');
+                    } else {
+                        if (step.scanIdx === idx) cls = ' scanning';
                     }
-                    for (let idx = 0; idx < step.tArr.length; idx++) {
-                        let cls = (step.scanIdx === idx) ? ' scanning' : '';
-                        tArrHtml += `<div class="cell${cls}">${step.tArr[idx]}<div class="index-label">${idx}</div></div>`;
+                    tArrHtml += `<div class="cell${cls}" id="tcell-${idx}">${step.tArr[idx]}<div class="index-label">${idx}</div></div>`;
+                }
+                if (step.sArr.length === 0) sArrHtml += `<div class="cell">(Empty)</div>`;
+                if (step.tArr.length === 0) tArrHtml += `<div class="cell">(Empty)</div>`;
+
+                if (mode === 'brute' && step.i >= 0 && step.i < step.sArr.length) {
+                    sArrHtml += `<div class="ptr i-ptr" id="ptr1" style="top: -30px;"><div>i</div><div class="ptr-arrow">↓</div></div>`;
+                    tArrHtml += `<div class="ptr i-ptr" id="ptr2" style="bottom: -30px; top:auto;"><div>i</div><div class="ptr-arrow" style="transform: rotate(180deg); margin-top:0; margin-bottom:2px;">↑</div></div>`;
+                }
+
+                sArrHtml += `</div>`;
+                tArrHtml += `</div>`;
+
+                let arrayContainer = `<div class="array-container" style="${mode === 'brute' ? '' : 'padding-top:10px;'}">${sArrHtml}${tArrHtml}</div>`;
+                layoutHtml += arrayContainer;
+
+                // Specific Tracker visuals
+                if (mode === 'better') {
+                    let mapHtml = `<div class="freq-container"><div class="freq-title">HashMap &lt;Character, Integer&gt;</div>`;
+                    if (Object.keys(step.mapVal).length === 0) {
+                        mapHtml += `<div style="font-size:13px; color:var(--text-dim);">(Empty)</div>`;
+                    } else {
+                        mapHtml += `<div class="hash-grid">`;
+                        for (let k in step.mapVal) {
+                            let cls = (step.activeChar === k) ? ' modified' : '';
+                            if (step.activeChar === k && step.isInvalid) cls = ' invalid';
+                            if (step.activeChar === k && step.isValid) cls = ' valid';
+
+                            mapHtml += `<div class="hash-box${cls}">
+                                            <div class="hash-char">${k}</div>
+                                            <div class="hash-val">${step.mapVal[k]}</div>
+                                         </div>`;
+                        }
+                        mapHtml += `</div>`;
                     }
-                    if (step.sArr.length === 0) sArrHtml += `<div class="cell">(Empty)</div>`;
-                    if (step.tArr.length === 0) tArrHtml += `<div class="cell">(Empty)</div>`;
-
-                    sArrHtml += `</div>`;
-                    tArrHtml += `</div>`;
-
-                    let arrayContainer = `<div class="array-container" style="padding-top:10px;">${sArrHtml}${tArrHtml}</div>`;
-
+                    mapHtml += `</div>`;
+                    layoutHtml += mapHtml;
+                } else if (mode === 'optimal') {
                     let freqHtml = `<div class="freq-container"><div class="freq-title">Frequency Array int[26] count</div><div class="freq-grid">`;
                     for (let c = 0; c < 26; c++) {
                         let cls = (step.cIndex === c) ? ' modified' : '';
@@ -425,13 +550,14 @@
                                      </div>`;
                     }
                     freqHtml += `</div></div>`;
-
-                    let resHtml = '';
-                    if (step.returnedFalse) resHtml = `<br><div style="text-align:center; padding: 10px; background: var(--pink-light); color: var(--pink); border-radius: 8px; font-weight:700;">Result: FALSE</div>`;
-                    if (step.returnedTrue) resHtml = `<br><div style="text-align:center; padding: 10px; background: var(--emerald-light); color: var(--emerald); border-radius: 8px; font-weight:700;">Result: TRUE</div>`;
-
-                    layoutHtml += `${arrayContainer}${freqHtml}${resHtml}`;
+                    layoutHtml += freqHtml;
                 }
+
+                // Result
+                let resHtml = '';
+                if (step.returnedFalse) resHtml = `<br><div style="text-align:center; padding: 10px; background: var(--pink-light); color: var(--pink); border-radius: 8px; font-weight:700;">Result: FALSE</div>`;
+                if (step.returnedTrue) resHtml = `<br><div style="text-align:center; padding: 10px; background: var(--emerald-light); color: var(--emerald); border-radius: 8px; font-weight:700;">Result: TRUE</div>`;
+                layoutHtml += resHtml;
 
                 layoutHtml += `</div>`;
 
@@ -461,8 +587,9 @@
             const controlsBar = document.querySelector('.controls-bar');
             const modeToggleHTML = `
                 <div class="mode-toggle">
-                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force</button>
-                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Frequency Array)</button>
+                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute (Sort)</button>
+                    <button class="mode-btn" id="btn-better" onclick="setMode('better')">Better (HashMap)</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Freq Arr)</button>
                 </div>
             `;
             controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
@@ -473,8 +600,13 @@
             engine.stopPlay();
             mode = m;
             document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-better').classList.toggle('active', m === 'better');
             document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
-            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
+
+            if (m === 'brute') engine.codeLines = CODE_BRUTE;
+            else if (m === 'better') engine.codeLines = CODE_BETTER;
+            else engine.codeLines = CODE_OPTIMAL;
+
             engine._renderCodeBlock();
             engine.run();
         };

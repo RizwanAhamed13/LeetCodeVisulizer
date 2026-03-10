@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Valid Palindrome</title>
     <meta name="description"
-        content="Interactive visualizer for LeetCode 125: Valid Palindrome (Brute Force String Reverse & Optimal Two Pointers).">
+        content="Interactive visualizer for LeetCode 125: Valid Palindrome (Brute Force String Reverse, Better Clean & Pointers, Optimal Two Pointers In-Place).">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
@@ -162,18 +162,6 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        .hl-orange {
-            color: var(--orange, #ea580c);
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .hl-pink {
-            color: var(--pink, #db2777);
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
         @keyframes popIn {
             0% {
                 transform: scale(0.5);
@@ -207,6 +195,8 @@
 <body>
     <script src="../../core/engine.js"></script>
     <script>
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
         const CODE_BRUTE = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
             { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isPalindrome' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
@@ -221,7 +211,27 @@
             { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'cleaned.equals(reversed)' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
-        ];
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
+
+        const CODE_BETTER = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isPalindrome' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        StringBuilder ' }, { t: 'v', v: 'builder ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'StringBuilder()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'char ' }, { t: 'v', v: 'ch : s.toCharArray()' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'Character.isLetterOrDigit(ch)' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                builder.append(Character.toLowerCase(ch))' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'tp', v: '        String ' }, { t: 'v', v: 'cleaned ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'builder.toString()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'left ' }, { t: 'op', v: '= ' }, { t: 'num', v: '0' }, { t: 'op', v: ', ' }, { t: 'v', v: 'right ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'cleaned.length() - ' }, { t: 'num', v: '1' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        while ' }, { t: 'br', v: '(' }, { t: 'v', v: 'left < right' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'cleaned.charAt(left) != cleaned.charAt(right)' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '            left++' }, { t: 'op', v: ';' }, { t: 'v', v: ' right--' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return true' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
 
         const CODE_OPTIMAL = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
@@ -244,7 +254,7 @@
             { tokens: [{ t: 'kw', v: '        return true' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
-        ];
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
 
         let mode = 'optimal';
 
@@ -289,6 +299,56 @@
             }
             return steps;
         }
+
+        function generateBetterTrace(s) {
+            const steps = [];
+            let builder = "";
+            let cleaned = "";
+
+            steps.push({ line: 3, desc: `Initialize empty StringBuilder.`, i: -1, s, builder });
+
+            for (let i = 0; i < s.length; i++) {
+                const ch = s[i];
+                steps.push({ line: 4, desc: `Loop i = ${i}, char = '${ch}'`, i, s, builder, ch });
+
+                if (isAlphanumeric(ch)) {
+                    steps.push({ line: 5, desc: `'${ch}' is alphanumeric. Append lowercase to builder.`, i, s, builder, ch, action: 'scan' });
+                    builder += ch.toLowerCase();
+                    steps.push({ line: 6, desc: `Builder is now: "${builder}"`, i, s, builder, ch, action: 'build' });
+                } else {
+                    steps.push({ line: 5, desc: `'${ch}' is NOT alphanumeric. Skip it.`, i, s, builder, ch, action: 'skip' });
+                }
+            }
+
+            cleaned = builder;
+            steps.push({ line: 9, desc: `Convert builder to string: cleaned = "${cleaned}"`, i: -1, s, builder, cleaned, action: 'clean' });
+
+            let left = 0, right = cleaned.length - 1;
+            steps.push({ line: 10, desc: `Initialize pointers on cleaned string: left = 0, right = ${right}.`, i: -1, s, cleaned, left, right, action: 'ptrs' });
+
+            while (left < right) {
+                steps.push({ line: 11, desc: `Check condition: left (${left}) < right (${right}). Continue.`, left, right, s, cleaned, action: 'ptrs' });
+
+                const l = cleaned[left];
+                const r = cleaned[right];
+                steps.push({ line: 12, desc: `Compare cleaned[${left}]='${l}' with cleaned[${right}]='${r}'.`, left, right, s, cleaned, action: 'compare' });
+
+                if (l !== r) {
+                    steps.push({ line: 12, desc: `Mismatch found! '${l}' != '${r}'. Return FALSE.`, left, right, s, cleaned, action: 'mismatch', res: false });
+                    return steps;
+                } else {
+                    steps.push({ line: 13, desc: `Match! '${l}' == '${r}'. Move both pointers inward.`, left, right, s, cleaned, action: 'match' });
+                    left++;
+                    right--;
+                }
+            }
+
+            steps.push({ line: 11, desc: `Check condition: left (${left}) < right (${right}) is FALSE. Loop ends.`, left, right, s, cleaned, action: 'ptrs' });
+            steps.push({ line: 15, desc: `All characters matched perfectly. Return TRUE.`, left: -1, right: -1, s, cleaned, action: 'done', res: true });
+
+            return steps;
+        }
+
 
         function generateOptimalTrace(s) {
             const steps = [];
@@ -342,7 +402,9 @@
             ],
             onRun: () => {
                 let s = document.getElementById('inputStr').value || "A man, a plan, a canal: Panama";
-                return mode === 'brute' ? generateBruteTrace(s) : generateOptimalTrace(s);
+                if (mode === 'brute') return generateBruteTrace(s);
+                if (mode === 'better') return generateBetterTrace(s);
+                return generateOptimalTrace(s);
             },
             onRenderStep: (step, container, eng) => {
                 let layoutHtml = `<div style="display:flex; flex-direction:column; gap: 24px; padding-bottom: 20px;">`;
@@ -406,6 +468,63 @@
 
                     layoutHtml += `<div class="array-container">${origHtml}${cleanHtml}${revHtml}</div>`;
                 }
+                // If Better Mode
+                else if (mode === 'better') {
+                    // Original String Array - for iterative building
+                    let origHtml = `<div class="array-row" id="origArr">`;
+                    if (step.s) origHtml += `<div class="array-label" style="left:-105px;">Original s</div>`;
+                    for (let idx = 0; idx < step.s.length; idx++) {
+                        let cls = '';
+                        if (step.i === idx) {
+                            if (step.action === 'skip') cls = ' skipped';
+                            else if (step.action === 'scan' || step.action === 'build') cls = ' scanning';
+                        }
+                        origHtml += `<div class="cell${cls}" id="cell-${idx}">${step.s[idx]}</div>`;
+                    }
+                    if (step.s.length === 0) origHtml += `<div class="cell">(Empty)</div>`;
+
+                    if (step.i >= 0 && step.i < step.s.length) {
+                        origHtml += `<div class="ptr i-ptr" id="ptr1"><div>i</div><div class="ptr-arrow">↓</div></div>`;
+                    }
+                    origHtml += `</div>`;
+
+                    let cleanHtml = '';
+                    if (step.cleaned !== undefined && (step.action === 'clean' || step.action === 'ptrs' || step.action === 'compare' || step.action === 'mismatch' || step.action === 'match' || step.action === 'done')) {
+                        cleanHtml = `<div class="array-row" style="margin-top: 10px;" id="cleanArr">`;
+                        cleanHtml += `<div class="array-label" style="left:-110px;">Cleaned</div>`;
+                        for (let idx = 0; idx < step.cleaned.length; idx++) {
+                            let cls = '';
+                            if (idx === step.left || idx === step.right) {
+                                if (step.action === 'mismatch') cls = ' mismatched';
+                                else if (step.action === 'match') cls = ' matched';
+                                else cls = ' scanning';
+                            }
+                            cleanHtml += `<div class="cell${cls}" id="cleanCell-${idx}">${step.cleaned[idx]}</div>`;
+                        }
+                        if (step.cleaned.length === 0) cleanHtml += `<div class="cell">(Empty)</div>`;
+
+                        // draw left right pointers on cleaned string
+                        if (step.left >= 0 && step.left < step.cleaned.length) {
+                            cleanHtml += `<div class="ptr l-ptr" id="ptrL"><div>left</div><div class="ptr-arrow">↓</div></div>`;
+                        }
+                        if (step.right >= 0 && step.right < step.cleaned.length) {
+                            cleanHtml += `<div class="ptr r-ptr" id="ptrR"><div class="ptr-arrow">↑</div><div>right</div></div>`;
+                        }
+                        cleanHtml += `</div>`;
+                    } else if (step.builder !== undefined && step.action !== 'clean') {
+                        // Just show builder if building
+                        cleanHtml = `<div class="array-row" style="margin-top: 10px;">`;
+                        cleanHtml += `<div class="array-label" style="left:-110px;">Builder</div>`;
+                        for (let idx = 0; idx < step.builder.length; idx++) {
+                            let cls = (idx === step.builder.length - 1 && step.action === 'build') ? ' built' : '';
+                            cleanHtml += `<div class="cell${cls}">${step.builder[idx]}</div>`;
+                        }
+                        if (step.builder.length === 0) cleanHtml += `<div class="cell" style="opacity:0.3;">...</div>`;
+                        cleanHtml += `</div>`;
+                    }
+
+                    layoutHtml += `<div class="array-container">${origHtml}${cleanHtml}</div>`;
+                }
                 // If Optimal Mode
                 else {
                     let origHtml = `<div class="array-row" id="origArr">`;
@@ -452,6 +571,23 @@
                         if (ptr1 && sCell) {
                             ptr1.style.left = sCell.offsetLeft + (sCell.clientWidth / 2) - 10 + 'px';
                         }
+                    } else if (mode === 'better') {
+                        const ptr1 = document.getElementById('ptr1');
+                        const sCell = document.getElementById('cell-' + step.i);
+                        if (ptr1 && sCell) {
+                            ptr1.style.left = sCell.offsetLeft + (sCell.clientWidth / 2) - 10 + 'px';
+                        }
+
+                        const ptrL = document.getElementById('ptrL');
+                        const ptrR = document.getElementById('ptrR');
+                        const lCell = document.getElementById('cleanCell-' + step.left);
+                        const rCell = document.getElementById('cleanCell-' + step.right);
+                        if (ptrL && lCell) {
+                            ptrL.style.left = lCell.offsetLeft + (lCell.clientWidth / 2) - 10 + 'px';
+                        }
+                        if (ptrR && rCell) {
+                            ptrR.style.left = rCell.offsetLeft + (rCell.clientWidth / 2) - 12 + 'px';
+                        }
                     } else {
                         const ptrL = document.getElementById('ptrL');
                         const ptrR = document.getElementById('ptrR');
@@ -472,8 +608,9 @@
             const controlsBar = document.querySelector('.controls-bar');
             const modeToggleHTML = `
                 <div class="mode-toggle">
-                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force (Filter & Reverse)</button>
-                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Two Pointers)</button>
+                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute (Reverse String)</button>
+                    <button class="mode-btn" id="btn-better" onclick="setMode('better')">Better (Clean & Ptrs)</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (In-Place Pointers)</button>
                 </div>
             `;
             controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
@@ -484,8 +621,9 @@
             engine.stopPlay();
             mode = m;
             document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-better').classList.toggle('active', m === 'better');
             document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
-            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
+            engine.codeLines = m === 'brute' ? CODE_BRUTE : m === 'better' ? CODE_BETTER : CODE_OPTIMAL;
             engine._renderCodeBlock();
             engine.run();
         };

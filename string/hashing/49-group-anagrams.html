@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Group Anagrams</title>
     <meta name="description"
-        content="Interactive visualizer for LeetCode 49: Group Anagrams (Brute Force Sort Key & Optimal Frequency Array Key).">
+        content="Interactive visualizer for LeetCode 49: Group Anagrams (Brute Force Sort Key, Better HashMap Character Count, Optimal Array Key).">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
@@ -176,12 +176,6 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        .hl-orange {
-            color: var(--orange, #ea580c);
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
         .hl-emerald {
             color: var(--emerald);
             font-weight: 600;
@@ -217,6 +211,8 @@
 <body>
     <script src="../../core/engine.js"></script>
     <script>
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
         const CODE_BRUTE = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
             { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'List<List<String>> ' }, { t: 'fn', v: 'groupAnagrams' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'strs' }, { t: 'br', v: ') {' }] },
@@ -231,7 +227,24 @@
             { tokens: [{ t: 'kw', v: '        return ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'ArrayList<>' }, { t: 'br', v: '(' }, { t: 'v', v: 'map.values()' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
-        ];
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
+
+        const CODE_BETTER = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'List<List<String>> ' }, { t: 'fn', v: 'groupAnagrams' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'strs' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        Map<Map<Character, Integer>, List<String>> ' }, { t: 'v', v: 'groupMap ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'HashMap<>()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's : strs' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '            Map<Character, Integer> charCount ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'v', v: 'HashMap<>()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'char ' }, { t: 'v', v: 'c : s.toCharArray()' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                charCount.put(c, charCount.getOrDefault(c, ' }, { t: 'num', v: '0' }, { t: 'v', v: ') + ' }, { t: 'num', v: '1' }, { t: 'v', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'v', v: '            groupMap.putIfAbsent(charCount, ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'ArrayList<>()' }, { t: 'v', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'v', v: '            groupMap.get(charCount).add(s)' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'ArrayList<>' }, { t: 'br', v: '(' }, { t: 'v', v: 'groupMap.values()' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] }
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
 
         const CODE_OPTIMAL = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
@@ -247,7 +260,7 @@
             { tokens: [{ t: 'kw', v: '        return ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'ArrayList<>' }, { t: 'br', v: '(' }, { t: 'v', v: 'map.values()' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
-        ];
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
 
         let mode = 'optimal';
 
@@ -266,14 +279,12 @@
             for (let i = 0; i < strs.length; i++) {
                 const s = strs[i];
                 steps.push({ line: 4, desc: `Process string: "${s}"`, currStr: i, map: cloneMap(map) });
-
                 steps.push({ line: 5, desc: `Convert "${s}" to character array.`, currStr: i, map: cloneMap(map) });
 
                 let arr = s.split('');
                 arr.sort();
                 let key = arr.join('');
                 steps.push({ line: 6, desc: `Sort the character array algebraically: "${arr.join(',')}"`, currStr: i, map: cloneMap(map) });
-
                 steps.push({ line: 7, desc: `Create String key = "${key}"`, currStr: i, activeKey: key, map: cloneMap(map) });
 
                 if (!map[key]) {
@@ -291,6 +302,45 @@
             return steps;
         }
 
+        function generateBetterTrace(strs) {
+            const steps = [];
+            const map = {}; // We simulate the Map<Map<Character, Integer>, List<String>> by serializing the nested map into a JSON string key for js.
+
+            steps.push({ line: 3, desc: `Initialize HashMap<Map<Character, Integer>, List<String>> groupMap.`, currStr: -1, map: {} });
+
+            for (let i = 0; i < strs.length; i++) {
+                const s = strs[i];
+                steps.push({ line: 4, desc: `Process string: "${s}"`, currStr: i, map: cloneMap(map) });
+                steps.push({ line: 5, desc: `Create a new charCount Map<Character, Integer> for "${s}".`, currStr: i, map: cloneMap(map) });
+
+                const charCount = {};
+                for (let c of s) {
+                    charCount[c] = (charCount[c] || 0) + 1;
+                }
+
+                // create a stable sorted JSON string to represent the map key
+                const sortedKeys = Object.keys(charCount).sort();
+                const keyObj = {};
+                for (let k of sortedKeys) keyObj[k] = charCount[k];
+                const key = JSON.stringify(keyObj);
+
+                steps.push({ line: 6, desc: `Count frequencies of all characters in "${s}" and populate charCount Map.`, currStr: i, activeKey: key, map: cloneMap(map) });
+
+                if (!map[key]) {
+                    map[key] = [];
+                    steps.push({ line: 9, desc: `Map key ${key} not in groupMap. Creating new ArrayList for this Map key.`, currStr: i, activeKey: key, map: cloneMap(map) });
+                } else {
+                    steps.push({ line: 9, desc: `Map key ${key} already exists in groupMap.`, currStr: i, activeKey: key, map: cloneMap(map) });
+                }
+
+                map[key].push(s);
+                steps.push({ line: 10, desc: `Add "${s}" to the list corresponding to the Map key.`, currStr: i, activeKey: key, map: cloneMap(map), hlUpdate: true });
+            }
+
+            steps.push({ line: 12, desc: `Finished processing all strings. Return all lists from groupMap.values().`, currStr: -1, map: cloneMap(map) });
+            return steps;
+        }
+
         function generateOptimalTrace(strs) {
             const steps = [];
             const map = {};
@@ -300,7 +350,6 @@
             for (let i = 0; i < strs.length; i++) {
                 const s = strs[i];
                 steps.push({ line: 4, desc: `Process string: "${s}"`, currStr: i, map: cloneMap(map) });
-
                 steps.push({ line: 5, desc: `Create new frequency int[26] count array.`, currStr: i, map: cloneMap(map) });
 
                 let count = new Array(26).fill(0);
@@ -308,11 +357,9 @@
                     count[c.charCodeAt(0) - 97]++;
                 }
 
-                // Formulate a clean array-like string representation as seen in Java Arrays.toString
                 let key = "[" + count.join(", ") + "]";
 
                 steps.push({ line: 6, desc: `Count frequencies of all characters in "${s}".`, currStr: i, countArr: [...count], map: cloneMap(map) });
-
                 steps.push({ line: 7, desc: `Convert frequency array to string key.`, currStr: i, countArr: [...count], activeKey: key, map: cloneMap(map) });
 
                 if (!map[key]) {
@@ -344,7 +391,9 @@
                 const strs = input.split(',').map(s => s.trim().toLowerCase().replace(/[^a-z]/g, '')).filter(s => s.length > 0);
                 if (strs.length === 0) strs.push("eat", "tea", "tan", "ate", "nat", "bat");
 
-                return mode === 'brute' ? generateBruteTrace(strs) : generateOptimalTrace(strs);
+                if (mode === 'brute') return generateBruteTrace(strs);
+                if (mode === 'better') return generateBetterTrace(strs);
+                return generateOptimalTrace(strs);
             },
             onRenderStep: (step, container, eng) => {
                 let layoutHtml = `<div style="display:flex; flex-direction:column; gap: 20px;">`;
@@ -352,7 +401,6 @@
                 // INPUT ARRAY RENDER
                 let inputHtml = `<div style="font-size:11px; font-weight:700; color:var(--text-dim); text-transform:uppercase; margin-bottom:12px;">Input String Array</div><div class="array-row">`;
 
-                const originalStrs = eng.trace[1]?.map ? Object.values(eng.trace[0]?.map || {}).flat() : []; // Hacky way to retrieve original if we need it, but we can just use the DOM input
                 let inputStrEl = document.getElementById('inputStr').value || "eat,tea,tan,ate,nat,bat";
                 const strs = inputStrEl.split(',').map(s => s.trim().toLowerCase().replace(/[^a-z]/g, '')).filter(s => s.length > 0);
                 if (strs.length === 0) strs.push("eat", "tea", "tan", "ate", "nat", "bat");
@@ -370,16 +418,29 @@
                 inputHtml += `</div>`;
 
                 // HASH MAP RENDER
-                let mapHtml = `<div class="map-container"><div class="map-title">HashMap&lt;String, List&lt;String&gt;&gt; map</div>`;
+                let mType = mode === 'brute' ? 'String' : mode === 'better' ? 'Map&lt;Character, Integer&gt;' : 'String';
+                let mapHtml = `<div class="map-container"><div class="map-title">HashMap&lt;${mType}, List&lt;String&gt;&gt;</div>`;
                 let hasEntries = false;
 
                 for (let k in step.map) {
                     hasEntries = true;
-                    // Create abbreviated key display for optimal mode array
                     let displayKey = k;
-                    if (mode === 'optimal') {
-                        // The string representation for Java int[] takes up too much space. Let's make it pretty and scannable.
+                    let displayLabel = 'Map Key';
+
+                    if (mode === 'better') {
+                        // Better approach: convert JSON key back to readable map format
+                        const charMap = JSON.parse(k);
+                        let cleanMap = "{ ";
+                        for (let charKey in charMap) cleanMap += `'${charKey}': ${charMap[charKey]}, `;
+                        if (Object.keys(charMap).length > 0) cleanMap = cleanMap.substring(0, cleanMap.length - 2);
+                        cleanMap += " }";
+                        displayKey = `<div style="font-size:11px; color:var(--text-dim); line-height:1.2;">${cleanMap}</div>`;
+                        displayLabel = 'Map Key (Map)';
+                    } else if (mode === 'optimal') {
                         displayKey = `<div style="font-size:9px; color:var(--text-dim); line-height:1.2;">[${k.substring(1, k.length - 1)}]</div>`;
+                        displayLabel = 'Map Key (String Arr)';
+                    } else {
+                        displayLabel = 'Map Key (String)';
                     }
 
                     const isHl = (step.hlUpdate && k === step.activeKey) ? ' highlight' : '';
@@ -392,7 +453,7 @@
                     mapHtml += `
                         <div class="map-entry${isHl}">
                             <div class="map-key-area">
-                                <div class="map-key-lbl">Map Key (String)</div>
+                                <div class="map-key-lbl">${displayLabel}</div>
                                 <div class="map-key">${displayKey}</div>
                             </div>
                             <div class="map-val-area">
@@ -405,7 +466,6 @@
                 if (!hasEntries) mapHtml += `<div style="padding: 24px; text-align: center; color: var(--text-dim); background: var(--bg2); border-radius: 12px; border: 1px dashed var(--border); font-size: 13px;">(Map is Empty)</div>`;
 
                 mapHtml += `</div>`;
-
                 layoutHtml += `${inputHtml}${mapHtml}</div>`;
 
                 container.innerHTML += eng.createSimpleCard('🔍 Execution Tracking', layoutHtml);
@@ -419,8 +479,9 @@
             const controlsBar = document.querySelector('.controls-bar');
             const modeToggleHTML = `
                 <div class="mode-toggle">
-                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force (Sort String Key)</button>
-                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Frequency Array Key)</button>
+                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute (Sort Key)</button>
+                    <button class="mode-btn" id="btn-better" onclick="setMode('better')">Better (HashMap Key)</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Array Key)</button>
                 </div>
             `;
             controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
@@ -431,8 +492,9 @@
             engine.stopPlay();
             mode = m;
             document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-better').classList.toggle('active', m === 'better');
             document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
-            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
+            engine.codeLines = m === 'brute' ? CODE_BRUTE : m === 'better' ? CODE_BETTER : CODE_OPTIMAL;
             engine._renderCodeBlock();
             engine.run();
         };

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Valid Parentheses</title>
     <meta name="description"
-        content="Interactive visualizer for LeetCode 20: Valid Parentheses (Brute Force String Replacement & Optimal Stack).">
+        content="Interactive visualizer for LeetCode 20: Valid Parentheses (Brute Force String Replace, Better Array Stack, Optimal Stack).">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
@@ -163,6 +163,8 @@
             color: var(--text-dim);
             text-transform: uppercase;
             letter-spacing: 1px;
+            width: 140%;
+            text-align: center;
         }
 
         .stack-item {
@@ -177,6 +179,7 @@
             font-weight: 700;
             color: var(--accent);
             animation: popDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
         }
 
         .stack-item.popping {
@@ -188,6 +191,14 @@
             font-size: 12px;
             font-weight: 600;
             padding: 20px 0;
+        }
+
+        .stack-idx {
+            position: absolute;
+            left: -30px;
+            font-size: 10px;
+            color: var(--text-dim);
+            top: 12px;
         }
 
         /* Brute Force String Box */
@@ -289,6 +300,8 @@
 <body>
     <script src="../../core/engine.js"></script>
     <script>
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
         const CODE_BRUTE = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
             { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isValid' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
@@ -302,27 +315,43 @@
             { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 's.length() == ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
-        ];
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
+
+        const CODE_BETTER = [
+            { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
+            { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isValid' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'tp', v: '        char' }, { t: 'br', v: '[] ' }, { t: 'v', v: 'stack ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'char' }, { t: 'br', v: '[' }, { t: 'v', v: 's.length()' }, { t: 'br', v: ']' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        int ' }, { t: 'v', v: 'top ' }, { t: 'op', v: '= ' }, { t: 'num', v: '-1' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'char ' }, { t: 'v', v: 'c : s.toCharArray()' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "'('" }, { t: 'v', v: ' || c == ' }, { t: 'str', v: "'{'" }, { t: 'v', v: ' || c == ' }, { t: 'str', v: "'['" }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'v', v: '                stack[++top] ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'c' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '            } else {' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'top == ' }, { t: 'num', v: '-1' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '                char ' }, { t: 'v', v: 't ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'stack[top--]' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "')'" }, { t: 'v', v: ' && t != ' }, { t: 'str', v: "'('" }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "'}'" }, { t: 'v', v: ' && t != ' }, { t: 'str', v: "'{'" }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "']'" }, { t: 'v', v: ' && t != ' }, { t: 'str', v: "'['" }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'top == ' }, { t: 'num', v: '-1' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] },
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
 
         const CODE_OPTIMAL = [
             { tokens: [{ t: 'kw', v: 'class ' }, { t: 'tp', v: 'Solution ' }, { t: 'br', v: '{' }] },
             { tokens: [{ t: 'kw', v: '    public ' }, { t: 'tp', v: 'boolean ' }, { t: 'fn', v: 'isValid' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String ' }, { t: 'v', v: 's' }, { t: 'br', v: ') {' }] },
             { tokens: [{ t: 'tp', v: '        Stack<Character> ' }, { t: 'v', v: 'stack ' }, { t: 'op', v: '= ' }, { t: 'kw', v: 'new ' }, { t: 'tp', v: 'Stack<>()' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'kw', v: '        for ' }, { t: 'br', v: '(' }, { t: 'tp', v: 'char ' }, { t: 'v', v: 'c : s.toCharArray()' }, { t: 'br', v: ') {' }] },
-            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "'('" }, { t: 'v', v: ' || c == ' }, { t: 'str', v: "'{'" }, { t: 'v', v: ' || c == ' }, { t: 'str', v: "'['" }, { t: 'br', v: ') {' }] },
-            { tokens: [{ t: 'v', v: '                stack.push(c)' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'kw', v: '            } else {' }] },
-            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'stack.isEmpty()' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'tp', v: '                char ' }, { t: 'v', v: 'top ' }, { t: 'op', v: '= ' }, { t: 'v', v: 'stack.pop()' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "')'" }, { t: 'v', v: ' && top != ' }, { t: 'str', v: "'('" }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "'}'" }, { t: 'v', v: ' && top != ' }, { t: 'str', v: "'{'" }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'kw', v: '                if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "']'" }, { t: 'v', v: ' && top != ' }, { t: 'str', v: "'['" }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'kw', v: '            if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "'('" }, { t: 'br', v: ') ' }, { t: 'v', v: 'stack.push(' }, { t: 'str', v: "')'" }, { t: 'v', v: ');' }] },
+            { tokens: [{ t: 'kw', v: '            else if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "'{'" }, { t: 'br', v: ') ' }, { t: 'v', v: 'stack.push(' }, { t: 'str', v: "'}'" }, { t: 'v', v: ');' }] },
+            { tokens: [{ t: 'kw', v: '            else if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'c == ' }, { t: 'str', v: "'['" }, { t: 'br', v: ') ' }, { t: 'v', v: 'stack.push(' }, { t: 'str', v: "']'" }, { t: 'v', v: ');' }] },
+            { tokens: [{ t: 'kw', v: '            else if ' }, { t: 'br', v: '(' }, { t: 'v', v: 'stack.isEmpty() || stack.pop() != c' }, { t: 'br', v: ') ' }, { t: 'kw', v: 'return false' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '        }' }] },
             { tokens: [{ t: 'kw', v: '        return ' }, { t: 'v', v: 'stack.isEmpty()' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
-        ];
+        ].map(line => { line.tokens.forEach(t => t.v = esc(t.v)); return line; });
 
         let mode = 'optimal';
 
@@ -352,6 +381,72 @@
             return steps;
         }
 
+        function generateBetterTrace(s) {
+            const steps = [];
+            let stack = new Array(s.length).fill('');
+            let top = -1;
+
+            steps.push({ line: 2, desc: `Initialize character array stack of size ${s.length}.`, i: -1, s, stack: [...stack], top, maxStack: stack.length });
+            steps.push({ line: 3, desc: `Initialize top pointer to -1.`, i: -1, s, stack: [...stack], top, maxStack: stack.length });
+
+            for (let i = 0; i < s.length; i++) {
+                const c = s[i];
+                steps.push({ line: 4, desc: `Loop i = ${i}, char = '${c}'`, i, s, stack: [...stack], top, action: 'scan', maxStack: stack.length });
+
+                if (c === '(' || c === '{' || c === '[') {
+                    steps.push({ line: 5, desc: `Char is an open parenthesis.`, i, s, stack: [...stack], top, action: 'check_open', maxStack: stack.length });
+                    top++;
+                    stack[top] = c;
+                    steps.push({ line: 6, desc: `stack[++top] = '${c}'. top is now ${top}.`, i, s, stack: [...stack], top, action: 'push', maxStack: stack.length });
+                } else {
+                    steps.push({ line: 7, desc: `Char is a close parenthesis. Check top.`, i, s, stack: [...stack], top, action: 'check_close', maxStack: stack.length });
+
+                    if (top === -1) {
+                        steps.push({ line: 8, desc: `top == -1 (Stack is empty). Cannot match '${c}'. Return false.`, i, s, stack: [...stack], top, action: 'invalid_empty', res: false, maxStack: stack.length });
+                        return steps;
+                    }
+
+                    steps.push({ line: 9, desc: `Stack is not empty. Get top element.`, i, s, stack: [...stack], top, action: 'pop_start', maxStack: stack.length });
+                    const t = stack[top];
+                    top--;
+
+                    // Modify stack copy to simulate pop for visualizer
+                    const visualStack = [...stack];
+                    for (let k = top + 1; k < visualStack.length; k++) visualStack[k] = '';
+
+                    steps.push({ line: 9, desc: `t = stack[top--]. t = '${t}', top is now ${top}.`, i, s, stack: [...visualStack], top, topChar: t, action: 'pop_done', maxStack: stack.length });
+
+                    let matchLine = 0;
+                    if (c === ')') matchLine = 10;
+                    if (c === '}') matchLine = 11;
+                    if (c === ']') matchLine = 12;
+
+                    let isMatch = false;
+                    if (c === ')' && t === '(') isMatch = true;
+                    if (c === '}' && t === '{') isMatch = true;
+                    if (c === ']' && t === '[') isMatch = true;
+
+                    if (!isMatch) {
+                        steps.push({ line: matchLine, desc: `Mismatch! Current '${c}' does NOT match popped '${t}'. Return false.`, i, s, stack: [...visualStack], top, topChar: t, action: 'invalid_mismatch', res: false, maxStack: stack.length });
+                        return steps;
+                    } else {
+                        steps.push({ line: matchLine, desc: `Match! Current '${c}' matches popped '${t}'. Continue.`, i, s, stack: [...visualStack], top, topChar: t, action: 'match_success', maxStack: stack.length });
+                    }
+                }
+            }
+
+            steps.push({ line: 15, desc: `Finished scanning string. Check if top == -1.`, i: -1, s, stack: [...stack], top, action: 'finish', maxStack: stack.length });
+
+            // Clean up stack for final render
+            const finalStack = [...stack];
+            for (let k = top + 1; k < finalStack.length; k++) finalStack[k] = '';
+
+            const res = top === -1;
+            steps.push({ line: 15, desc: `top is ${top}. ${res ? 'Stack IS empty. All matched!' : 'Stack is NOT empty (top != -1). Unmatched openers remain.'} Return ${res}.`, i: -1, s, stack: [...finalStack], top, action: 'finish', res, maxStack: stack.length });
+
+            return steps;
+        }
+
         function generateOptimalTrace(s) {
             const steps = [];
             const stack = [];
@@ -360,46 +455,41 @@
 
             for (let i = 0; i < s.length; i++) {
                 const c = s[i];
-                steps.push({ line: 4, desc: `Loop i = ${i}, char = '${c}'`, i, s, stack: [...stack], action: 'scan' });
+                steps.push({ line: 3, desc: `Loop i = ${i}, char = '${c}'`, i, s, stack: [...stack], action: 'scan' });
 
-                if (c === '(' || c === '{' || c === '[') {
-                    steps.push({ line: 4, desc: `Char is an open parenthesis.`, i, s, stack: [...stack], action: 'check_open' });
-                    stack.push(c);
-                    steps.push({ line: 5, desc: `Push '${c}' onto the stack.`, i, s, stack: [...stack], action: 'push' });
+                if (c === '(') {
+                    stack.push(')');
+                    steps.push({ line: 4, desc: `Found '('. Expected closing is ')'. Push ')' to stack.`, i, s, stack: [...stack], action: 'push' });
+                } else if (c === '{') {
+                    stack.push('}');
+                    steps.push({ line: 5, desc: `Found '{'. Expected closing is '}'. Push '}' to stack.`, i, s, stack: [...stack], action: 'push' });
+                } else if (c === '[') {
+                    stack.push(']');
+                    steps.push({ line: 6, desc: `Found '['. Expected closing is ']'. Push ']' to stack.`, i, s, stack: [...stack], action: 'push' });
                 } else {
-                    steps.push({ line: 6, desc: `Char is a close parenthesis. Check stack.`, i, s, stack: [...stack], action: 'check_close' });
+                    steps.push({ line: 7, desc: `Char is a close parenthesis '${c}'. Check stack.`, i, s, stack: [...stack], action: 'check_close' });
 
                     if (stack.length === 0) {
-                        steps.push({ line: 7, desc: `Stack is empty! Cannot match '${c}'. Return false.`, i, s, stack: [...stack], action: 'invalid_empty', res: false });
+                        steps.push({ line: 7, desc: `Stack is empty! Expected an opener before '${c}'. Return false.`, i, s, stack: [...stack], action: 'invalid_empty', res: false });
                         return steps;
                     }
 
-                    steps.push({ line: 8, desc: `Stack is not empty. Pop the top element.`, i, s, stack: [...stack], action: 'pop_start' });
+                    steps.push({ line: 7, desc: `Pop top of stack and compare with '${c}'.`, i, s, stack: [...stack], action: 'pop_start' });
                     const top = stack.pop();
-                    steps.push({ line: 8, desc: `Popped: top = '${top}'.`, i, s, stack: [...stack], topChar: top, action: 'pop_done' });
+                    steps.push({ line: 7, desc: `Popped '${top}'.`, i, s, stack: [...stack], topChar: top, action: 'pop_done' });
 
-                    let matchLine = 0;
-                    if (c === ')') matchLine = 9;
-                    if (c === '}') matchLine = 10;
-                    if (c === ']') matchLine = 11;
-
-                    let isMatch = false;
-                    if (c === ')' && top === '(') isMatch = true;
-                    if (c === '}' && top === '{') isMatch = true;
-                    if (c === ']' && top === '[') isMatch = true;
-
-                    if (!isMatch) {
-                        steps.push({ line: matchLine, desc: `Mismatch! Current '${c}' does NOT match popped '${top}'. Return false.`, i, s, stack: [...stack], topChar: top, action: 'invalid_mismatch', res: false });
+                    if (top !== c) {
+                        steps.push({ line: 7, desc: `Mismatch! Popped '${top}' != current '${c}'. Return false.`, i, s, stack: [...stack], topChar: top, action: 'invalid_mismatch', res: false });
                         return steps;
                     } else {
-                        steps.push({ line: matchLine, desc: `Match! Current '${c}' matches popped '${top}'. Continue.`, i, s, stack: [...stack], topChar: top, action: 'match_success' });
+                        steps.push({ line: 7, desc: `Match! Popped '${top}' == current '${c}'. Valid so far.`, i, s, stack: [...stack], topChar: top, action: 'match_success' });
                     }
                 }
             }
 
-            steps.push({ line: 14, desc: `Finished scanning string. Check if stack is empty.`, i: -1, s, stack: [...stack], action: 'finish' });
+            steps.push({ line: 9, desc: `Finished scanning string. Check if stack is empty.`, i: -1, s, stack: [...stack], action: 'finish' });
             const res = stack.length === 0;
-            steps.push({ line: 14, desc: `Stack ${res ? 'IS empty. All matched!' : 'is NOT empty. Unmatched openers remain.'} Return ${res}.`, i: -1, s, stack: [...stack], action: 'finish', res });
+            steps.push({ line: 9, desc: `Stack ${res ? 'IS empty. All matched!' : 'is NOT empty. Unmatched expected closures remain.'} Return ${res}.`, i: -1, s, stack: [...stack], action: 'finish', res });
 
             return steps;
         }
@@ -416,7 +506,9 @@
                 let s = document.getElementById('inputStr').value.replace(/[^()\[\]{}]/g, '');
                 if (!s) s = "{[()]}";
 
-                return mode === 'brute' ? generateBruteTrace(s) : generateOptimalTrace(s);
+                if (mode === 'brute') return generateBruteTrace(s);
+                if (mode === 'better') return generateBetterTrace(s);
+                return generateOptimalTrace(s);
             },
             onRenderStep: (step, container, eng) => {
                 let layoutHtml = `<div style="display:flex; flex-direction:column; gap: 20px;">`;
@@ -439,7 +531,7 @@
 
                     layoutHtml += `${varsHtml}${strHtml}${resHtml}`;
                 }
-                // If Optimal Mode
+                // If Optimal / Better Mode
                 else {
                     let sArrHtml = `<div class="array-container"><div class="array-row" id="sArr">`;
 
@@ -449,10 +541,6 @@
                             if (step.action === 'scan' || step.action === 'check_open' || step.action === 'check_close') cls = ' scanning';
                             if (step.action === 'invalid_empty' || step.action === 'invalid_mismatch') cls = ' mismatched';
                             if (step.action === 'match_success') cls = ' matched';
-                        }
-                        if (step.i > idx && step.action !== 'push' && !step.action?.startsWith('pop') && !step.action?.startsWith('match') && !step.action?.startsWith('invalid')) {
-                            // Elements already processed
-                            // Normally we don't hide them unless mapped to animation, but a fade on match highlights logic.
                         }
                         sArrHtml += `<div class="cell${cls}" id="cell-${idx}">${step.s[idx]}<div class="index-label">${idx}</div></div>`;
                     }
@@ -464,21 +552,31 @@
                     sArrHtml += `</div></div>`;
 
                     // Stack Render
-                    let stackHtml = `<div class="stack-container"><div class="stack-title">Stack</div>`;
-                    if (step.stack.length === 0 && step.action !== 'pop_start') stackHtml += `<div class="stack-empty">Empty</div>`;
+                    let drawStack = mode === 'better' ? step.stack.slice(0, step.top >= 0 ? step.top + 1 : 0) : [...step.stack];
 
-                    let drawStack = [...step.stack];
+                    let stackTitle = mode === 'better' ? 'char[] stack' : 'Stack&lt;Character&gt;';
+                    let stackHtml = `<div class="stack-container"><div class="stack-title">${stackTitle}</div>`;
+                    if (drawStack.length === 0 && step.action !== 'pop_start') stackHtml += `<div class="stack-empty">Empty</div>`;
+
                     if (step.action === 'pop_start') {
-                        // Keep popped item showing for animation
                         drawStack.push(step.topChar || '?');
                     }
 
                     for (let x = drawStack.length - 1; x >= 0; x--) {
+                        if (drawStack[x] === '') continue; // Skip empty slots in array stack visualization
                         let cls = '';
-                        if (step.action === 'push' && x === drawStack.length - 1) cls = ' stack-item popping'; // Animation re-used as popIn/Down basically
+                        if (step.action === 'push' && x === drawStack.length - 1) cls = ' stack-item popping';
                         if (step.action === 'pop_start' && x === drawStack.length - 1) cls = ' stack-item popping';
-                        stackHtml += `<div class="stack-item${cls ? cls : ''}">${drawStack[x]}</div>`;
+
+                        let idxLabel = mode === 'better' ? `<div class="stack-idx">${x}</div>` : '';
+                        stackHtml += `<div class="stack-item${cls ? cls : ''}">${drawStack[x]}${idxLabel}</div>`;
                     }
+
+                    // Show top pointer for better mode
+                    if (mode === 'better') {
+                        stackHtml += `<div style="position: absolute; bottom: 0; width: 100%; text-align: center; color: var(--accent); font-size: 10px; font-weight: bold; background: var(--bg3); padding: 4px; border-radius: 0 0 12px 12px;">top = ${step.top}</div>`;
+                    }
+
                     stackHtml += `</div>`;
 
                     let resHtml = '';
@@ -498,7 +596,7 @@
 
                 eng.highlightLine(step.line);
 
-                if (mode === 'optimal') {
+                if (mode !== 'brute') {
                     setTimeout(() => {
                         const ptr1 = document.getElementById('ptr1');
                         const sCell = document.getElementById('cell-' + step.i);
@@ -514,8 +612,9 @@
             const controlsBar = document.querySelector('.controls-bar');
             const modeToggleHTML = `
                 <div class="mode-toggle">
-                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force (String Replace)</button>
-                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Stack)</button>
+                    <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute (Replace "()")</button>
+                    <button class="mode-btn" id="btn-better" onclick="setMode('better')">Better (Array Stack)</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Java Stack)</button>
                 </div>
             `;
             controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
@@ -526,8 +625,9 @@
             engine.stopPlay();
             mode = m;
             document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-better').classList.toggle('active', m === 'better');
             document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
-            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
+            engine.codeLines = m === 'brute' ? CODE_BRUTE : m === 'better' ? CODE_BETTER : CODE_OPTIMAL;
             engine._renderCodeBlock();
             engine.run();
         };

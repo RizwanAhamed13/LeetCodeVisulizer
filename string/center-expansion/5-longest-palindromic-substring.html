@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Longest Palindromic Substring</title>
     <meta name="description"
-        content="Interactive visualizer for LeetCode 5: Longest Palindromic Substring (Brute Force & Optimal Center Expansion).">
+        content="Interactive visualizer for LeetCode 5: Longest Palindromic Substring (Brute Force, Better DP, Optimal Center Expansion).">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
@@ -137,6 +137,74 @@
             background: var(--red-bg, #fee2e2);
         }
 
+        /* DB Table for Better DP */
+        .dp-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px;
+        }
+
+        .dp-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--orange);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .dp-grid {
+            display: grid;
+            gap: 2px;
+            background: var(--border);
+            padding: 2px;
+            border-radius: 8px;
+        }
+
+        .dp-cell {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .dp-cell.header {
+            background: var(--bg3);
+            color: var(--text-dim);
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .dp-cell.true {
+            background: var(--emerald-light, #d1fae5);
+            color: var(--emerald);
+        }
+
+        .dp-cell.false {
+            background: var(--pink-light, #fce7f3);
+            color: var(--pink);
+        }
+
+        .dp-cell.active {
+            border: 2px solid var(--accent);
+            box-shadow: inset 0 0 0 1px var(--accent-light);
+            z-index: 10;
+            transform: scale(1.1);
+        }
+
+        .dp-cell.dep {
+            border: 2px dashed var(--orange);
+            background: var(--orange-light);
+        }
+
         .info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -248,6 +316,12 @@
             font-weight: 600;
             font-family: 'JetBrains Mono', monospace;
         }
+
+        .hl-yellow {
+            color: var(--yellow, #d97706);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
     </style>
 </head>
 
@@ -283,28 +357,54 @@
             { tokens: [{ t: 'br', v: '}' }] }
         ];
 
+        const CODE_BETTER = [
+            { tokens: [{ t: 'kw', v: 'class' }, { t: 'tp', v: ' Solution' }, { t: 'br', v: ' {' }] },
+            { tokens: [{ t: 'kw', v: '    public' }, { t: 'tp', v: ' String' }, { t: 'fn', v: ' longestPalindrome' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String' }, { t: '', v: ' s' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '        if' }, { t: 'br', v: ' (' }, { t: '', v: 's' }, { t: 'op', v: ' == ' }, { t: 'kw', v: 'null' }, { t: 'op', v: ' || ' }, { t: '', v: 's.length()' }, { t: 'op', v: ' <= ' }, { t: 'num', v: '1' }, { t: 'br', v: ')' }, { t: 'kw', v: ' return' }, { t: '', v: ' s' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        int' }, { t: '', v: ' n' }, { t: 'op', v: ' = ' }, { t: '', v: 's.length()' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        boolean' }, { t: '', v: '[][] dp' }, { t: 'op', v: ' = ' }, { t: 'kw', v: 'new' }, { t: 'tp', v: ' boolean' }, { t: 'br', v: '[' }, { t: '', v: 'n' }, { t: 'br', v: '][' }, { t: '', v: 'n' }, { t: 'br', v: ']' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '        String' }, { t: '', v: ' maxStr' }, { t: 'op', v: ' = ' }, { t: 'str', v: '""' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        for' }, { t: 'br', v: ' (' }, { t: 'tp', v: 'int' }, { t: '', v: ' diff' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: '', v: 'diff' }, { t: 'op', v: ' < ' }, { t: '', v: 'n' }, { t: 'op', v: '; ' }, { t: '', v: 'diff++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '            for' }, { t: 'br', v: ' (' }, { t: 'tp', v: 'int' }, { t: '', v: ' i' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: ', ' }, { t: '', v: 'j' }, { t: 'op', v: ' = ' }, { t: 'num', v: 'i' }, { t: 'op', v: ' + ' }, { t: '', v: 'diff' }, { t: 'op', v: '; ' }, { t: '', v: 'j' }, { t: 'op', v: ' < ' }, { t: '', v: 'n' }, { t: 'op', v: '; ' }, { t: '', v: 'i++' }, { t: 'op', v: ', ' }, { t: '', v: 'j++' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: 'kw', v: '                if' }, { t: 'br', v: ' (' }, { t: '', v: 'diff' }, { t: 'op', v: ' == ' }, { t: 'num', v: '0' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: '', v: '                    dp[i][j]' }, { t: 'op', v: ' = ' }, { t: 'kw', v: 'true' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '                }' }, { t: 'kw', v: ' else if' }, { t: 'br', v: ' (' }, { t: '', v: 'diff' }, { t: 'op', v: ' == ' }, { t: 'num', v: '1' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: '', v: '                    dp[i][j]' }, { t: 'op', v: ' = (' }, { t: '', v: 's.charAt(i)' }, { t: 'op', v: ' == ' }, { t: '', v: 's.charAt(j)' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '                }' }, { t: 'kw', v: ' else' }, { t: 'br', v: ' {' }] },
+            { tokens: [{ t: '', v: '                    dp[i][j]' }, { t: 'op', v: ' = (' }, { t: '', v: 's.charAt(i)' }, { t: 'op', v: ' == ' }, { t: '', v: 's.charAt(j)' }, { t: 'op', v: ' && ' }, { t: '', v: 'dp[i + ' }, { t: 'num', v: '1' }, { t: '', v: '][j - ' }, { t: 'num', v: '1' }, { t: 'br', v: '])' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '                }' }] },
+            { tokens: [{ t: 'kw', v: '                if' }, { t: 'br', v: ' (' }, { t: '', v: 'dp[i][j]' }, { t: 'op', v: ' && ' }, { t: '', v: 'j - i + ' }, { t: 'num', v: '1' }, { t: 'op', v: ' > ' }, { t: '', v: 'maxStr.length()' }, { t: 'br', v: ') {' }] },
+            { tokens: [{ t: '', v: '                    maxStr' }, { t: 'op', v: ' = ' }, { t: '', v: 's.substring(i, j + ' }, { t: 'num', v: '1' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '                }' }] },
+            { tokens: [{ t: 'br', v: '            }' }] },
+            { tokens: [{ t: 'br', v: '        }' }] },
+            { tokens: [{ t: 'kw', v: '        return' }, { t: '', v: ' maxStr' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'br', v: '    }' }] },
+            { tokens: [{ t: 'br', v: '}' }] }
+        ];
+
         const CODE_OPTIMAL = [
             { tokens: [{ t: 'kw', v: 'class' }, { t: 'tp', v: ' Solution' }, { t: 'br', v: ' {' }] },
             { tokens: [{ t: 'kw', v: '    public' }, { t: 'tp', v: ' String' }, { t: 'fn', v: ' longestPalindrome' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String' }, { t: '', v: ' s' }, { t: 'br', v: ') {' }] },
-            { tokens: [{ t: 'kw', v: '        if' }, { t: 'br', v: ' (' }, { t: '', v: 's' }, { t: 'op', v: ' == ' }, { t: 'kw', v: 'null' }, { t: 'op', v: ' || ' }, { t: '', v: 's.length()' }, { t: 'op', v: ' < ' }, { t: 'num', v: '1' }, { t: 'br', v: ')' }, { t: 'kw', v: ' return' }, { t: 'str', v: ' ""' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        if' }, { t: 'br', v: ' (' }, { t: '', v: 's' }, { t: 'op', v: ' == ' }, { t: 'kw', v: 'null' }, { t: 'op', v: ' || ' }, { t: '', v: 's.length()' }, { t: 'op', v: ' <= ' }, { t: 'num', v: '1' }, { t: 'br', v: ')' }, { t: 'kw', v: ' return' }, { t: '', v: ' s' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'tp', v: '        int' }, { t: '', v: ' start' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'tp', v: '        int' }, { t: '', v: ' end' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'kw', v: '        for' }, { t: 'br', v: ' (' }, { t: 'tp', v: 'int' }, { t: '', v: ' i' }, { t: 'op', v: ' = ' }, { t: 'num', v: '0' }, { t: 'op', v: '; ' }, { t: '', v: 'i' }, { t: 'op', v: ' < ' }, { t: '', v: 's.length()' }, { t: 'op', v: '; ' }, { t: '', v: 'i++' }, { t: 'br', v: ') {' }] },
             { tokens: [{ t: 'tp', v: '            int' }, { t: '', v: ' len1' }, { t: 'op', v: ' = ' }, { t: 'fn', v: 'expandFromCenter' }, { t: 'br', v: '(' }, { t: '', v: 's, i, i' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: 'tp', v: '            int' }, { t: '', v: ' len2' }, { t: 'op', v: ' = ' }, { t: 'fn', v: 'expandFromCenter' }, { t: 'br', v: '(' }, { t: '', v: 's, i, i + 1' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'tp', v: '            int' }, { t: '', v: ' len2' }, { t: 'op', v: ' = ' }, { t: 'fn', v: 'expandFromCenter' }, { t: 'br', v: '(' }, { t: '', v: 's, i, i + ' }, { t: 'num', v: '1' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'tp', v: '            int' }, { t: '', v: ' len' }, { t: 'op', v: ' = ' }, { t: 'fn', v: 'Math.max' }, { t: 'br', v: '(' }, { t: '', v: 'len1, len2' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'kw', v: '            if' }, { t: 'br', v: ' (' }, { t: '', v: 'len' }, { t: 'op', v: ' > ' }, { t: '', v: 'end - start' }, { t: 'br', v: ') {' }] },
-            { tokens: [{ t: '', v: '                start' }, { t: 'op', v: ' = ' }, { t: '', v: 'i - (len - 1) / 2' }, { t: 'op', v: ';' }] },
-            { tokens: [{ t: '', v: '                end' }, { t: 'op', v: ' = ' }, { t: '', v: 'i + len / 2' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: '', v: '                start' }, { t: 'op', v: ' = ' }, { t: '', v: 'i - (' }, { t: '', v: 'len - ' }, { t: 'num', v: '1' }, { t: 'br', v: ')' }, { t: 'op', v: ' / ' }, { t: 'num', v: '2' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: '', v: '                end' }, { t: 'op', v: ' = ' }, { t: '', v: 'i + len / ' }, { t: 'num', v: '2' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '            }' }] },
             { tokens: [{ t: 'br', v: '        }' }] },
-            { tokens: [{ t: 'kw', v: '        return' }, { t: '', v: ' s.substring' }, { t: 'br', v: '(' }, { t: '', v: 'start, end + 1' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        return' }, { t: '', v: ' s.substring' }, { t: 'br', v: '(' }, { t: '', v: 'start, end + ' }, { t: 'num', v: '1' }, { t: 'br', v: ')' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'kw', v: '    private' }, { t: 'tp', v: ' int' }, { t: 'fn', v: ' expandFromCenter' }, { t: 'br', v: '(' }, { t: 'tp', v: 'String' }, { t: '', v: ' s, ' }, { t: 'tp', v: 'int' }, { t: '', v: ' left, ' }, { t: 'tp', v: 'int' }, { t: '', v: ' right' }, { t: 'br', v: ') {' }] },
             { tokens: [{ t: 'kw', v: '        while' }, { t: 'br', v: ' (' }, { t: '', v: 'left' }, { t: 'op', v: ' >= ' }, { t: 'num', v: '0' }, { t: 'op', v: ' && ' }, { t: '', v: 'right' }, { t: 'op', v: ' < ' }, { t: '', v: 's.length()' }, { t: 'op', v: ' && ' }, { t: '', v: 's.charAt(left)' }, { t: 'op', v: ' == ' }, { t: '', v: 's.charAt(right)' }, { t: 'br', v: ') {' }] },
             { tokens: [{ t: '', v: '            left' }, { t: 'op', v: '--' }, { t: 'op', v: '; ' }, { t: '', v: 'right' }, { t: 'op', v: '++' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '        }' }] },
-            { tokens: [{ t: 'kw', v: '        return' }, { t: '', v: ' right - left - 1' }, { t: 'op', v: ';' }] },
+            { tokens: [{ t: 'kw', v: '        return' }, { t: '', v: ' right - left - ' }, { t: 'num', v: '1' }, { t: 'op', v: ';' }] },
             { tokens: [{ t: 'br', v: '    }' }] },
             { tokens: [{ t: 'br', v: '}' }] },
         ].map(line => {
@@ -316,7 +416,7 @@
 
         function generateBruteTrace(s) {
             const steps = [];
-            if (!s || s.length <= 1) { steps.push({ codeLine: 2, desc: 'Length <= 1. Return immediately.', vars: {}, charStates: [] }); return steps; }
+            if (!s || s.length <= 1) { steps.push({ codeLine: 3, desc: 'Length <= 1. Return immediately.', vars: {}, charStates: [] }); return steps; }
             let maxLen = 1;
             let maxStr = s.substring(0, 1);
 
@@ -324,7 +424,7 @@
 
             for (let i = 0; i < s.length; i++) {
                 const cs = new Array(s.length).fill('default'); cs[i] = 'pointer-i';
-                steps.push({ codeLine: 5, desc: `Outer loop <span class="hl-cyan">i = ${i}</span>`, vars: { i, j: '-', maxLen, left: '-', right: '-' }, charStates: cs, bp: maxStr });
+                steps.push({ codeLine: 6, desc: `Outer loop <span class="hl-yellow">i = ${i}</span>`, vars: { i, j: '-', maxLen, left: '-', right: '-' }, charStates: cs, bp: maxStr });
 
                 for (let j = i + maxLen; j < s.length; j++) {
                     const st = new Array(s.length).fill('default'); st[i] = 'pointer-i'; st[j] = 'pointer-j';
@@ -333,7 +433,7 @@
                     let left = i, right = j;
                     let isPal = true;
 
-                    steps.push({ codeLine: 16, desc: `Call helper isPalindrome(s, ${left}, ${right}).`, vars: { i, j, maxLen, left, right }, charStates: [...st], bp: maxStr });
+                    steps.push({ codeLine: 8, desc: `Call helper isPalindrome(s, ${left}, ${right}).`, vars: { i, j, maxLen, left, right }, charStates: [...st], bp: maxStr });
 
                     while (left < right) {
                         const checkSt = [...st];
@@ -343,12 +443,12 @@
                         if (s.charAt(left) !== s.charAt(right)) {
                             isPal = false;
                             checkSt[left] = 'mismatch'; checkSt[right] = 'mismatch';
-                            steps.push({ codeLine: 18, desc: `'${s.charAt(left)}' != '${s.charAt(right)}'. Mismatch!`, vars: { i, j, maxLen, left, right }, charStates: checkSt, bp: maxStr });
+                            steps.push({ codeLine: 19, desc: `'${s.charAt(left)}' != '${s.charAt(right)}'. Mismatch!`, vars: { i, j, maxLen, left, right }, charStates: checkSt, bp: maxStr });
                             break;
                         }
 
                         checkSt[left] = 'matched'; checkSt[right] = 'matched';
-                        steps.push({ codeLine: 19, desc: `'${s.charAt(left)}' == '${s.charAt(right)}'. Match! Move inwards.`, vars: { i, j, maxLen, left, right }, charStates: checkSt, bp: maxStr });
+                        steps.push({ codeLine: 20, desc: `'${s.charAt(left)}' == '${s.charAt(right)}'. Match! Move inwards.`, vars: { i, j, maxLen, left, right }, charStates: checkSt, bp: maxStr });
                         left++;
                         right--;
                     }
@@ -356,7 +456,7 @@
                     if (isPal) {
                         const bs = [...st];
                         for (let k = i; k <= j; k++) bs[k] = 'best-palindrome';
-                        steps.push({ codeLine: 21, desc: `Substring is a palindrome! return true.`, vars: { i, j, maxLen, left: '-', right: '-' }, charStates: bs, bp: maxStr });
+                        steps.push({ codeLine: 22, desc: `Substring is a palindrome! return true.`, vars: { i, j, maxLen, left: '-', right: '-' }, charStates: bs, bp: maxStr });
 
                         let curLen = j - i + 1;
                         maxLen = curLen;
@@ -370,13 +470,58 @@
             const startIndex = s.indexOf(maxStr);
             for (let k = startIndex; k < startIndex + maxLen; k++) fs[k] = 'best-palindrome';
 
-            steps.push({ codeLine: 13, desc: `Return "<span class="hl-purple">${maxStr}</span>"`, vars: { i: '-', j: '-', maxLen, left: '-', right: '-' }, charStates: fs, bp: maxStr, finalResult: maxStr });
+            steps.push({ codeLine: 14, desc: `Return "<span class="hl-purple">${maxStr}</span>"`, vars: { i: '-', j: '-', maxLen, left: '-', right: '-' }, charStates: fs, bp: maxStr, finalResult: maxStr });
+            return steps;
+        }
+
+        function generateBetterTrace(s) {
+            const steps = [];
+            const n = s.length;
+            if (n <= 1) { steps.push({ codeLine: 3, desc: 'Length <= 1. Return immediately.', vars: {}, charStates: [] }); return steps; }
+
+            let dp = Array(n).fill(null).map(() => Array(n).fill(false));
+            let maxStr = s.substring(0, 1);
+            dp[0][0] = true; // Just for initial visualize if needed
+
+            steps.push({ codeLine: 5, desc: `Initialize <span class="hl-cyan">dp table</span> of size ${n}x${n}`, vars: { diff: '-', i: '-', j: '-', maxStr }, charStates: new Array(n).fill('default'), dp, bp: maxStr });
+
+            for (let diff = 0; diff < n; diff++) {
+                steps.push({ codeLine: 7, desc: `Outer loop <span class="hl-purple">diff = ${diff}</span> (substring length = diff + 1)`, vars: { diff, i: '-', j: '-', maxStr }, charStates: new Array(n).fill('default'), dp: dp.map(r => [...r]), bp: maxStr });
+
+                for (let i = 0, j = i + diff; j < n; i++, j++) {
+                    const cs = new Array(n).fill('default'); cs[i] = 'pointer-i'; cs[j] = 'pointer-j';
+
+                    if (diff === 0) {
+                        dp[i][j] = true;
+                        steps.push({ codeLine: 10, desc: `Substrings of length 1 (diff=0) are always palindromes. dp[${i}][${j}] = true`, vars: { diff, i, j, maxStr }, charStates: cs, dp: dp.map(r => [...r]), activeDp: [i, j], bp: maxStr });
+                    } else if (diff === 1) {
+                        dp[i][j] = s[i] === s[j];
+                        steps.push({ codeLine: 12, desc: `Substrings of length 2 (diff=1). Compare '${s[i]}' and '${s[j]}'. dp[${i}][${j}] = ${dp[i][j]}`, vars: { diff, i, j, maxStr }, charStates: cs, dp: dp.map(r => [...r]), activeDp: [i, j], bp: maxStr });
+                    } else {
+                        dp[i][j] = (s[i] === s[j]) && dp[i + 1][j - 1];
+                        steps.push({ codeLine: 14, desc: `Check ends '${s[i]}' == '${s[j]}' AND inner dp[${i + 1}][${j - 1}]. dp[${i}][${j}] = ${dp[i][j]}`, vars: { diff, i, j, maxStr }, charStates: cs, dp: dp.map(r => [...r]), activeDp: [i, j], depDp: [i + 1, j - 1], bp: maxStr });
+                    }
+
+                    if (dp[i][j] && (j - i + 1 > maxStr.length)) {
+                        maxStr = s.substring(i, j + 1);
+                        const bs = new Array(n).fill('default');
+                        for (let k = i; k <= j; k++) bs[k] = 'best-palindrome';
+                        steps.push({ codeLine: 17, desc: `New longest palindrome found: <span class="hl-cyan">"${maxStr}"</span>`, vars: { diff, i, j, maxStr }, charStates: bs, dp: dp.map(r => [...r]), bp: maxStr });
+                    }
+                }
+            }
+
+            const fs = new Array(n).fill('default');
+            const startIndex = s.indexOf(maxStr);
+            for (let k = startIndex; k < startIndex + maxStr.length; k++) fs[k] = 'best-palindrome';
+
+            steps.push({ codeLine: 21, desc: `Return "<span class="hl-purple">${maxStr}</span>"`, vars: { diff: '-', i: '-', j: '-', maxStr }, charStates: fs, dp: dp.map(r => [...r]), bp: maxStr, finalResult: maxStr });
             return steps;
         }
 
         function generateOptimalTrace(s) {
             const steps = [];
-            if (!s || s.length < 1) { steps.push({ codeLine: 2, desc: 'Empty input — return ""', vars: {}, charStates: [] }); return steps; }
+            if (!s || s.length < 1) { steps.push({ codeLine: 3, desc: 'Empty input — return ""', vars: {}, charStates: [] }); return steps; }
             let start = 0, end = 0;
             steps.push({ codeLine: 4, desc: 'Initialize <span class="hl-cyan">start = 0</span>, <span class="hl-cyan">end = 0</span>', vars: { start: 0, end: 0, i: '-', left: '-', right: '-', len1: '-', len2: '-', len: '-' }, charStates: new Array(s.length).fill('default'), bp: s.substring(start, end + 1) });
 
@@ -387,15 +532,15 @@
                 const odd = traceExpand(s, i, i);
                 odd.steps.forEach(st => { st.vars.start = start; st.vars.end = end; st.vars.i = i; st.bp = s.substring(start, end + 1); steps.push(st); });
                 const len1 = odd.result;
-                steps.push({ codeLine: 6, desc: `Odd expansion: <span class="hl-emerald">len1 = ${len1}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2: '-', len: '-' }, charStates: odd.matched, bp: s.substring(start, end + 1) });
+                steps.push({ codeLine: 7, desc: `Odd expansion: <span class="hl-emerald">len1 = ${len1}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2: '-', len: '-' }, charStates: odd.matched, bp: s.substring(start, end + 1) });
 
                 const even = traceExpand(s, i, i + 1);
                 even.steps.forEach(st => { st.vars.start = start; st.vars.end = end; st.vars.i = i; st.bp = s.substring(start, end + 1); steps.push(st); });
                 const len2 = even.result;
-                steps.push({ codeLine: 7, desc: `Even expansion: <span class="hl-emerald">len2 = ${len2}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2, len: '-' }, charStates: even.matched, bp: s.substring(start, end + 1) });
+                steps.push({ codeLine: 8, desc: `Even expansion: <span class="hl-emerald">len2 = ${len2}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2, len: '-' }, charStates: even.matched, bp: s.substring(start, end + 1) });
 
                 const len = Math.max(len1, len2);
-                steps.push({ codeLine: 8, desc: `<span class="hl-purple">len = max(${len1}, ${len2}) = ${len}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2, len }, charStates: new Array(s.length).fill('default'), bp: s.substring(start, end + 1) });
+                steps.push({ codeLine: 9, desc: `<span class="hl-purple">len = max(${len1}, ${len2}) = ${len}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2, len }, charStates: new Array(s.length).fill('default'), bp: s.substring(start, end + 1) });
 
                 if (len > end - start) {
                     const os = start, oe = end;
@@ -405,12 +550,12 @@
                     for (let k = start; k <= end; k++) bs[k] = 'best-palindrome';
                     steps.push({ codeLine: 11, desc: `New best! <span class="hl-purple">len ${len} > ${oe - os}</span> → <span class="hl-cyan">start=${start}, end=${end}</span> → "<span class="hl-purple">${s.substring(start, end + 1)}</span>"`, vars: { start, end, i, left: '-', right: '-', len1, len2, len }, charStates: bs, bp: s.substring(start, end + 1) });
                 } else {
-                    steps.push({ codeLine: 9, desc: `No update: <span class="hl-cyan">len ${len} ≤ ${end - start}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2, len }, charStates: new Array(s.length).fill('default'), bp: s.substring(start, end + 1) });
+                    steps.push({ codeLine: 10, desc: `No update: <span class="hl-cyan">len ${len} ≤ ${end - start}</span>`, vars: { start, end, i, left: '-', right: '-', len1, len2, len }, charStates: new Array(s.length).fill('default'), bp: s.substring(start, end + 1) });
                 }
             }
             const fs = new Array(s.length).fill('default');
             for (let k = start; k <= end; k++) fs[k] = 'best-palindrome';
-            steps.push({ codeLine: 14, desc: `Return "<span class="hl-purple">${s.substring(start, end + 1)}</span>"`, vars: { start, end }, charStates: fs, bp: s.substring(start, end + 1), finalResult: s.substring(start, end + 1) });
+            steps.push({ codeLine: 15, desc: `Return "<span class="hl-purple">${s.substring(start, end + 1)}</span>"`, vars: { start, end }, charStates: fs, bp: s.substring(start, end + 1), finalResult: s.substring(start, end + 1) });
             return steps;
         }
 
@@ -420,24 +565,22 @@
             const es = new Array(s.length).fill('default');
             if (left >= 0 && left < s.length) es[left] = 'pointer-left';
             if (right >= 0 && right < s.length) es[right] = right === left ? 'pointer-left' : 'pointer-right';
-            steps.push({ codeLine: 16, desc: `${label}: <span class="hl-emerald">expandFromCenter(s, ${iL}, ${iR})</span>`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: es });
+            steps.push({ codeLine: 17, desc: `${label}: <span class="hl-emerald">expandFromCenter(s, ${iL}, ${iR})</span>`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: es });
             let matched = new Array(s.length).fill('default');
             while (left >= 0 && right < s.length && s[left] === s[right]) {
                 const st = new Array(s.length).fill('default');
                 st[left] = 'pointer-left'; if (right !== left) st[right] = 'pointer-right';
                 for (let k = left; k <= right; k++) if (k !== left && k !== right) st[k] = 'matched';
                 matched = [...st];
-                steps.push({ codeLine: 17, desc: `Match! s[${left}]='<span class="hl-emerald">${s[left]}</span>' == s[${right}]='<span class="hl-emerald">${s[right]}</span>'`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: st });
+                steps.push({ codeLine: 18, desc: `Match! s[${left}]='<span class="hl-emerald">${s[left]}</span>' == s[${right}]='<span class="hl-emerald">${s[right]}</span>'`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: st });
                 left--; right++;
             }
-            if (left >= 0 && right < s.length) {
-                const st = [...matched]; if (left >= 0 && left < s.length) st[left] = 'mismatch'; if (right < s.length) st[right] = 'mismatch';
-                steps.push({ codeLine: 17, desc: `Mismatch: s[${left}]='${s[left]}' ≠ s[${right}]='${s[right]}'`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: st });
-            } else {
-                steps.push({ codeLine: 17, desc: `Out of bounds (left=${left}, right=${right})`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: matched });
+            if (left >= 0 || right < s.length) { // we usually always mismatch or go out of bounds
+                const st = [...matched]; if (left >= 0 && left < s.length) st[left] = 'mismatch'; if (right >= 0 && right < s.length) st[right] = 'mismatch';
+                steps.push({ codeLine: 18, desc: (left < 0 || right >= s.length) ? `Out of bounds (left=${left}, right=${right})` : `Mismatch: s[${left}]='${s[left]}' ≠ s[${right}]='${s[right]}'`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: st });
             }
             const res = right - left - 1;
-            steps.push({ codeLine: 20, desc: `Return <span class="hl-cyan">${right} - ${left} - 1 = ${res}</span>`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: matched });
+            steps.push({ codeLine: 21, desc: `Return <span class="hl-cyan">${right} - ${left} - 1 = ${res}</span>`, vars: { left, right, len1: '-', len2: '-', len: '-' }, charStates: matched });
             return { steps, result: res, matched };
         }
 
@@ -453,7 +596,10 @@
                 let s = document.getElementById('inputStr').value.trim();
                 if (!s) s = "babad";
                 window.engineCache = { s };
-                return mode === 'brute' ? generateBruteTrace(s) : generateOptimalTrace(s);
+
+                if (mode === 'brute') return generateBruteTrace(s);
+                if (mode === 'better') return generateBetterTrace(s);
+                return generateOptimalTrace(s);
             },
             onRenderStep: (step, container, eng) => {
                 const s = window.engineCache.s;
@@ -474,6 +620,35 @@
 
                 container.innerHTML += eng.createZoomableCard('str_container', '📝 String (Zoomable)', strHtml, '140px');
 
+                // DP Table Render if Better mode
+                if (mode === 'better' && step.dp) {
+                    let n = step.dp.length;
+                    let dpHtml = `<div class="dp-container"><div class="dp-title">boolean[][] dp Table</div><div class="dp-grid" style="grid-template-columns: 24px repeat(${n}, 32px);">`;
+
+                    // Empty top-left
+                    dpHtml += `<div class="dp-cell" style="background:transparent; border:none;"></div>`;
+                    // Column headers
+                    for (let j = 0; j < n; j++) dpHtml += `<div class="dp-cell header">${j}</div>`;
+
+                    for (let i = 0; i < n; i++) {
+                        // Row header
+                        dpHtml += `<div class="dp-cell header">${i}</div>`;
+                        for (let j = 0; j < n; j++) {
+                            let val = step.dp[i][j];
+                            let cls = val === true ? 'true' : (val === false ? 'false' : '');
+                            let displayVal = val === true ? 'T' : (val === false ? 'F' : '-');
+
+                            if (step.activeDp && step.activeDp[0] === i && step.activeDp[1] === j) cls += ' active';
+                            if (step.depDp && step.depDp[0] === i && step.depDp[1] === j) cls += ' dep';
+
+                            dpHtml += `<div class="dp-cell ${cls}">${displayVal}</div>`;
+                        }
+                    }
+                    dpHtml += `</div></div>`;
+                    container.innerHTML += eng.createSimpleCard('🧮 DP Table', dpHtml);
+                }
+
+
                 // Variables
                 const v = step.vars || {};
                 let varsHtml = `<div class="info-grid">`;
@@ -486,6 +661,13 @@
                         { k: 'j', l: 'j', c: 'orange' },
                         { k: 'left', l: 'left', c: 'emerald' },
                         { k: 'right', l: 'right', c: 'pink' }
+                    ];
+                } else if (mode === 'better') {
+                    varConfigs = [
+                        { k: 'maxStr', l: 'maxStr', c: 'purple' },
+                        { k: 'diff', l: 'diff', c: 'orange' },
+                        { k: 'i', l: 'i', c: 'yellow' },
+                        { k: 'j', l: 'j', c: 'pink' }
                     ];
                 } else {
                     varConfigs = [
@@ -528,7 +710,8 @@
             const modeToggleHTML = `
                 <div class="mode-toggle">
                     <button class="mode-btn" id="btn-brute" onclick="setMode('brute')">Brute Force</button>
-                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Center Expansion)</button>
+                    <button class="mode-btn" id="btn-better" onclick="setMode('better')">Better (Dynamic Prog)</button>
+                    <button class="mode-btn active" id="btn-optimal" onclick="setMode('optimal')">Optimal (Center Expand)</button>
                 </div>
             `;
             controlsBar.insertAdjacentHTML('afterbegin', modeToggleHTML);
@@ -540,9 +723,10 @@
             engine.stopPlay();
             mode = m;
             document.getElementById('btn-brute').classList.toggle('active', m === 'brute');
+            document.getElementById('btn-better').classList.toggle('active', m === 'better');
             document.getElementById('btn-optimal').classList.toggle('active', m === 'optimal');
 
-            engine.codeLines = m === 'brute' ? CODE_BRUTE : CODE_OPTIMAL;
+            engine.codeLines = m === 'brute' ? CODE_BRUTE : m === 'better' ? CODE_BETTER : CODE_OPTIMAL;
             engine._renderCodeBlock();
             engine.run();
         };
